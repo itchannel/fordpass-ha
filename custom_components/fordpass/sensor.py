@@ -16,8 +16,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     snrarray = [ "odometer"]
     sensors = []
     for snr in snrarray:
-        sensors.append(CarSensor(entry, snr))
-    async_add_entities(sensors, False)
+        async_add_entities([CarSensor(entry, snr)], False)
 
 
 
@@ -45,7 +44,7 @@ class CarSensor(FordPassEntity,Entity):
     
     @property
     def state(self):
-        return self.state
+        return self._state
 
     @property
     def device_id(self):
