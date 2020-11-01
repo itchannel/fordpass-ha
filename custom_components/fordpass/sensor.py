@@ -4,7 +4,7 @@ from homeassistant.helpers.entity import Entity
 
 from . import FordPassEntity
 from .const import DOMAIN
-from datatime import timedelta
+from datetime import timedelta
 
 
 _LOGGER = logging.getLogger(__name__)
