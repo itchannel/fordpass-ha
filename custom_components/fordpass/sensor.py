@@ -29,6 +29,7 @@ class CarSensor(FordPassEntity,Entity):
         self.coordinator = coordinator
         self._device_id = "fordpass_" + sensor
         self._state = None
+        self._measurement = None
 
     async def async_update(self):
         await self.coordinator.async_request_refresh()
