@@ -37,10 +37,12 @@ class CarSensor(FordPassEntity,Entity):
             
         if self.sensor ==  "odometer":
             self._state = self.coordinator.data[self.sensor]["value"]
+            self._measurement = "km"
             for key, value in self.coordinator.data[self.sensor].items():
                 self._attr[key] = value
         elif self.sensor == "fuel":
             self._state = self.coordinator.data[self.sensor]["fuelLevel"]
+            self._measurement = "L"
             for key, value in self.coordinator.data[self.sensor].items():
                 self._attr[key] = value
         elif self.sensor == "battery":
@@ -74,6 +76,10 @@ class CarSensor(FordPassEntity,Entity):
     @property
     def device_state_attributes(self):
         return self._attr
+
+    @property
+    def unit_of_measurement(self):
+        return self._measurement
 
 
         
