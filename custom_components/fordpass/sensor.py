@@ -68,6 +68,14 @@ class CarSensor(FordPassEntity,Entity):
             self._state = self.coordinator.data[self.sensor]["value"]
             for key, value in self.coordinator.data[self.sensor].items():
                 self._attr[key] = value
+        elif self.sensor == "doorStatus":
+            doorstr = "Closed"
+            for door in self.coordinator.data[self.sensor]:
+                if door["value"] != "Closed":
+                   doorstr = "Open"
+            for key,value in self.coordinator.data[self.sensor].items():
+                self._attr["key"] = value["value"]
+
     
 
     @property
