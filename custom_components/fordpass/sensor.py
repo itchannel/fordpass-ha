@@ -45,8 +45,6 @@ class CarSensor(FordPassEntity,Entity):
                 self._attr[key] = value
         elif self.sensor == "battery":
             self._state = self.coordinator.data[self.sensor]["batteryHealth"]["value"]
-            for key, value in self.coordinator.data[self.sensor].items():
-                self._attr[key] = value
         elif self.sensor == "oil":
             self._state = self.coordinator.data[self.sensor]["oilLife"]
             for key, value in self.coordinator.data[self.sensor].items():
