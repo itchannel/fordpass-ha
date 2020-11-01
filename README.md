@@ -30,4 +30,5 @@ Use HACS and add as a custom repo. Once installed you will be presented with a c
 - Code tidy up
 - Individual door statuses
 - Alarm event
-- Potentially Starting the car
+- Potentially Starting the carModofi
+- Window Status
