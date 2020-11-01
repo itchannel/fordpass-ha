@@ -13,7 +13,7 @@ SCAN_INTERVAL = timedelta(seconds=300)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the lock from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id]
-    snrarray = [ "odometer", "fuel", "battery", "oil", "tirePressure"]
+    snrarray = [ "odometer", "fuel", "battery", "oil", "tirePressure", "gps"]
     sensors = []
     for snr in snrarray:
         async_add_entities([CarSensor(entry, snr)], True)
@@ -27,7 +27,7 @@ class CarSensor(FordPassEntity,Entity):
         self.sensor = sensor
         self._attr = {}
         self.coordinator = coordinator
-        self._device_id = sensor
+        self._device_id = "fordpass_" + sensor
         #TEST
         self._state = None
 
@@ -43,15 +43,17 @@ class CarSensor(FordPassEntity,Entity):
             self._state = self.coordinator.data[self.sensor]["value"]
         elif self.sensor == "fuel":
             self._state = self.coordinator.data[self.sensor]["fuelLevel"]
-            for key, value in self.coordinator.data[self.sensor].items():
-                self._attr[key] = value
         elif self.sensor == "battery":
             self._state = self.coordinator.data[self.sensor]["batteryHealth"]["value"]
         elif self.sensor == "oil":
             self._state = self.coordinator.data[self.sensor]["oilLife"]
         elif self.sensor == "tirePressure":
             self._state = self.coordinator.data[self.sensor]["value"]
-
+        elif self.sensor == "gps":
+            self._state = self.coordinator.data[self.sensor]["gpsState"]
+        #Show any attributes with each item    
+        for key, value in self.coordinator.data[self.sensor].items():
+                self._attr[key] = value
 
     @property
     def name(self):
