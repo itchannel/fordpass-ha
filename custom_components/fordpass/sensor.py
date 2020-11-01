@@ -24,7 +24,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class CarSensor(FordPassEntity,Entity):
     def __init__(self, coordinator, sensor):
-        self.sensor = sensor
+        self.sensor = "fordpass_" + sensor
         self._attr = {}
         self.coordinator = coordinator
         self._device_id = "fordpass_" + sensor
@@ -45,10 +45,14 @@ class CarSensor(FordPassEntity,Entity):
                 self._attr[key] = value
         elif self.sensor == "fuel":
             self._state = self.coordinator.data[self.sensor]["fuelLevel"]
+            for key, value in self.coordinator.data[self.sensor].items():
+                self._attr[key] = value
         elif self.sensor == "battery":
             self._state = self.coordinator.data[self.sensor]["batteryHealth"]["value"]
         elif self.sensor == "oil":
             self._state = self.coordinator.data[self.sensor]["oilLife"]
+            for key, value in self.coordinator.data[self.sensor].items():
+                self._attr[key] = value
         elif self.sensor == "tirePressure":
             self._state = self.coordinator.data[self.sensor]["value"]
         elif self.sensor == "gps":
