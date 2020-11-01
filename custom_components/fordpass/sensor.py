@@ -41,6 +41,8 @@ class CarSensor(FordPassEntity,Entity):
         #May need to improve this
         if self.sensor ==  "odometer":
             self._state = self.coordinator.data[self.sensor]["value"]
+            for key, value in self.coordinator.data[self.sensor].items():
+                self._attr[key] = value
         elif self.sensor == "fuel":
             self._state = self.coordinator.data[self.sensor]["fuelLevel"]
         elif self.sensor == "battery":
@@ -51,9 +53,9 @@ class CarSensor(FordPassEntity,Entity):
             self._state = self.coordinator.data[self.sensor]["value"]
         elif self.sensor == "gps":
             self._state = self.coordinator.data[self.sensor]["gpsState"]
-        #Show any attributes with each item    
-        for key, value in self.coordinator.data[self.sensor].items():
+            for key, value in self.coordinator.data[self.sensor].items():
                 self._attr[key] = value
+    
 
     @property
     def name(self):
