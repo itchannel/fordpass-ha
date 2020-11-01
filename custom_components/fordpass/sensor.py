@@ -17,7 +17,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     sensors = []
     for snr in snrarray:
         sensors.append(CarSensor(entry, snr))
-    async_add_entities(sensors, True)
+    async_add_entities(sensors, False)
 
 
 
