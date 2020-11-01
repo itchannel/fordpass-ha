@@ -28,17 +28,13 @@ class CarSensor(FordPassEntity,Entity):
         self._attr = {}
         self.coordinator = coordinator
         self._device_id = "fordpass_" + sensor
-        #TEST
         self._state = None
 
     async def async_update(self):
         await self.coordinator.async_request_refresh()
-        #Sensor check 1
         if self.coordinator.data is None or self.coordinator.data[self.sensor] is None:
             return None
             
-
-        #May need to improve this
         if self.sensor ==  "odometer":
             self._state = self.coordinator.data[self.sensor]["value"]
             for key, value in self.coordinator.data[self.sensor].items():
