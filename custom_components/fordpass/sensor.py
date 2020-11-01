@@ -4,8 +4,11 @@ from homeassistant.helpers.entity import Entity
 
 from . import FordPassEntity
 from .const import DOMAIN
+from datatime import timedelta
+
 
 _LOGGER = logging.getLogger(__name__)
+SCAN_INTERVAL = timedelta(seconds=300)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the lock from the config."""
