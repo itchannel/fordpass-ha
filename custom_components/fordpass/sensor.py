@@ -13,7 +13,7 @@ SCAN_INTERVAL = timedelta(seconds=300)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the lock from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id]
-    snrarray = [ "odometer", "fuel", "battery", "oil", "tirePressure", "gps", "alarm", "ignition"]
+    snrarray = [ "odometer", "fuel", "battery", "oil", "tirePressure", "gps", "alarm", "ignitionStatus"]
     sensors = []
     for snr in snrarray:
         async_add_entities([CarSensor(entry, snr)], True)
@@ -64,7 +64,7 @@ class CarSensor(FordPassEntity,Entity):
             self._state = self.coordinator.data[self.sensor]["value"]
             for key, value in self.coordinator.data[self.sensor].items():
                 self._attr[key] = value
-        elif self.sensor == "ignition":
+        elif self.sensor == "ignitionStatus":
             self._state = self.coordinator.data[self.sensor]["value"]
             for key, value in self.coordinator.data[self.sensor].items():
                 self._attr[key] = value

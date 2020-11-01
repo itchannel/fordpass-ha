@@ -21,6 +21,8 @@ Use HACS and add as a custom repo. Once installed you will be presented with a c
 - Last known GPS Coordinates/Map
 - Tyre Status
 - Battery Status
+- Ignition Status
+- Alarm Status
 
 
 ## Coming Soon
@@ -28,6 +30,4 @@ Use HACS and add as a custom repo. Once installed you will be presented with a c
 - Code tidy up
 - Individual door statuses
 - Alarm event
-- Ignition Status
-- Alarm Status
 - Potentially Starting the car
