@@ -24,7 +24,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class CarSensor(FordPassEntity,Entity):
     def __init__(self, coordinator, sensor):
-        self.sensor = "fordpass_" + sensor
+        self.sensor = sensor
         self._attr = {}
         self.coordinator = coordinator
         self._device_id = "fordpass_" + sensor
@@ -63,7 +63,7 @@ class CarSensor(FordPassEntity,Entity):
 
     @property
     def name(self):
-        return self.sensor
+        return "fordpass_" + self.sensor
     
     @property
     def state(self):
