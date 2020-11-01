@@ -29,8 +29,10 @@ class CarSensor(FordPassEntity,Entity):
         self._state = None
 
     async def async_update(self):
-        await self.coordinator.async_request_refresh()#
+        await self.coordinator.async_request_refresh()
         #Sensor check 1
+        if self.coordinator.data is None or self.coordinator.data[self.sensor] is None:
+            return None
         self._state = self.coordinator.data[self.sensor]["value"]
 
 
