@@ -29,7 +29,7 @@ class CarSensor(FordPassEntity,Entity):
 
     async def async_update(self):
         await self.coordinator.async_request_refresh()
-        self.state = self.coordinator.data[sensor]["value"]
+        self.state = self.coordinator.data[self.sensor]["value"]
 
 
     @property
