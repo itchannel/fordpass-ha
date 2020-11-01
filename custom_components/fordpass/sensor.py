@@ -24,6 +24,7 @@ class CarSensor(FordPassEntity,Entity):
     def __init__(self, coordinator, sensor):
         self.sensor = sensor
         self.coordinator = coordinator
+        #TEST
         self._state = None
 
     async def async_update(self):
