@@ -24,6 +24,7 @@ class CarSensor(FordPassEntity,Entity):
     def __init__(self, coordinator, sensor):
         self.sensor = sensor
         self.coordinator = coordinator
+        self._device_id = "sensor"
         #TEST
         self._state = None
 
@@ -40,6 +41,10 @@ class CarSensor(FordPassEntity,Entity):
     @property
     def state(self):
         return self.state
+
+    @property
+    def device_id(self):
+        return self.device_id
 
 
         
