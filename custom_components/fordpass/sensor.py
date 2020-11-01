@@ -46,7 +46,7 @@ class CarSensor(FordPassEntity,Entity):
             self._state = self.coordinator.data[self.sensor]["batteryHealth"]["value"]
         elif self.sensor == "oil":
             self._state = self.coordinator.data[self.sensor]["oilLife"]
-        elife self.sensor == "tirePressure":
+        elif self.sensor == "tirePressure":
             self._state = self.coordinator.data[self.sensor]["value"]
 
 
