@@ -22,7 +22,7 @@ from .const import DOMAIN, MANUFACTURER, VEHICLE, VIN
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
 
-PLATFORMS = ["lock","sensor"]
+PLATFORMS = ["lock","sensor", "switch"]
 
 _LOGGER = logging.getLogger(__name__)
 

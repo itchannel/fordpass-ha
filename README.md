@@ -31,4 +31,4 @@ Use HACS and add as a custom repo. Once installed you will be presented with a c
 - Code tidy up
 - Alarm event (Anyone have the json output for this event would be appreciated :) )
 - Potentially Starting the car
-- Window Status
+- Window Status (Anyone have the json output for this event would be appreciated :))
