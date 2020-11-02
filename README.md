@@ -23,12 +23,12 @@ Use HACS and add as a custom repo. Once installed you will be presented with a c
 - Battery Status
 - Ignition Status
 - Alarm Status
+- Individual door statuses
 
 
 ## Coming Soon
 
 - Code tidy up
-- Individual door statuses
-- Alarm event
-- Potentially Starting the carModofi
+- Alarm event (Anyone have the json output for this event would be appreciated :) )
+- Potentially Starting the car
 - Window Status
