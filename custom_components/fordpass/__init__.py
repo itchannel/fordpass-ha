@@ -22,7 +22,7 @@ from .const import DOMAIN, MANUFACTURER, VEHICLE, VIN
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
 
-PLATFORMS = ["lock","sensor"]
+PLATFORMS = ["lock","sensor", "switch"]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -107,6 +107,7 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
                 return DottedDict(data)
         except Exception as ex:
             self._available = False  # Mark as unavailable
+            _LOGGER.warning(str(ex))
             _LOGGER.warning("Error communicating with FordPass for %s", self.vin)
             raise UpdateFailed(
                 f"Error communicating with FordPass for {self.vin}"
