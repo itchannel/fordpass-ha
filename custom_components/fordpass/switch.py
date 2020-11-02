@@ -18,7 +18,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class Switch(FordPassEntity, SwitchEntity):
     """Define the Switch for turning ignition off/on"""
 
-    def __init__(self, coorditnator):
+    def __init__(self, coordinator):
         super().__init__(device_id="fordpass_ignitionsw", name="Ignition Switch", coordinator=coordinator)
 
     async def async_turn_on(self, **kwargs):

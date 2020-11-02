@@ -13,7 +13,7 @@ SCAN_INTERVAL = timedelta(seconds=300)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Entities from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id]
-    snrarray = [ "odometer", "fuel", "battery", "oil", "tirePressure", "gps", "alarm", "ignitionStatus"]
+    snrarray = [ "odometer", "fuel", "battery", "oil", "tirePressure", "gps", "alarm", "ignitionStatus", "doorStatus"]
     sensors = []
     for snr in snrarray:
         async_add_entities([CarSensor(entry, snr)], True)
