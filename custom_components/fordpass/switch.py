@@ -19,7 +19,7 @@ class Switch(FordPassEntity, SwitchEntity):
     """Define the Switch for turning ignition off/on"""
 
     def __init__(self, coordinator):
-        super().__init__(device_id="fordpass_ignitionsw", name="Ignition Switch", coordinator=coordinator)
+        super().__init__(device_id="fordpass_ignitionsw", name="fordpass_Ignition_Switch", coordinator=coordinator)
 
     async def async_turn_on(self, **kwargs):
         await self.coordinator.hass.async_add_executor_job(
@@ -38,9 +38,6 @@ class Switch(FordPassEntity, SwitchEntity):
     @property
     def is_on(self):
         """Determine if the vehicle is started."""
-        if self.coordinator.data is None or self.coordinator.data["ignitionStatus"] is None:
+        if self.coordinator.data is None or self.coordinator.data["remoteStartStatus"] is None:
             return None
-        if self.coordinator.data["ignitionStatus"]["value"] == "On":
-            return True
-        else:
-            return False
+        return self.coordinator.data["remoteStartStatus"]["value"]
