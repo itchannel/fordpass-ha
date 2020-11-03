@@ -41,7 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     password = entry.data[CONF_PASSWORD]
     vin = entry.data[VIN]
 
-    coordinator = FordPassDataUpdateCoordinator(hass, user, password, vin, 1)
+    coordinator = FordPassDataUpdateCoordinator(hass, user, password, vin)
 
     await coordinator.async_refresh()  # Get initial data
 
