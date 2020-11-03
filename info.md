@@ -2,6 +2,8 @@
 
 # **Changelog**
 - Added door status
+- Added token saving
+- Added car poll refresh
 
 
 
