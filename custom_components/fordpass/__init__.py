@@ -5,7 +5,7 @@ import logging
 
 import async_timeout
 from dotted.collection import DottedDict
-from fordpass_new import Vehicle
+from .fordpass_new import Vehicle
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
