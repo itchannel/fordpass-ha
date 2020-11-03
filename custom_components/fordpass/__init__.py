@@ -77,11 +77,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
     """DataUpdateCoordinator to handle fetching new data about the vehicle."""
 
-    def __init__(self, hass, user, password, vin):
+    def __init__(self, hass, user, password, vin, saveToken=False):
         """Initialize the coordinator and set up the Vehicle object."""
         self._hass = hass
         self.vin = vin
-        self.vehicle = Vehicle(user, password, vin)
+        self.vehicle = Vehicle(user, password, vin, saveToken)
         self._available = True
 
         super().__init__(
