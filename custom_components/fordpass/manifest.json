@@ -9,7 +9,7 @@
     "zeroconf": [],
     "homekit": {},
     "dependencies": [],
-    "codeowners": ["@clarkd", "@itchannel"],
+    "codeowners": ["@itchannel"],
     "quality_scale": "silver"
   }
   
