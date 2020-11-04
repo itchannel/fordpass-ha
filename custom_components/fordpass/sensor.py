@@ -5,10 +5,12 @@ from homeassistant.helpers.entity import Entity
 from . import FordPassEntity
 from .const import DOMAIN
 from datetime import timedelta
+from homeassistant.util import Throttle
 
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=300)
+TIME_BETWEEN_UPDATES = timedelta(seconds=300)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Entities from the config."""
@@ -16,7 +18,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     snrarray = [ "odometer", "fuel", "battery", "oil", "tirePressure", "gps", "alarm", "ignitionStatus", "doorStatus"]
     sensors = []
     for snr in snrarray:
-        async_add_entities([CarSensor(entry, snr)], True)
+        async_add_entities([CarSensor(entry, snr)], False)
 
 
 
@@ -31,6 +33,7 @@ class CarSensor(FordPassEntity,Entity):
         self._state = None
         self._measurement = None
 
+    @Throttle(TIME_BETWEEN_UPDATES)
     async def async_update(self):
         await self.coordinator.async_request_refresh()
         if self.coordinator.data is None or self.coordinator.data[self.sensor] is None:
