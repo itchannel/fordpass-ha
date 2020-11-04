@@ -88,7 +88,7 @@ class Vehicle(object):
                 result["expiry_date"] = time.time() + result['expires_in']
                 self.writeToken(result)
             self.token = result['access_token']
-            self.refreshToken = result["refresh_token"]
+            self.refresh_token = result["refresh_token"]
             self.expiresAt = time.time() + result['expires_in']
 
     def __acquireToken(self):
