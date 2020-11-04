@@ -1,12 +1,10 @@
 # Fordpass Home Assistant Integration
 
-## Warning this is still being actively worked on and is still buggy!
-
 ## Credit 
-https://github.com/clarkd - Initial Home Assistant automation and Python code (Lock/Unlock)
+https://github.com/clarkd - Initial Home Assistant automation idea and Python code (Lock/Unlock)
 
 ## Install
-Use HACS and add as a custom repo. Once installed you will be presented with a config input requirements the plugin needs the following:
+Use HACS and add as a custom repo. Once the integration is installed go to your integrations and follow the configuration options to specify the below:
 - Username (Fordpass App)
 - Password (Fordpass App)
 - VIN Number
