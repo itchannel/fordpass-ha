@@ -10,6 +10,5 @@
     "homekit": {},
     "dependencies": [],
     "codeowners": ["@itchannel"],
-    "quality_scale": "silver"
   }
   
