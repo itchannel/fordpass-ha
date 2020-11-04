@@ -1,4 +1,3 @@
-.github/workflows/validate.yml
 name: Validate
 
 on:
