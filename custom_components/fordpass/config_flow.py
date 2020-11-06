@@ -1,7 +1,7 @@
 """Config flow for FordPass integration."""
 import logging
 
-from .fordpass import Vehicle
+from .fordpass_new import Vehicle
 import voluptuous as vol
 
 from homeassistant import config_entries, core, exceptions
