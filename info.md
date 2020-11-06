@@ -1,4 +1,3 @@
-## This is a BETA version
 
 # **Changelog**
 - Added door status
