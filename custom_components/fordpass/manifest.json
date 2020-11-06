@@ -2,14 +2,12 @@
     "domain": "fordpass",
     "name": "FordPass",
     "config_flow": true,
-    "documentation": "https://github.com/itchannel/fordpass",
-    "issue_tracker": "https://github.com/itchannel/fordpass/issues",
+    "documentation": "https://github.com/itchannel/fordpass-ha",
+    "issue_tracker": "https://github.com/itchannel/fordpass-ha/issues",
     "requirements": ["dotted==0.1.8"],
     "ssdp": [],
     "zeroconf": [],
     "homekit": {},
     "dependencies": [],
     "codeowners": ["@itchannel"]
-
   }
-  
