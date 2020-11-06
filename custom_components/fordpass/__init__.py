@@ -1,13 +1,11 @@
 """The FordPass integration."""
 import asyncio
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 import async_timeout
-from dotted.collection import DottedDict
-from .fordpass_new import Vehicle
 import voluptuous as vol
-
+from dotted.collection import DottedDict
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -19,10 +17,11 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .const import DOMAIN, MANUFACTURER, VEHICLE, VIN
+from .fordpass_new import Vehicle
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
 
-PLATFORMS = ["lock","sensor", "switch"]
+PLATFORMS = ["lock", "sensor", "switch"]
 
 _LOGGER = logging.getLogger(__name__)
 
