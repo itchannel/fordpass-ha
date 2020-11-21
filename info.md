@@ -1,5 +1,12 @@
 
 # **Changelog**
+### Version 1.04
+- Added window position status
+- Added service "fresh_status" to allow for polling the car at a set interval or event
+- Added Last Refreshed sensor, so you can see when the car was last polled for data
+- Added some more debug logging
+
+### Version 1.03
 - Added door status
 - Added token saving
 - Added car poll refresh

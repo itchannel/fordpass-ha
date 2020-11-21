@@ -23,6 +23,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         "alarm",
         "ignitionStatus",
         "doorStatus",
+        "windowPosition",
+        "lastRefresh",
     ]
     sensors = []
     for snr in snrarray:
@@ -60,6 +62,15 @@ class CarSensor(FordPassEntity, Entity):
                     if value["value"] != "Closed":
                         return "Open"
                 return "Closed"
+            elif self.sensor == "windowPosition":
+                if self.coordinator.data[self.sensor] == None:
+                    return "Unsupported"
+                for key, value in self.coordinator.data[self.sensor].items():
+                    if value["value"] != "Fully_Closed":
+                        return "Open"
+                return "Closed"
+            elif self.sensor == "lastRefresh":
+                return self.coordinator.data[self.sensor]
         elif ftype == "measurement":
             if self.sensor == "odometer":
                 return "km"
@@ -78,6 +89,10 @@ class CarSensor(FordPassEntity, Entity):
             elif self.sensor == "ignitionStatus":
                 return None
             elif self.sensor == "doorStatus":
+                return None
+            elif self.sensor == "windowsPosition":
+                return None
+            elif self.sensor == "lastRefresh":
                 return None
         elif ftype == "attribute":
             if self.sensor == "odometer":
@@ -101,6 +116,15 @@ class CarSensor(FordPassEntity, Entity):
                 for key, value in self.coordinator.data[self.sensor].items():
                     doors[key] = value["value"]
                 return doors
+            elif self.sensor == "windowPosition":
+                if self.coordinator.data[self.sensor] == None:
+                    return None
+                windows = dict()
+                for key, value in self.coordinator.data[self.sensor].items():
+                    windows[key] = value["value"]
+                return windows
+            elif self.sensor == "lastRefresh":
+                return None
 
     @property
     def name(self):

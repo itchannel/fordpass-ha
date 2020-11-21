@@ -54,7 +54,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             hass.config_entries.async_forward_entry_setup(entry, component)
         )
 
+    async def async_refresh_status_service(service_call):
+        await hass.async_add_executor_job(
+            refresh_status, hass, service_call, coordinator
+        )
+
+    hass.services.async_register(
+        DOMAIN,
+        "refresh_status",
+        async_refresh_status_service,
+    )
+
     return True
+
+
+def refresh_status(service, hass, coordinator):
+    _LOGGER.debug("Running Service")
+    coordinator.vehicle.requestUpdate()
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
