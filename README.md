@@ -9,6 +9,12 @@ Use HACS and add as a custom repo. Once the integration is installed go to your 
 - Password (Fordpass App)
 - VIN Number
 
+## Usage
+Your car must have the lastest onboard modem functionality and have registered/authorised the fordpass application
+
+### Car Refresh
+I have added a service to poll the car for updates, due to the battery drain I have left this up to you to set the interval. The service to be called is "
+
 
 ## Currently Working
 
@@ -23,10 +29,11 @@ Use HACS and add as a custom repo. Once the integration is installed go to your 
 - Alarm Status
 - Individual door statuses
 - Remote Start
+- Window Status (Only if your car supports it!)
+- Last Car Refresh status
 
 
 ## Coming Soon
 
 - Code tidy up
 - Alarm event (Anyone have the json output for this event would be appreciated :) )
-- Window Status (Anyone have the json output for this event would be appreciated :))
