@@ -23,8 +23,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         "alarm",
         "ignitionStatus",
         "doorStatus",
-        "windowPosition", 
-        "lastRefresh"
+        "windowPosition",
+        "lastRefresh",
     ]
     sensors = []
     for snr in snrarray:
@@ -62,7 +62,7 @@ class CarSensor(FordPassEntity, Entity):
                     if value["value"] != "Closed":
                         return "Open"
                 return "Closed"
-            elif self.sensor == "windowPosition" :
+            elif self.sensor == "windowPosition":
                 if self.coordinator.data[self.sensor] == None:
                     return "Unsupported"
                 for key, value in self.coordinator.data[self.sensor].items():
