@@ -21,7 +21,7 @@ from .fordpass_new import Vehicle
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
 
-PLATFORMS = ["lock", "sensor", "switch"]
+PLATFORMS = ["lock", "sensor", "switch", "device_tracker"]
 
 _LOGGER = logging.getLogger(__name__)
 
