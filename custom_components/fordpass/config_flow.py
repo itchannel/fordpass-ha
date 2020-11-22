@@ -1,12 +1,12 @@
 """Config flow for FordPass integration."""
 import logging
 
-from .fordpass_new import Vehicle
 import voluptuous as vol
 from homeassistant import config_entries, core, exceptions
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
 from .const import DOMAIN, VIN  # pylint:disable=unused-import
+from .fordpass_new import Vehicle
 
 _LOGGER = logging.getLogger(__name__)
 
