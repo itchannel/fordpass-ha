@@ -44,7 +44,7 @@ class CarSensor(FordPassEntity, Entity):
             if self.sensor == "odometer":
                 return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "fuel":
-                return self.coordinator.data[self.sensor]["fuelLevel"]
+                return round(self.coordinator.data[self.sensor]["fuelLevel"])
             elif self.sensor == "battery":
                 return self.coordinator.data[self.sensor]["batteryHealth"]["value"]
             elif self.sensor == "oil":
@@ -75,7 +75,7 @@ class CarSensor(FordPassEntity, Entity):
             if self.sensor == "odometer":
                 return "km"
             elif self.sensor == "fuel":
-                return "L"
+                return "%"
             elif self.sensor == "battery":
                 return None
             elif self.sensor == "oil":
