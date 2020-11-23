@@ -6,7 +6,9 @@ from homeassistant import config_entries, core, exceptions
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import callback
 
+
 from .const import DOMAIN, VIN, CONF_UNITS, CONF_UNIT, DEFAULT_UNIT  # pylint:disable=unused-import
+
 from .fordpass_new import Vehicle
 
 _LOGGER = logging.getLogger(__name__)

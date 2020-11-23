@@ -62,7 +62,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             refresh_status, hass, service_call, coordinator
         )
 
-
     hass.services.async_register(
         DOMAIN,
         "refresh_status",
@@ -70,6 +69,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
 
     return True
+
 
 async def async_update_options(hass, config_entry):
     options = {
@@ -80,6 +80,7 @@ async def async_update_options(hass, config_entry):
     hass.config_entries.async_update_entry(
         config_entry, options=options
     )
+
 
 def refresh_status(service, hass, coordinator):
     _LOGGER.debug("Running Service")
