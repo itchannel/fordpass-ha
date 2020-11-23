@@ -22,7 +22,11 @@ class Lock(FordPassEntity, LockEntity):
 
     def __init__(self, coordinator):
         """Initialize."""
-        super().__init__(device_id="fordpass_doorlock", name="fordpass_doorlock", coordinator=coordinator)
+        super().__init__(
+            device_id="fordpass_doorlock",
+            name="fordpass_doorlock",
+            coordinator=coordinator,
+        )
 
     async def async_lock(self, **kwargs):
         """Locks the vehicle."""

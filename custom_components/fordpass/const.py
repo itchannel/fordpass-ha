@@ -11,7 +11,4 @@ VEHICLE = "Ford Vehicle"
 DEFAULT_UNIT = "metric"
 CONF_UNIT = "units"
 
-CONF_UNITS = [
-    "imperial", 
-    "metric"
-]
+CONF_UNITS = ["imperial", "metric"]
