@@ -16,6 +16,9 @@ Your car must have the lastest onboard modem functionality and have registered/a
 I have added a service to poll the car for updates, due to the battery drain I have left this up to you to set the interval. The service to be called is "refresh_status" and can be accessed in home assistant using "fordpas.refresh_status" with no parameters.
 
 **This will take up to 5 mins to update from the car once the service has been run**
+###
+Click on options and choose imperial or metric to display in km/miles. Takes effect on next restart of home assistant. Default is Metric
+
 
 
 ## Currently Working
@@ -33,6 +36,7 @@ I have added a service to poll the car for updates, due to the battery drain I h
 - Remote Start
 - Window Status (Only if your car supports it!)
 - Last Car Refresh status
+- Car Tracker
 
 
 ## Coming Soon

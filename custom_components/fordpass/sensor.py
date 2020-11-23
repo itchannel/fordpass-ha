@@ -5,7 +5,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 
 from . import FordPassEntity
-from .const import DOMAIN
+from .const import DOMAIN, CONF_UNIT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,13 +28,14 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     ]
     sensors = []
     for snr in snrarray:
-        async_add_entities([CarSensor(entry, snr)], True)
+        async_add_entities([CarSensor(entry, snr, config_entry.options)], True)
 
 
-class CarSensor(FordPassEntity, Entity):
-    def __init__(self, coordinator, sensor):
+class CarSensor(FordPassEntity, Entity,):
+    def __init__(self, coordinator, sensor, options):
 
         self.sensor = sensor
+        self.options = options
         self._attr = {}
         self.coordinator = coordinator
         self._device_id = "fordpass_" + sensor
@@ -42,9 +43,12 @@ class CarSensor(FordPassEntity, Entity):
     def get_value(self, ftype):
         if ftype == "state":
             if self.sensor == "odometer":
-                return self.coordinator.data[self.sensor]["value"]
+                if self.options[CONF_UNIT] == "imperial":
+                    return round(float(self.coordinator.data[self.sensor]["value"]) / 1.60934)
+                else:
+                    return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "fuel":
-                return self.coordinator.data[self.sensor]["fuelLevel"]
+                return round(self.coordinator.data[self.sensor]["fuelLevel"])
             elif self.sensor == "battery":
                 return self.coordinator.data[self.sensor]["batteryHealth"]["value"]
             elif self.sensor == "oil":
@@ -73,9 +77,12 @@ class CarSensor(FordPassEntity, Entity):
                 return self.coordinator.data[self.sensor]
         elif ftype == "measurement":
             if self.sensor == "odometer":
-                return "km"
+                if self.options[CONF_UNIT] == "imperial":
+                    return "mi"
+                else:
+                    return "km"
             elif self.sensor == "fuel":
-                return "L"
+                return "%"
             elif self.sensor == "battery":
                 return None
             elif self.sensor == "oil":

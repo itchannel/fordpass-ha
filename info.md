@@ -1,5 +1,12 @@
 
 # **Changelog**
+### Version 1.05
+- Added device_tracker type (fordpass_tracker)
+- Added imperial or metric selection
+- Change fuel reading to %
+- Renamed lock entity from "lock.lock" to "lock.fordpass_lock"
+
+
 ### Version 1.04
 - Added window position status
 - Added service "fresh_status" to allow for polling the car at a set interval or event
