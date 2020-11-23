@@ -5,7 +5,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 
 from . import FordPassEntity
-from .const import DOMAIN, CONF_UNIT
+from .const import CONF_UNIT, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,7 +31,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         async_add_entities([CarSensor(entry, snr, config_entry.options)], True)
 
 
-class CarSensor(FordPassEntity, Entity,):
+class CarSensor(
+    FordPassEntity,
+    Entity,
+):
     def __init__(self, coordinator, sensor, options):
 
         self.sensor = sensor
@@ -44,7 +47,9 @@ class CarSensor(FordPassEntity, Entity,):
         if ftype == "state":
             if self.sensor == "odometer":
                 if self.options[CONF_UNIT] == "imperial":
-                    return round(float(self.coordinator.data[self.sensor]["value"]) / 1.60934)
+                    return round(
+                        float(self.coordinator.data[self.sensor]["value"]) / 1.60934
+                    )
                 else:
                     return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "fuel":
