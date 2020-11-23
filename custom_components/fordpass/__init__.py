@@ -73,7 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_update_options(hass, config_entry):
     options = {
-        CONF_UNIT: entry.data.get(
+        CONF_UNIT: config_entry.data.get(
             CONF_UNIT, DEFAULT_UNIT
             )
     }
