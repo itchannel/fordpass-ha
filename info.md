@@ -2,6 +2,9 @@
 # **Changelog**
 ### Version 1.05
 - Added device_tracker type (fordpass_tracker)
+- Added imperial or metric selection
+- Change fuel reading to %
+- Renamed lock entity from "lock.lock" to "lock.fordpass_lock"
 
 
 ### Version 1.04

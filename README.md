@@ -17,6 +17,9 @@ I have added a service to poll the car for updates, due to the battery drain I h
 
 **This will take up to 5 mins to update from the car once the service has been run**
 
+###
+Click on options and choose imperial or metric to display in km/miles. Takes effect on next restart of home assistant. Default is Metric
+
 
 ## Currently Working
 
@@ -33,6 +36,7 @@ I have added a service to poll the car for updates, due to the battery drain I h
 - Remote Start
 - Window Status (Only if your car supports it!)
 - Last Car Refresh status
+- Car Tracker
 
 
 ## Coming Soon

@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
-from .const import DOMAIN, MANUFACTURER, VEHICLE, VIN
+from .const import DOMAIN, MANUFACTURER, VEHICLE, VIN, DEFAULT_UNIT, CONF_UNIT
 from .fordpass_new import Vehicle
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
@@ -44,6 +44,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     await coordinator.async_refresh()  # Get initial data
 
+    if not entry.options:
+        await async_update_options(hass, entry)
+
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady
 
@@ -59,6 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             refresh_status, hass, service_call, coordinator
         )
 
+
     hass.services.async_register(
         DOMAIN,
         "refresh_status",
@@ -67,6 +71,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     return True
 
+async def async_update_options(hass, config_entry):
+    options = {
+        CONF_UNIT: entry.data.get(
+            CONF_UNIT, DEFAULT_UNIT
+            )
+    }
+    hass.config_entries.async_update_entry(
+        config_entry, options=options
+    )
 
 def refresh_status(service, hass, coordinator):
     _LOGGER.debug("Running Service")
