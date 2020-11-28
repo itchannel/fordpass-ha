@@ -1,5 +1,13 @@
 
 # **Changelog**
+### Version 1.07
+- Support for multiple regions (Fixes unavaliable bug)
+- Token renamed to fordpass_token
+
+**In order to support regions you will need to reinstall the integration to change region** (Existing installs will default to North America)
+
+### Version 1.06 
+- Minor bug fix
 ### Version 1.05
 - Added device_tracker type (fordpass_tracker)
 - Added imperial or metric selection
@@ -17,9 +25,6 @@
 - Added door status
 - Added token saving
 - Added car poll refresh
-
-
-
 
 
 Fordpass can be configured via Integrations UI

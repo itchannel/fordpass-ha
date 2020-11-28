@@ -14,8 +14,13 @@ defaultHeaders = {
 
 apiHeaders = {
     **defaultHeaders,
-    "Application-Id": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
     "Content-Type": "application/json",
+}
+
+region_lookup = {
+    "UK&Europe": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
+    "Australia": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
+    "North America & Canada": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592",
 }
 
 baseUrl = "https://usapi.cv.ford.com/api"
@@ -24,10 +29,11 @@ baseUrl = "https://usapi.cv.ford.com/api"
 class Vehicle(object):
     # Represents a Ford vehicle, with methods for status and issuing commands
 
-    def __init__(self, username, password, vin, saveToken=False):
+    def __init__(self, username, password, vin, region, saveToken=False):
         self.username = username
         self.password = password
         self.saveToken = saveToken
+        self.region = region_lookup[region]
         self.vin = vin
         self.token = None
         self.expires = None
@@ -59,7 +65,7 @@ class Vehicle(object):
             logging.info("Succesfully fetched token Stage1")
             result = r.json()
             data = {"code": result["access_token"]}
-            headers = {**apiHeaders}
+            headers = {**apiHeaders, "Application-Id": self.region}
             # Fetch OAUTH token stage 2 and refresh token
             r = requests.put(
                 "https://api.mps.ford.com/api/oauth2/v1/token",
@@ -81,7 +87,7 @@ class Vehicle(object):
     def refreshToken(self, token):
         # Token is invalid so let's try refreshing it
         data = {"refresh_token": token["refresh_token"]}
-        headers = {**apiHeaders}
+        headers = {**apiHeaders, "Application-Id": self.region}
 
         r = requests.put(
             "https://api.mps.ford.com/api/oauth2/v1/refresh",
@@ -101,7 +107,7 @@ class Vehicle(object):
         # Fetch and refresh token as needed
         # If file exists read in token file and check it's valid
         if self.saveToken:
-            if os.path.isfile("/tmp/token.txt"):
+            if os.path.isfile("/tmp/fordpass_token.txt"):
                 data = self.readToken()
             else:
                 data = dict()
@@ -129,13 +135,13 @@ class Vehicle(object):
 
     def writeToken(self, token):
         # Save token to file to be reused
-        with open("/tmp/token.txt", "w") as outfile:
+        with open("/tmp/fordpass_token.txt", "w") as outfile:
             token["expiry_date"] = time.time() + token["expires_in"]
             json.dump(token, outfile)
 
     def readToken(self):
         # Get saved token from file
-        with open("/tmp/token.txt") as token_file:
+        with open("/tmp/fordpass_token.txt") as token_file:
             return json.load(token_file)
 
     def status(self):
@@ -145,7 +151,11 @@ class Vehicle(object):
 
         params = {"lrdt": "01-01-1970 00:00:00"}
 
-        headers = {**apiHeaders, "auth-token": self.token}
+        headers = {
+            **apiHeaders,
+            "auth-token": self.token,
+            "Application-Id": self.region,
+        }
 
         r = requests.get(
             f"{baseUrl}/vehicles/v4/{self.vin}/status", params=params, headers=headers
@@ -203,7 +213,11 @@ class Vehicle(object):
         Make a request to the given URL, passing data/params as needed
         """
 
-        headers = {**apiHeaders, "auth-token": self.token}
+        headers = {
+            **apiHeaders, 
+            "auth-token": self.token,
+            "Application-Id": self.region
+            }
 
         return getattr(requests, method.lower())(
             url, headers=headers, data=data, params=params

@@ -1,13 +1,15 @@
 # Fordpass Home Assistant Integration
 
 ## Credit 
-https://github.com/clarkd - Initial Home Assistant automation idea and Python code (Lock/Unlock)
+- https://github.com/clarkd - Initial Home Assistant automation idea and Python code (Lock/Unlock)
+- https://github.com/pinballnewf - Figuring out the application ID issue
 
 ## Install
 Use HACS and add as a custom repo. Once the integration is installed go to your integrations and follow the configuration options to specify the below:
 - Username (Fordpass App)
 - Password (Fordpass App)
 - VIN Number
+- Region (Where you are based, required for tokens to work correctly)
 
 ## Usage
 Your car must have the lastest onboard modem functionality and have registered/authorised the fordpass application
@@ -37,6 +39,7 @@ Click on options and choose imperial or metric to display in km/miles. Takes eff
 - Window Status (Only if your car supports it!)
 - Last Car Refresh status
 - Car Tracker
+- Supports Multiple Regions
 
 
 ## Coming Soon

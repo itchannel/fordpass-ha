@@ -11,6 +11,8 @@ from .const import (  # pylint:disable=unused-import
     CONF_UNITS,
     DEFAULT_UNIT,
     DOMAIN,
+    REGION,
+    REGION_OPTIONS,
     VIN,
 )
 from .fordpass_new import Vehicle
@@ -22,6 +24,7 @@ DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
         vol.Required(VIN): vol.All(str, vol.Length(min=17, max=17)),
+        vol.Required(REGION): vol.In(REGION_OPTIONS),
     }
 )
 
@@ -31,7 +34,8 @@ async def validate_input(hass: core.HomeAssistant, data):
 
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
-    vehicle = Vehicle(data[CONF_USERNAME], data[CONF_PASSWORD], data[VIN])
+    _LOGGER.debug(data[REGION])
+    vehicle = Vehicle(data[CONF_USERNAME], data[CONF_PASSWORD], data[VIN], data[REGION])
 
     try:
         result = await hass.async_add_executor_job(vehicle.auth)

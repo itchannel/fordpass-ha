@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
-from .const import CONF_UNIT, DEFAULT_UNIT, DOMAIN, MANUFACTURER, VEHICLE, VIN
+from .const import CONF_UNIT, DEFAULT_UNIT, DOMAIN, MANUFACTURER, REGION, VEHICLE, VIN
 from .fordpass_new import Vehicle
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
@@ -39,8 +39,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     user = entry.data[CONF_USERNAME]
     password = entry.data[CONF_PASSWORD]
     vin = entry.data[VIN]
-
-    coordinator = FordPassDataUpdateCoordinator(hass, user, password, vin, 1)
+    for ar in entry.data:
+        _LOGGER.debug(ar)
+    if REGION in entry.data.keys():
+        _LOGGER.debug(entry.data[REGION])
+        region = entry.data[REGION]
+    else:
+        _LOGGER.debug("CANT GET REGION")
+        region = "North America & Canada"
+    coordinator = FordPassDataUpdateCoordinator(hass, user, password, vin, region, 1)
 
     await coordinator.async_refresh()  # Get initial data
 
@@ -100,11 +107,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
     """DataUpdateCoordinator to handle fetching new data about the vehicle."""
 
-    def __init__(self, hass, user, password, vin, saveToken=False):
+    def __init__(self, hass, user, password, vin, region, saveToken=False):
         """Initialize the coordinator and set up the Vehicle object."""
         self._hass = hass
         self.vin = vin
-        self.vehicle = Vehicle(user, password, vin, saveToken)
+        self.vehicle = Vehicle(user, password, vin, region, saveToken)
         self._available = True
 
         super().__init__(

@@ -6,7 +6,8 @@
         "data": {
           "vin": "VIN",
           "username": "FordPass Username (Email)",
-          "password": "FordPass Password"
+          "password": "FordPass Password",
+          "region": "FordPass Region"
         }
       }
     },
