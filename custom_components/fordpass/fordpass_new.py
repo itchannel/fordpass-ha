@@ -20,7 +20,7 @@ apiHeaders = {
 region_lookup = {
     "UK&Europe": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
     "Australia": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
-    "North America & Canada": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592"
+    "North America & Canada": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592",
 }
 
 baseUrl = "https://usapi.cv.ford.com/api"
@@ -65,10 +65,7 @@ class Vehicle(object):
             logging.info("Succesfully fetched token Stage1")
             result = r.json()
             data = {"code": result["access_token"]}
-            headers = {
-                **apiHeaders,
-                "Application-Id": self.region
-            }
+            headers = {**apiHeaders, "Application-Id": self.region}
             # Fetch OAUTH token stage 2 and refresh token
             r = requests.put(
                 "https://api.mps.ford.com/api/oauth2/v1/token",
@@ -90,10 +87,7 @@ class Vehicle(object):
     def refreshToken(self, token):
         # Token is invalid so let's try refreshing it
         data = {"refresh_token": token["refresh_token"]}
-        headers = {
-            **apiHeaders,
-            "Application-Id": self.region
-        }
+        headers = {**apiHeaders, "Application-Id": self.region}
 
         r = requests.put(
             "https://api.mps.ford.com/api/oauth2/v1/refresh",
@@ -158,10 +152,10 @@ class Vehicle(object):
         params = {"lrdt": "01-01-1970 00:00:00"}
 
         headers = {
-            **apiHeaders, 
+            **apiHeaders,
             "auth-token": self.token,
-            "Application-Id": self.region
-            }
+            "Application-Id": self.region,
+        }
 
         r = requests.get(
             f"{baseUrl}/vehicles/v4/{self.vin}/status", params=params, headers=headers
