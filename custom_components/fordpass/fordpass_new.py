@@ -219,7 +219,11 @@ class Vehicle(object):
         Make a request to the given URL, passing data/params as needed
         """
 
-        headers = {**apiHeaders, "auth-token": self.token}
+        headers = {
+            **apiHeaders, 
+            "auth-token": self.token,
+            "Application-Id": self.region
+            }
 
         return getattr(requests, method.lower())(
             url, headers=headers, data=data, params=params
