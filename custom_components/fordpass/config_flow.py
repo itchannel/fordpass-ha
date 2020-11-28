@@ -11,9 +11,9 @@ from .const import (  # pylint:disable=unused-import
     CONF_UNITS,
     DEFAULT_UNIT,
     DOMAIN,
-    VIN,
     REGION,
-    REGION_OPTIONS
+    REGION_OPTIONS,
+    VIN,
 )
 from .fordpass_new import Vehicle
 
@@ -24,7 +24,7 @@ DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
         vol.Required(VIN): vol.All(str, vol.Length(min=17, max=17)),
-        vol.Required(REGION): vol.In(REGION_OPTIONS)
+        vol.Required(REGION): vol.In(REGION_OPTIONS),
     }
 )
 

@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
-from .const import CONF_UNIT, DEFAULT_UNIT, DOMAIN, MANUFACTURER, VEHICLE, VIN, REGION
+from .const import CONF_UNIT, DEFAULT_UNIT, DOMAIN, MANUFACTURER, REGION, VEHICLE, VIN
 from .fordpass_new import Vehicle
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
@@ -26,8 +26,6 @@ PLATFORMS = ["lock", "sensor", "switch", "device_tracker"]
 _LOGGER = logging.getLogger(__name__)
 
 SCAN_INTERVAL = timedelta(seconds=300)
-
-
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
