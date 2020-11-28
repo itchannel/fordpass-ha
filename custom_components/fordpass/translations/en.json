@@ -13,9 +13,20 @@
                 "data": {
                     "password": "FordPass Password",
                     "username": "FordPass Username (Email)",
-                    "vin": "VIN"
+                    "vin": "VIN",
+                    "region" : "FordPass Region"
                 }
             }
+        }
+    },
+    "options": {
+        "step": {
+        "init": {
+            "data": {
+            "units": "Unit of Measurement"
+            },
+            "description": "Configure fordpass options"
+        }
         }
     },
     "title": "FordPass"
