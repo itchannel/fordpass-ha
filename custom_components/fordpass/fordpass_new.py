@@ -1,6 +1,6 @@
 import json
 import logging
-import os.path
+import os
 import time
 
 import requests
@@ -144,6 +144,12 @@ class Vehicle(object):
         with open("/tmp/fordpass_token.txt") as token_file:
             return json.load(token_file)
 
+    def clearToken(self):
+        if os.path.isfile("/tmp/fordpass_token.txt"):
+            os.remove("/tmp/fordpass_token.txt")
+        if os.path.isfile("/tmp/token.txt"):
+            os.remove("/tmp/token.txt")
+
     def status(self):
         # Get the status of the vehicle
 
@@ -214,10 +220,10 @@ class Vehicle(object):
         """
 
         headers = {
-            **apiHeaders, 
+            **apiHeaders,
             "auth-token": self.token,
-            "Application-Id": self.region
-            }
+            "Application-Id": self.region,
+        }
 
         return getattr(requests, method.lower())(
             url, headers=headers, data=data, params=params

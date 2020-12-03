@@ -5,7 +5,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 
 from . import FordPassEntity
-from .const import CONF_UNIT, DOMAIN
+from .const import CONF_UNIT, DOMAIN, SENSORS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -13,22 +13,9 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Entities from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id]
-    snrarray = [
-        "odometer",
-        "fuel",
-        "battery",
-        "oil",
-        "tirePressure",
-        "gps",
-        "alarm",
-        "ignitionStatus",
-        "doorStatus",
-        "windowPosition",
-        "lastRefresh",
-    ]
     sensors = []
-    for snr in snrarray:
-        async_add_entities([CarSensor(entry, snr, config_entry.options)], True)
+    for key, value in SENSORS.items():
+        async_add_entities([CarSensor(entry, key, config_entry.options)], True)
 
 
 class CarSensor(
@@ -68,7 +55,7 @@ class CarSensor(
                 return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "doorStatus":
                 for key, value in self.coordinator.data[self.sensor].items():
-                    if value["value"] != "Closed":
+                    if (value["value"] != "Closed") or (value["value"] != "Invalid"):
                         return "Open"
                 return "Closed"
             elif self.sensor == "windowPosition":
@@ -80,6 +67,9 @@ class CarSensor(
                 return "Closed"
             elif self.sensor == "lastRefresh":
                 return self.coordinator.data[self.sensor]
+            elif self.sensor == "elVeh":
+                if self.coordinator.data["elVehDTE"] != None:
+                    return self.coordinator.data["chargingStatus"]["value"]
         elif ftype == "measurement":
             if self.sensor == "odometer":
                 if self.options[CONF_UNIT] == "imperial":
@@ -112,7 +102,11 @@ class CarSensor(
             elif self.sensor == "fuel":
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "battery":
-                return None
+                return {
+                    "Battery Voltage": self.coordinator.data[self.sensor][
+                        "batteryStatusActual"
+                    ]["value"]
+                }
             elif self.sensor == "oil":
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "tirePressure":
@@ -137,6 +131,25 @@ class CarSensor(
                 return windows
             elif self.sensor == "lastRefresh":
                 return None
+            elif self.sensor == "elVeh":
+                if self.coordinator.data["elVehDTE"] != None:
+                    return {
+                        "Plug Status": self.coordinator.data["plugStatus"]["value"],
+                        "Charge Start Time": self.coordinator.data["chargeStartTime"][
+                            "value"
+                        ],
+                        "Charge End Time": self.coordinator.data["chargeEndTime"][
+                            "value"
+                        ],
+                        "Battery Fill Level": self.coordinator.data["batteryFillLevel"][
+                            "value"
+                        ],
+                        "Charger Power Type": self.coordinator.data["chargerPowertype"][
+                            "value"
+                        ],
+                    }
+                else:
+                    return None
 
     @property
     def name(self):
@@ -157,3 +170,7 @@ class CarSensor(
     @property
     def unit_of_measurement(self):
         return self.get_value("measurement")
+
+    @property
+    def icon(self):
+        return SENSORS[self.sensor]["icon"]
