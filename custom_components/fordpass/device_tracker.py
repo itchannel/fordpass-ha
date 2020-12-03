@@ -50,4 +50,3 @@ class CarTracker(FordPassEntity, TrackerEntity):
     @property
     def icon(self):
         return "mdi:radar"
-    

@@ -222,7 +222,7 @@ class Vehicle(object):
         headers = {
             **apiHeaders,
             "auth-token": self.token,
-            "Application-Id": self.region
+            "Application-Id": self.region,
         }
 
         return getattr(requests, method.lower())(

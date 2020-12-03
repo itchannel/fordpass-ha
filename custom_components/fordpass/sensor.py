@@ -104,7 +104,11 @@ class CarSensor(
             elif self.sensor == "fuel":
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "battery":
-                return {"Battery Voltage" :  self.coordinator.data[self.sensor]["batteryStatusActual"]["value"] }
+                return {
+                    "Battery Voltage": self.coordinator.data[self.sensor][
+                        "batteryStatusActual"
+                    ]["value"]
+                }
             elif self.sensor == "oil":
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "tirePressure":
@@ -133,12 +137,6 @@ class CarSensor(
                 if self.coordinator.data["elVehDTE"] != None:
                     return {
                         "Plug Status": self.coordinator.data["plugStatus"]["value"],
-<<<<<<< HEAD
-                        "Charge Start Time": self.coordinator.data["chargeStartTime"]["value"],
-                        "Charge End Time": self.coordinator.data["chargeEndTime"]["value"],
-                        "Battery Fill Level" : self.coordinator.data["batteryFillLevel"]["value"],
-                        "Charger Power Type" : self.coordinator.data["chargerPowertype"]["value"]
-=======
                         "Charge Start Time": self.coordinator.data["chargeStartTime"][
                             "value"
                         ],
@@ -151,7 +149,6 @@ class CarSensor(
                         "Charger Power Type": self.coordinator.data["chargerPowertype"][
                             "value"
                         ],
->>>>>>> ba33be3c701cc5e077b3606b6767ba7ebc59b66d
                     }
                 else:
                     return None
@@ -176,10 +173,6 @@ class CarSensor(
     def unit_of_measurement(self):
         return self.get_value("measurement")
 
-<<<<<<< HEAD
-    @property 
-=======
     @property
->>>>>>> ba33be3c701cc5e077b3606b6767ba7ebc59b66d
     def icon(self):
         return SENSORS[self.sensor]["icon"]
