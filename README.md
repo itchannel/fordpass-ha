@@ -21,6 +21,9 @@ I have added a service to poll the car for updates, due to the battery drain I h
 ###
 Click on options and choose imperial or metric to display in km/miles. Takes effect on next restart of home assistant. Default is Metric
 
+### Clear Tokens
+If you are experiencing any sign in issues, please trying clearing your tokens using the "clear_tokens" service call.
+
 
 
 ## Currently Working
@@ -40,6 +43,7 @@ Click on options and choose imperial or metric to display in km/miles. Takes eff
 - Last Car Refresh status
 - Car Tracker
 - Supports Multiple Regions
+- Electric Vehicle Support
 
 
 ## Coming Soon

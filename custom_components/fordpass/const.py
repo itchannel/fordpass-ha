@@ -30,5 +30,5 @@ SENSORS = {
         "doorStatus" : {"icon": "mdi:car-door"},
         "windowPosition" : {"icon": "mdi:car-door"},
         "lastRefresh" : {"icon": "mdi:clock"},
-        "elVeh" : {"icon": "mdi:CarElectric"}
+        "elVeh" : {"icon": "mdi:ev-station"}
 }

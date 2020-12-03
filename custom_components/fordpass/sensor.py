@@ -70,6 +70,8 @@ class CarSensor(
             elif self.sensor == "elVeh":
                 if self.coordinator.data["elVehDTE"] != None:
                     return self.coordinator.data["chargingStatus"]["value"]
+                else:
+                    return "Unsupported"
         elif ftype == "measurement":
             if self.sensor == "odometer":
                 if self.options[CONF_UNIT] == "imperial":
