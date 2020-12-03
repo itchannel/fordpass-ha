@@ -220,10 +220,10 @@ class Vehicle(object):
         """
 
         headers = {
-            **apiHeaders, 
+            **apiHeaders,
             "auth-token": self.token,
             "Application-Id": self.region
-            }
+        }
 
         return getattr(requests, method.lower())(
             url, headers=headers, data=data, params=params

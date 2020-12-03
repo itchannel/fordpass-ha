@@ -51,4 +51,3 @@ class Switch(FordPassEntity, SwitchEntity):
     @property
     def icon(self):
         return "mdi:key-star"
-
