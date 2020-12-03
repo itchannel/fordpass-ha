@@ -47,3 +47,8 @@ class Switch(FordPassEntity, SwitchEntity):
         ):
             return None
         return self.coordinator.data["remoteStartStatus"]["value"]
+
+    @property
+    def icon(self):
+        return "mdi:key-star"
+

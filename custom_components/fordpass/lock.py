@@ -50,3 +50,8 @@ class Lock(FordPassEntity, LockEntity):
         if self.coordinator.data is None or self.coordinator.data["lockStatus"] is None:
             return None
         return self.coordinator.data["lockStatus"]["value"] == "LOCKED"
+
+    @property
+    def icon(self):
+        return "mdi:car-door-lock"
+

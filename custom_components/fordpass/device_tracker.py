@@ -46,3 +46,8 @@ class CarTracker(FordPassEntity, TrackerEntity):
     @property
     def device_state_attributes(self):
         return self.coordinator.data[self.sensor].items()
+
+    @property
+    def icon(self):
+        return "mdi:radar"
+    
