@@ -104,15 +104,7 @@ class CarSensor(
             elif self.sensor == "fuel":
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "battery":
-<<<<<<< HEAD
                 return {"Battery Voltage" :  self.coordinator.data[self.sensor]["batteryStatusActual"]["value"] }
-=======
-                return {
-                    "Battery Voltage": self.coordinator.data[self.sensor][
-                        "batteryStatusActual"
-                    ]["value"]
-                }
->>>>>>> ba33be3c701cc5e077b3606b6767ba7ebc59b66d
             elif self.sensor == "oil":
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "tirePressure":
