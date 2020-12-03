@@ -1,5 +1,11 @@
 
 # **Changelog**
+### Version 1.08
+- Added Icons for each entity
+- Added "clear_tokens" service call
+- Added Electric Vehicle features
+- Fixed "Invalid" lock status
+
 ### Version 1.07
 - Support for multiple regions (Fixes unavaliable bug)
 - Token renamed to fordpass_token

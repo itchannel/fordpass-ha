@@ -69,10 +69,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             refresh_status, hass, service_call, coordinator
         )
 
+    async def async_clear_tokens_service(service_call):
+        await hass.async_add_executor_job(clear_tokens, hass, service_call, coordinator)
+
+    async def async_clear_tokens_service(service_call):
+        await hass.async_add_executor_job(clear_tokens, hass, service_call, coordinator)
+
     hass.services.async_register(
         DOMAIN,
         "refresh_status",
         async_refresh_status_service,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        "clear_tokens",
+        async_clear_tokens_service,
     )
 
     return True
@@ -86,6 +97,16 @@ async def async_update_options(hass, config_entry):
 def refresh_status(service, hass, coordinator):
     _LOGGER.debug("Running Service")
     coordinator.vehicle.requestUpdate()
+
+
+def clear_tokens(service, hass, coordinator):
+    _LOGGER.debug("Clearing Tokens")
+    coordinator.vehicle.clearToken()
+
+
+def clear_tokens(service, hass, coordinator):
+    _LOGGER.debug("Clearing Tokens")
+    coordinator.vehicle.clearToken()
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):

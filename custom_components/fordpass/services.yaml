@@ -1,2 +1,4 @@
 refresh_status:
   description: "Poll car for latest status (Takes up to 5mins to update once this function has been run!)"
+clear_tokens:
+  description: "Clear the cached tokens"
