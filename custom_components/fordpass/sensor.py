@@ -55,7 +55,9 @@ class CarSensor(
                 return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "doorStatus":
                 for key, value in self.coordinator.data[self.sensor].items():
-                    if (value["value"] != "Closed") or (value["value"] != "Invalid"):
+                    if value["value"] == "Invalid":
+                        continue
+                    if value["value"] != "Closed":
                         return "Open"
                 return "Closed"
             elif self.sensor == "windowPosition":
@@ -112,6 +114,41 @@ class CarSensor(
             elif self.sensor == "oil":
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "tirePressure":
+                if self.coordinator.data["TPMS"] != None:
+                    return {
+                        "leftFrontTirePressure": round(
+                            float(
+                                self.coordinator.data["TPMS"]["leftFrontTirePressure"][
+                                    "value"
+                                ]
+                            )
+                            * 0.1450377377
+                        ),
+                        "rightFrontTirePressure": round(
+                            float(
+                                self.coordinator.data["TPMS"]["rightFrontTirePressure"][
+                                    "value"
+                                ]
+                            )
+                            * 0.1450377377
+                        ),
+                        "outerLeftRearTirePressure": round(
+                            float(
+                                self.coordinator.data["TPMS"][
+                                    "outerLeftRearTirePressure"
+                                ]["value"]
+                            )
+                            * 0.1450377377
+                        ),
+                        "outerRightRearTirePressure": round(
+                            float(
+                                self.coordinator.data["TPMS"][
+                                    "outerRightRearTirePressure"
+                                ]["value"]
+                            )
+                            * 0.1450377377
+                        ),
+                    }
                 return None
             elif self.sensor == "gps":
                 return self.coordinator.data[self.sensor].items()
