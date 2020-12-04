@@ -1,5 +1,10 @@
 
 # **Changelog**
+### Version 1.09
+- Added individual TMPS Support
+- Fixed door open bug
+
+
 ### Version 1.08
 - Added Icons for each entity
 - Added "clear_tokens" service call

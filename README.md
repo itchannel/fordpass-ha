@@ -44,9 +44,9 @@ If you are experiencing any sign in issues, please trying clearing your tokens u
 - Car Tracker
 - Supports Multiple Regions
 - Electric Vehicle Support
+- TPMS Sensors
 
 
 ## Coming Soon
 
-- Code tidy up
 - Alarm event (Anyone have the json output for this event would be appreciated :) )
