@@ -1,5 +1,10 @@
 
 # **Changelog**
+### Version 1.10
+- Fixed door open bug 2.0 (New position value)
+- Added a check to see if a vehicle supports GPS before adding the entity
+
+
 ### Version 1.09
 - Added individual TMPS Support
 - Fixed door open bug

@@ -12,7 +12,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Entities from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id]
 
-    async_add_entities([CarTracker(entry, "gps")], True)
+    #Added a check to see if the car supports GPS
+    if entry.data["gps"] != None:
+        async_add_entities([CarTracker(entry, "gps")], True)
+    else:
+        _LOGGER.debug("Vehicle does not support GPS")
 
 
 class CarTracker(FordPassEntity, TrackerEntity):
