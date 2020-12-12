@@ -48,6 +48,8 @@ class CarSensor(
             elif self.sensor == "tirePressure":
                 return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "gps":
+                if self.coordinator.data[self.sensor] == None:
+                    return "Unsupported"
                 return self.coordinator.data[self.sensor]["gpsState"]
             elif self.sensor == "alarm":
                 return self.coordinator.data[self.sensor]["value"]
@@ -64,7 +66,10 @@ class CarSensor(
                 if self.coordinator.data[self.sensor] == None:
                     return "Unsupported"
                 for key, value in self.coordinator.data[self.sensor].items():
-                    if value["value"] != "Fully_Closed":
+                    if (
+                        value["value"] != "Fully_Closed"
+                        or value["value"] != "Fully_closed_position"
+                    ):
                         return "Open"
                 return "Closed"
             elif self.sensor == "lastRefresh":
@@ -151,6 +156,8 @@ class CarSensor(
                     }
                 return None
             elif self.sensor == "gps":
+                if self.coordinator.data[self.sensor] == None:
+                    return None
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "alarm":
                 return self.coordinator.data[self.sensor].items()
