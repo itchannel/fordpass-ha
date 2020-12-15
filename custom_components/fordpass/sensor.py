@@ -66,7 +66,10 @@ class CarSensor(
                 if self.coordinator.data[self.sensor] == None:
                     return "Unsupported"
                 for key, value in self.coordinator.data[self.sensor].items():
-                    if value["value"] != "Fully_Closed" or value["value"] != "Fully_closed_position":
+                    if (
+                        value["value"] != "Fully_Closed"
+                        or value["value"] != "Fully_closed_position"
+                    ):
                         return "Open"
                 return "Closed"
             elif self.sensor == "lastRefresh":
