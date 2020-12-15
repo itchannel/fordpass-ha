@@ -1,14 +1,16 @@
 
 # **Changelog**
+### Version 1.11
+- Added check for "Undefined_window_position" window value
+- Fixed bug when TMPS value was 0 (Some cars return 0 on individual tyre pressures)
+
 ### Version 1.10
 - Fixed door open bug 2.0 (New position value)
 - Added a check to see if a vehicle supports GPS before adding the entity
 
-
 ### Version 1.09
 - Added individual TMPS Support
 - Fixed door open bug
-
 
 ### Version 1.08
 - Added Icons for each entity
