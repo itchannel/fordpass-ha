@@ -69,6 +69,7 @@ class CarSensor(
                     if (
                         value["value"] != "Fully_Closed"
                         or value["value"] != "Fully_closed_position"
+                        or value["value"] != "Undefined_window_position"
                     ):
                         return "Open"
                 return "Closed"
@@ -126,6 +127,7 @@ class CarSensor(
                                 self.coordinator.data["TPMS"]["leftFrontTirePressure"][
                                     "value"
                                 ]
+                                or 0
                             )
                             * 0.1450377377
                         ),
@@ -134,6 +136,7 @@ class CarSensor(
                                 self.coordinator.data["TPMS"]["rightFrontTirePressure"][
                                     "value"
                                 ]
+                                or 0
                             )
                             * 0.1450377377
                         ),
@@ -142,6 +145,7 @@ class CarSensor(
                                 self.coordinator.data["TPMS"][
                                     "outerLeftRearTirePressure"
                                 ]["value"]
+                                or 0
                             )
                             * 0.1450377377
                         ),
@@ -150,6 +154,7 @@ class CarSensor(
                                 self.coordinator.data["TPMS"][
                                     "outerRightRearTirePressure"
                                 ]["value"]
+                                or 0
                             )
                             * 0.1450377377
                         ),
