@@ -124,7 +124,8 @@ class CarSensor(
                                 self.coordinator.data["TPMS"]["leftFrontTirePressure"][
                                     "value"
                                 ]
-                            or 0)
+                                or 0
+                            )
                             * 0.1450377377
                         ),
                         "rightFrontTirePressure": round(
@@ -132,7 +133,8 @@ class CarSensor(
                                 self.coordinator.data["TPMS"]["rightFrontTirePressure"][
                                     "value"
                                 ]
-                            or 0)
+                                or 0
+                            )
                             * 0.1450377377
                         ),
                         "outerLeftRearTirePressure": round(
@@ -140,7 +142,8 @@ class CarSensor(
                                 self.coordinator.data["TPMS"][
                                     "outerLeftRearTirePressure"
                                 ]["value"]
-                            or 0)
+                                or 0
+                            )
                             * 0.1450377377
                         ),
                         "outerRightRearTirePressure": round(
@@ -148,7 +151,8 @@ class CarSensor(
                                 self.coordinator.data["TPMS"][
                                     "outerRightRearTirePressure"
                                 ]["value"]
-                            or 0)
+                                or 0
+                            )
                             * 0.1450377377
                         ),
                     }
