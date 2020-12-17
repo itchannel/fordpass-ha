@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.12
+- Fixed window status reporting as Open
+
 ### Version 1.11
 - Added check for "Undefined_window_position" window value
 - Fixed bug when TMPS value was 0 (Some cars return 0 on individual tyre pressures)
