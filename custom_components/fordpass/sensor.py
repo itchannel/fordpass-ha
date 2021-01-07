@@ -65,7 +65,12 @@ class CarSensor(
             elif self.sensor == "windowPosition":
                 if self.coordinator.data[self.sensor] == None:
                     return "Unsupported"
-                window_closed_status = ["Fully_Closed", "Fully_closed_position", "Undefined_window_position", "Undefined"]
+                window_closed_status = [
+                    "Fully_Closed",
+                    "Fully_closed_position",
+                    "Undefined_window_position",
+                    "Undefined",
+                ]
                 for key, value in self.coordinator.data[self.sensor].items():
                     if value["value"] not in window_closed_status:
                         return "Open"
