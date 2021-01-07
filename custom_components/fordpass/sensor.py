@@ -65,7 +65,12 @@ class CarSensor(
             elif self.sensor == "windowPosition":
                 if self.coordinator.data[self.sensor] == None:
                     return "Unsupported"
-                window_closed_status = ["Fully_Closed", "Fully_closed_position", "Undefined_window_position"]
+                window_closed_status = [
+                    "Fully_Closed",
+                    "Fully_closed_position",
+                    "Undefined_window_position",
+                    "Undefined",
+                ]
                 for key, value in self.coordinator.data[self.sensor].items():
                     if value["value"] not in window_closed_status:
                         return "Open"
@@ -118,6 +123,10 @@ class CarSensor(
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "tirePressure":
                 if self.coordinator.data["TPMS"] != None:
+                    if self.options[CONF_UNIT] == "imperial":
+                        sval = 0.1450377377
+                    else:
+                        sval = 1
                     return {
                         "leftFrontTirePressure": round(
                             float(
@@ -126,7 +135,7 @@ class CarSensor(
                                 ]
                                 or 0
                             )
-                            * 0.1450377377
+                            * sval
                         ),
                         "rightFrontTirePressure": round(
                             float(
@@ -135,7 +144,7 @@ class CarSensor(
                                 ]
                                 or 0
                             )
-                            * 0.1450377377
+                            * sval
                         ),
                         "outerLeftRearTirePressure": round(
                             float(
@@ -144,7 +153,7 @@ class CarSensor(
                                 ]["value"]
                                 or 0
                             )
-                            * 0.1450377377
+                            * sval
                         ),
                         "outerRightRearTirePressure": round(
                             float(
@@ -153,7 +162,7 @@ class CarSensor(
                                 ]["value"]
                                 or 0
                             )
-                            * 0.1450377377
+                            * sval
                         ),
                     }
                 return None

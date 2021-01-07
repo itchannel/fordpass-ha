@@ -5,6 +5,7 @@ import time
 
 import requests
 
+_LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
     "Accept": "*/*",
     "Accept-Language": "en-us",
@@ -39,6 +40,7 @@ class Vehicle(object):
         self.expires = None
         self.expiresAt = None
         self.refresh_token = None
+        self.token_location = "custom_components/fordpass/fordpass_token.txt"
 
     def auth(self):
         """Authenticate and store the token"""
@@ -62,7 +64,7 @@ class Vehicle(object):
         )
 
         if r.status_code == 200:
-            logging.info("Succesfully fetched token Stage1")
+            _LOGGER.debug("Succesfully fetched token Stage1")
             result = r.json()
             data = {"code": result["access_token"]}
             headers = {**apiHeaders, "Application-Id": self.region}
@@ -102,12 +104,15 @@ class Vehicle(object):
             self.token = result["access_token"]
             self.refresh_token = result["refresh_token"]
             self.expiresAt = time.time() + result["expires_in"]
+        if r.status_code == 401:
+            _LOGGER.debug("401 response stage 2: refresh stage 1 token")
+            self.auth()
 
     def __acquireToken(self):
         # Fetch and refresh token as needed
         # If file exists read in token file and check it's valid
         if self.saveToken:
-            if os.path.isfile("/tmp/fordpass_token.txt"):
+            if os.path.isfile(self.token_location):
                 data = self.readToken()
             else:
                 data = dict()
@@ -123,25 +128,25 @@ class Vehicle(object):
         self.expiresAt = data["expiry_date"]
         if self.expiresAt:
             if time.time() >= self.expiresAt:
-                logging.info("No token, or has expired, requesting new token")
+                _LOGGER.debug("No token, or has expired, requesting new token")
                 self.refreshToken(data)
                 # self.auth()
         if self.token == None:
             # No existing token exists so refreshing library
             self.auth()
         else:
-            logging.info("Token is valid, continuing")
+            _LOGGER.debug("Token is valid, continuing")
             pass
 
     def writeToken(self, token):
         # Save token to file to be reused
-        with open("/tmp/fordpass_token.txt", "w") as outfile:
+        with open(self.token_location, "w") as outfile:
             token["expiry_date"] = time.time() + token["expires_in"]
             json.dump(token, outfile)
 
     def readToken(self):
         # Get saved token from file
-        with open("/tmp/fordpass_token.txt") as token_file:
+        with open(self.token_location) as token_file:
             return json.load(token_file)
 
     def clearToken(self):
@@ -170,6 +175,16 @@ class Vehicle(object):
             result = r.json()
             if result["status"] == 402:
                 r.raise_for_status()
+            return result["vehiclestatus"]
+        if r.status_code == 401:
+            self.refreshToken(self.token)
+            r = requests.get(
+                f"{baseUrl}/vehicles/v4/{self.vin}/status",
+                params=params,
+                headers=headers,
+            )
+            if r.status_code == 200:
+                result = r.json()
             return result["vehiclestatus"]
         else:
             r.raise_for_status()
@@ -236,14 +251,14 @@ class Vehicle(object):
         status = self.__makeRequest("GET", f"{url}/{id}", None, None)
         result = status.json()
         if result["status"] == 552:
-            logging.info("Command is pending")
+            _LOGGER.debug("Command is pending")
             time.sleep(5)
             return self.__pollStatus(url, id)  # retry after 5s
         elif result["status"] == 200:
-            logging.info("Command completed succesfully")
+            _LOGGER.debug("Command completed succesfully")
             return True
         else:
-            logging.info("Command failed")
+            _LOGGER.debug("Command failed")
             return False
 
     def __requestAndPoll(self, method, url):
