@@ -1,5 +1,11 @@
 
 # **Changelog**
+### Version 1.13
+- Fixed window status for Undefined
+- Tire pressure now reports based on region
+- Fixed 401 error for certain token refreshes
+- Token file has been moved to same folder as install (Can be changed by changing the token_location variable)
+
 ### Version 1.12
 - Fixed window status reporting as Open
 

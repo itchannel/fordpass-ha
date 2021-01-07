@@ -177,7 +177,12 @@ class Vehicle(object):
                 r.raise_for_status()
             return result["vehiclestatus"]
         if r.status_code == 401:
-            self.refreshToken(self.token)
+            _LOGGER.debug("401 with status request: start token refresh")
+            data = dict()
+            data["access_token"] = self.token
+            data["refresh_token"] = self.refresh_token
+            data["expiry_date"] = self.expiresAt
+            self.refreshToken(data)
             r = requests.get(
             f"{baseUrl}/vehicles/v4/{self.vin}/status", params=params, headers=headers
             )
