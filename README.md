@@ -1,5 +1,7 @@
 # Fordpass Home Assistant Integration
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
+
 ## Credit 
 - https://github.com/clarkd - Initial Home Assistant automation idea and Python code (Lock/Unlock)
 - https://github.com/pinballnewf - Figuring out the application ID issue

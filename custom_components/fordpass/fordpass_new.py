@@ -183,6 +183,12 @@ class Vehicle(object):
             data["refresh_token"] = self.refresh_token
             data["expiry_date"] = self.expiresAt
             self.refreshToken(data)
+            self.__acquireToken()
+            headers = {
+                **apiHeaders,
+                "auth-token": self.token,
+                "Application-Id": self.region,
+            }
             r = requests.get(
             f"{baseUrl}/vehicles/v4/{self.vin}/status", params=params, headers=headers
             )
