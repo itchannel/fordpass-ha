@@ -1,8 +1,11 @@
 # Fordpass Home Assistant Integration
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
+
 ## Credit 
 - https://github.com/clarkd - Initial Home Assistant automation idea and Python code (Lock/Unlock)
 - https://github.com/pinballnewf - Figuring out the application ID issue
+- https://github.com/degrashopper - Fixing 401 error for certain installs
 
 ## Install
 Use HACS and add as a custom repo. Once the integration is installed go to your integrations and follow the configuration options to specify the below:
