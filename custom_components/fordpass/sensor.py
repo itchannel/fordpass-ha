@@ -1,8 +1,8 @@
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from homeassistant.helpers.entity import Entity
-from homeassistant.util import Throttle
+from homeassistant.util import Throttle, dt
 
 from . import FordPassEntity
 from .const import CONF_UNIT, DOMAIN, SENSORS
@@ -76,7 +76,7 @@ class CarSensor(
                         return "Open"
                 return "Closed"
             elif self.sensor == "lastRefresh":
-                return self.coordinator.data[self.sensor]
+                return dt.as_local(datetime.strptime(self.coordinator.data[self.sensor], '%m-%d-%Y %H:%M:%S'))
             elif self.sensor == "elVeh":
                 if self.coordinator.data["elVehDTE"] != None:
                     return self.coordinator.data["chargingStatus"]["value"]
