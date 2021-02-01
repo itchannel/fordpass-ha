@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.14
+- Converted "lastrefresh" to home assistant local time
+
 ### Version 1.13
 - Fixed window status for Undefined
 - Tire pressure now reports based on region
