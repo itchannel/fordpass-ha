@@ -190,7 +190,9 @@ class Vehicle(object):
                 "Application-Id": self.region,
             }
             r = requests.get(
-            f"{baseUrl}/vehicles/v4/{self.vin}/status", params=params, headers=headers
+                f"{baseUrl}/vehicles/v4/{self.vin}/status",
+                params=params,
+                headers=headers,
             )
             if r.status_code == 200:
                 result = r.json()
