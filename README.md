@@ -53,3 +53,4 @@ If you are experiencing any sign in issues, please trying clearing your tokens u
 ## Coming Soon
 
 - Alarm event (Anyone have the json output for this event would be appreciated :) )
+- Will address the bugs/requests by the end of the month busy with work currently.
