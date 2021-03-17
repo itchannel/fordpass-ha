@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.15
+- Added Version attribute to manifest.json
+
 ### Version 1.14
 - Converted "lastrefresh" to home assistant local time
 
