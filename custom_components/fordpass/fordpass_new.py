@@ -143,6 +143,7 @@ class Vehicle(object):
         with open(self.token_location, "w") as outfile:
             token["expiry_date"] = time.time() + token["expires_in"]
             json.dump(token, outfile)
+            outfile.truncate()
 
     def readToken(self):
         # Get saved token from file
@@ -154,6 +155,8 @@ class Vehicle(object):
             os.remove("/tmp/fordpass_token.txt")
         if os.path.isfile("/tmp/token.txt"):
             os.remove("/tmp/token.txt")
+        if os.path.isfile(self.token_location):
+            os.remove(self.token_location)
 
     def status(self):
         # Get the status of the vehicle
@@ -190,7 +193,9 @@ class Vehicle(object):
                 "Application-Id": self.region,
             }
             r = requests.get(
-            f"{baseUrl}/vehicles/v4/{self.vin}/status", params=params, headers=headers
+                f"{baseUrl}/vehicles/v4/{self.vin}/status",
+                params=params,
+                headers=headers,
             )
             if r.status_code == 200:
                 result = r.json()

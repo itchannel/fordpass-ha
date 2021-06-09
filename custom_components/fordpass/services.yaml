@@ -1,4 +1,9 @@
 refresh_status:
   description: "Poll car for latest status (Takes up to 5mins to update once this function has been run!)"
+  fields:
+    vin:
+      name: Vin
+      description: "Parse a vin number to only refresh the specified vehicle (Default refreshes all added vehicles)"
+      example: "1C4GJ25342B521742"
 clear_tokens:
   description: "Clear the cached tokens"
