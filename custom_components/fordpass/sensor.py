@@ -1,5 +1,5 @@
 import logging
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle, dt
@@ -76,7 +76,11 @@ class CarSensor(
                         return "Open"
                 return "Closed"
             elif self.sensor == "lastRefresh":
-                return dt.as_local(datetime.strptime(self.coordinator.data[self.sensor], '%m-%d-%Y %H:%M:%S'))
+                return dt.as_local(
+                    datetime.strptime(
+                        self.coordinator.data[self.sensor], "%m-%d-%Y %H:%M:%S"
+                    )
+                )
             elif self.sensor == "elVeh":
                 if self.coordinator.data["elVehDTE"] != None:
                     return self.coordinator.data["chargingStatus"]["value"]
@@ -112,7 +116,7 @@ class CarSensor(
             if self.sensor == "odometer":
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "fuel":
-                
+
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "battery":
                 return {
