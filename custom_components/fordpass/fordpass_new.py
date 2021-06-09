@@ -235,11 +235,15 @@ class Vehicle(object):
             "DELETE", f"{baseUrl}/vehicles/v2/{self.vin}/doors/lock"
         )
 
-    def requestUpdate(self):
+    def requestUpdate(self, vin=""):
         # Send request to refresh data from the cars module
         self.__acquireToken()
+        if vin:
+            vinnum = vin
+        else:
+            vinnum = self.vin
         status = self.__makeRequest(
-            "PUT", f"{baseUrl}/vehicles/v2/{self.vin}/status", None, None
+            "PUT", f"{baseUrl}/vehicles/v2/{vinnum}/status", None, None
         )
         return status.json()["status"]
 
