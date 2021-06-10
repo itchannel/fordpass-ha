@@ -142,13 +142,26 @@ class Vehicle(object):
         # Save token to file to be reused
         with open(self.token_location, "w") as outfile:
             token["expiry_date"] = time.time() + token["expires_in"]
+            _LOGGER.debug(token)
             json.dump(token, outfile)
-            outfile.truncate()
 
     def readToken(self):
         # Get saved token from file
-        with open(self.token_location) as token_file:
-            return json.load(token_file)
+        try:
+          with open(self.token_location) as token_file:
+            test = json.load(token_file)
+            _LOGGER.debug(test)
+            return test
+        except ValueError:
+          _LOGGER.debug("Fixing malformed token")
+          with open(self.token_location, 'rb+') as filehandle:
+             filehandle.seek(-1, os.SEEK_END)
+             filehandle.truncate()
+          with open(self.token_location) as token_file:
+            test = json.load(token_file)
+            _LOGGER.debug(test)
+            return test
+
 
     def clearToken(self):
         if os.path.isfile("/tmp/fordpass_token.txt"):
@@ -202,6 +215,21 @@ class Vehicle(object):
             return result["vehiclestatus"]
         else:
             r.raise_for_status()
+    
+    def guardStatus(self):
+        #WIP current being tested
+        self.__acquireToken()
+
+        params = {"lrdt": "01-01-1970 00:00:00"}
+
+        headers = {**apiHeaders, "auth-token": self.token}
+
+        r = requests.get(
+            f"{guardUrl}/guardmode/v1/{self.vin}/session", params=params, headers=headers
+        )
+        _LOGGER.debug(r.text)
+        _LOGGER.debug(r.status_code)
+
 
     def start(self):
         """
@@ -234,6 +262,30 @@ class Vehicle(object):
         return self.__requestAndPoll(
             "DELETE", f"{baseUrl}/vehicles/v2/{self.vin}/doors/lock"
         )
+
+
+    def enableGuard(self):
+        """
+        Enable Guard mode on supported models
+        """
+        self.__acquireToken()
+
+        r = self.__makeRequest(
+            "PUT", f"{guardUrl}/guardmode/v1/{self.vin}/session", None, None
+        )
+        _LOGGER.debug(r.text)
+        return r
+
+    def disableGuard(self):
+        """
+        Disable Guard mode on supported models
+        """
+        self.__acquireToken()
+        r = self.__makeRequest(
+            "DELETE", f"{guardUrl}/guardmode/v1/{self.vin}/session", None, None
+        )
+        _LOGGER.debug(r.text)
+        return r
 
     def requestUpdate(self, vin=""):
         # Send request to refresh data from the cars module
