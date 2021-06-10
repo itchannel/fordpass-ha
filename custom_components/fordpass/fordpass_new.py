@@ -26,6 +26,8 @@ region_lookup = {
 
 baseUrl = "https://usapi.cv.ford.com/api"
 
+guardUrl = "https://api.mps.ford.com/api"
+
 
 class Vehicle(object):
     # Represents a Ford vehicle, with methods for status and issuing commands
