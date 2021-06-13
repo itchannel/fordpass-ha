@@ -213,9 +213,9 @@ class Vehicle(object):
             return result["vehiclestatus"]
         else:
             r.raise_for_status()
-    
+
     def guardStatus(self):
-        #WIP current being tested
+        # WIP current being tested
         self.__acquireToken()
 
         params = {"lrdt": "01-01-1970 00:00:00"}
@@ -223,11 +223,12 @@ class Vehicle(object):
         headers = {**apiHeaders, "auth-token": self.token}
 
         r = requests.get(
-            f"{guardUrl}/guardmode/v1/{self.vin}/session", params=params, headers=headers
+            f"{guardUrl}/guardmode/v1/{self.vin}/session",
+            params=params,
+            headers=headers,
         )
         _LOGGER.debug(r.text)
         _LOGGER.debug(r.status_code)
-
 
     def start(self):
         """
@@ -260,7 +261,6 @@ class Vehicle(object):
         return self.__requestAndPoll(
             "DELETE", f"{baseUrl}/vehicles/v2/{self.vin}/doors/lock"
         )
-
 
     def enableGuard(self):
         """
