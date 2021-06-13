@@ -26,6 +26,8 @@ region_lookup = {
 
 baseUrl = "https://usapi.cv.ford.com/api"
 
+guardUrl = "https://api.mps.ford.com/api"
+
 
 class Vehicle(object):
     # Represents a Ford vehicle, with methods for status and issuing commands
@@ -142,18 +144,30 @@ class Vehicle(object):
         # Save token to file to be reused
         with open(self.token_location, "w") as outfile:
             token["expiry_date"] = time.time() + token["expires_in"]
+            _LOGGER.debug(token)
             json.dump(token, outfile)
 
     def readToken(self):
         # Get saved token from file
-        with open(self.token_location) as token_file:
-            return json.load(token_file)
+        try:
+          with open(self.token_location) as token_file:
+            token = json.load(token_file)
+            return token
+        except ValueError:
+          _LOGGER.debug("Fixing malformed token")
+          self.auth()
+          with open(self.token_location) as token_file:
+            token = json.load(token_file)
+            return token
+
 
     def clearToken(self):
         if os.path.isfile("/tmp/fordpass_token.txt"):
             os.remove("/tmp/fordpass_token.txt")
         if os.path.isfile("/tmp/token.txt"):
             os.remove("/tmp/token.txt")
+        if os.path.isfile(self.token_location):
+            os.remove(self.token_location)
 
     def status(self):
         # Get the status of the vehicle
@@ -200,6 +214,22 @@ class Vehicle(object):
         else:
             r.raise_for_status()
 
+    def guardStatus(self):
+        # WIP current being tested
+        self.__acquireToken()
+
+        params = {"lrdt": "01-01-1970 00:00:00"}
+
+        headers = {**apiHeaders, "auth-token": self.token}
+
+        r = requests.get(
+            f"{guardUrl}/guardmode/v1/{self.vin}/session",
+            params=params,
+            headers=headers,
+        )
+        _LOGGER.debug(r.text)
+        _LOGGER.debug(r.status_code)
+
     def start(self):
         """
         Issue a start command to the engine
@@ -232,11 +262,38 @@ class Vehicle(object):
             "DELETE", f"{baseUrl}/vehicles/v2/{self.vin}/doors/lock"
         )
 
-    def requestUpdate(self):
+    def enableGuard(self):
+        """
+        Enable Guard mode on supported models
+        """
+        self.__acquireToken()
+
+        r = self.__makeRequest(
+            "PUT", f"{guardUrl}/guardmode/v1/{self.vin}/session", None, None
+        )
+        _LOGGER.debug(r.text)
+        return r
+
+    def disableGuard(self):
+        """
+        Disable Guard mode on supported models
+        """
+        self.__acquireToken()
+        r = self.__makeRequest(
+            "DELETE", f"{guardUrl}/guardmode/v1/{self.vin}/session", None, None
+        )
+        _LOGGER.debug(r.text)
+        return r
+
+    def requestUpdate(self, vin=""):
         # Send request to refresh data from the cars module
         self.__acquireToken()
+        if vin:
+            vinnum = vin
+        else:
+            vinnum = self.vin
         status = self.__makeRequest(
-            "PUT", f"{baseUrl}/vehicles/v2/{self.vin}/status", None, None
+            "PUT", f"{baseUrl}/vehicles/v2/{vinnum}/status", None, None
         )
         return status.json()["status"]
 

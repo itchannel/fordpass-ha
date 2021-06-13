@@ -18,7 +18,9 @@ Use HACS and add as a custom repo. Once the integration is installed go to your 
 Your car must have the lastest onboard modem functionality and have registered/authorised the fordpass application
 
 ### Car Refresh
-I have added a service to poll the car for updates, due to the battery drain I have left this up to you to set the interval. The service to be called is "refresh_status" and can be accessed in home assistant using "fordpas.refresh_status" with no parameters.
+I have added a service to poll the car for updates, due to the battery drain I have left this up to you to set the interval. The service to be called is "refresh_status" and can be accessed in home assistant using "fordpas.refresh_status". 
+
+Optionally you can add the "vin" parameter followed by your VIN number to only refresh one vehicle. By default this service will refresh all registered cars in HA.
 
 **This will take up to 5 mins to update from the car once the service has been run**
 ###

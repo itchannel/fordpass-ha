@@ -116,6 +116,7 @@ class CarSensor(
             if self.sensor == "odometer":
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "fuel":
+
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "battery":
                 return {

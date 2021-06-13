@@ -94,17 +94,17 @@ async def async_update_options(hass, config_entry):
     hass.config_entries.async_update_entry(config_entry, options=options)
 
 
-def refresh_status(service, hass, coordinator):
+def refresh_status(hass, service, coordinator):
     _LOGGER.debug("Running Service")
-    coordinator.vehicle.requestUpdate()
+    vin = service.data.get("vin", "")
+    status = coordinator.vehicle.requestUpdate(vin)
+    if status == 401:
+        _LOGGER.debug("Invalid VIN")
+    elif status == 200:
+        _LOGGER.debug("Refresh Sent")
 
 
-def clear_tokens(service, hass, coordinator):
-    _LOGGER.debug("Clearing Tokens")
-    coordinator.vehicle.clearToken()
-
-
-def clear_tokens(service, hass, coordinator):
+def clear_tokens(hass, service, coordinator):
     _LOGGER.debug("Clearing Tokens")
     coordinator.vehicle.clearToken()
 

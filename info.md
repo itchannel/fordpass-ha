@@ -1,5 +1,12 @@
 
 # **Changelog**
+
+### Version 1.16
+- Fixed json error when adding multiple cars
+- Added "vin" option to "refresh" service to allow for refreshing of individual cars
+- Fixed service bug calling the wrong variable
+- Updated manifest for latest HA requirements
+
 ### Version 1.15
 - Added Version attribute to manifest.json
 
