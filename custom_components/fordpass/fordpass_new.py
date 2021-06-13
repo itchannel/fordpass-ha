@@ -151,18 +151,14 @@ class Vehicle(object):
         # Get saved token from file
         try:
           with open(self.token_location) as token_file:
-            test = json.load(token_file)
-            _LOGGER.debug(test)
-            return test
+            token = json.load(token_file)
+            return token
         except ValueError:
           _LOGGER.debug("Fixing malformed token")
-          with open(self.token_location, 'rb+') as filehandle:
-             filehandle.seek(-1, os.SEEK_END)
-             filehandle.truncate()
+          self.auth()
           with open(self.token_location) as token_file:
-            test = json.load(token_file)
-            _LOGGER.debug(test)
-            return test
+            token = json.load(token_file)
+            return token
 
 
     def clearToken(self):
