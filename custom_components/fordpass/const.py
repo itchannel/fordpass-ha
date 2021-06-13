@@ -32,3 +32,8 @@ SENSORS = {
     "lastRefresh": {"icon": "mdi:clock"},
     "elVeh": {"icon": "mdi:ev-station"},
 }
+
+SWITCHES = {
+    "ignition" : {"icon": "hass:power"},
+    "guardmode" : {"icon": "mdi:shield-key"}
+}
