@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.17
+- Added VIN option to UI
+- Added Guard mode switch (Need people to test as don't have access to a guard mode enabled vehicle)
 
 ### Version 1.16
 - Fixed json error when adding multiple cars

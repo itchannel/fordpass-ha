@@ -150,16 +150,15 @@ class Vehicle(object):
     def readToken(self):
         # Get saved token from file
         try:
-          with open(self.token_location) as token_file:
-            token = json.load(token_file)
-            return token
+            with open(self.token_location) as token_file:
+                token = json.load(token_file)
+                return token
         except ValueError:
-          _LOGGER.debug("Fixing malformed token")
-          self.auth()
-          with open(self.token_location) as token_file:
-            token = json.load(token_file)
-            return token
-
+            _LOGGER.debug("Fixing malformed token")
+            self.auth()
+            with open(self.token_location) as token_file:
+                token = json.load(token_file)
+                return token
 
     def clearToken(self):
         if os.path.isfile("/tmp/fordpass_token.txt"):
