@@ -3,6 +3,14 @@
 ### Version 1.17
 - Added VIN option to UI
 - Added Guard mode switch (Need people to test as don't have access to a guard mode enabled vehicle)
+- Added extra sensors (Credit @tonesto7)
+    - Zonelighting (Supported models only)
+    - Deep sleep status
+    - Remote start status
+    - Firmware update status
+- Added partial opening status for windows (Credit @tonesto7)
+- Added logic to only add supported sensors (Still in Beta)
+
 
 ### Version 1.16
 - Fixed json error when adding multiple cars
