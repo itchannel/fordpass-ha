@@ -54,3 +54,5 @@ WINDOW_POSITIONS = {
         "Btwn 10% and 60% open": "Open-Partial",
     },
 }
+
+SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
