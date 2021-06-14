@@ -12,8 +12,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Switch from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id]
 
-    #switches = [Switch(entry)]
-    #async_add_entities(switches, False)
+    # switches = [Switch(entry)]
+    # async_add_entities(switches, False)
     for key, value in SWITCHES.items():
         sw = Switch(entry, key, config_entry.options)
         # Only add guard entity if supported by the car
@@ -26,7 +26,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             async_add_entities([sw], False)
 
 
-
 class Switch(FordPassEntity, SwitchEntity):
     """Define the Switch for turning ignition off/on"""
 
@@ -35,7 +34,6 @@ class Switch(FordPassEntity, SwitchEntity):
         self._device_id = "fordpass_" + switch
         self.switch = switch
         self.coordinator = coordinator
-
 
     async def async_turn_on(self, **kwargs):
         if self.switch == "ignition":
@@ -64,6 +62,7 @@ class Switch(FordPassEntity, SwitchEntity):
     @property
     def name(self):
         return "fordpass_" + self.switch + "_Switch"
+
     @property
     def device_id(self):
         return self.device_id
@@ -93,7 +92,6 @@ class Switch(FordPassEntity, SwitchEntity):
                 return True
             else:
                 return False
-
 
     @property
     def icon(self):

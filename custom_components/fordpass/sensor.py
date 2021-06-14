@@ -13,7 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Entities from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id]
-    
+
     for key, value in SENSORS.items():
         sensor = CarSensor(entry, key, config_entry.options)
         # Add support for only adding compatible sensors for the given vehicle
@@ -98,8 +98,13 @@ class CarSensor(
             elif self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.coordinator.data:
                     return "Unsupported"
-                if self.coordinator.data["zoneLighting"] != None and self.coordinator.data["zoneLighting"]["activationData"] != None:
-                    return self.coordinator.data["zoneLighting"]["activationData"]["value"]
+                if (
+                    self.coordinator.data["zoneLighting"] != None
+                    and self.coordinator.data["zoneLighting"]["activationData"] != None
+                ):
+                    return self.coordinator.data["zoneLighting"]["activationData"][
+                        "value"
+                    ]
                 else:
                     return "Unsupported"
             elif self.sensor == "remoteStartStatus":
@@ -241,45 +246,103 @@ class CarSensor(
                     return None
                 else:
                     elecs = dict()
-                    if self.coordinator.data["plugStatus"] != None and self.coordinator.data["plugStatus"]["value"] != None:
-                        elecs["Plug Status"] = self.coordinator.data["plugStatus"]["value"]
+                    if (
+                        self.coordinator.data["plugStatus"] != None
+                        and self.coordinator.data["plugStatus"]["value"] != None
+                    ):
+                        elecs["Plug Status"] = self.coordinator.data["plugStatus"][
+                            "value"
+                        ]
 
-                    if self.coordinator.data["chargeStartTime"] != None and self.coordinator.data["chargeStartTime"]["value"] != None:
-                        elecs["Charge Start Time"] = self.coordinator.data["chargeStartTime"]["value"]
+                    if (
+                        self.coordinator.data["chargeStartTime"] != None
+                        and self.coordinator.data["chargeStartTime"]["value"] != None
+                    ):
+                        elecs["Charge Start Time"] = self.coordinator.data[
+                            "chargeStartTime"
+                        ]["value"]
 
-                    if self.coordinator.data["chargeEndTime"] != None and self.coordinator.data["chargeEndTime"]["value"] != None:
-                        elecs["Charge End Time"] = self.coordinator.data["chargeEndTime"]["value"]
-                    
-                    if self.coordinator.data["batteryFillLevel"] != None and self.coordinator.data["batteryFillLevel"]["value"] != None:
-                        elecs["Battery Fill Level"] = self.coordinator.data["batteryFillLevel"]["value"]
+                    if (
+                        self.coordinator.data["chargeEndTime"] != None
+                        and self.coordinator.data["chargeEndTime"]["value"] != None
+                    ):
+                        elecs["Charge End Time"] = self.coordinator.data[
+                            "chargeEndTime"
+                        ]["value"]
 
-                    if self.coordinator.data["chargerPowertype"] != None and self.coordinator.data["chargerPowertype"]["value"] != None:
-                        elecs["Charger Power Type"] = self.coordinator.data["chargerPowertype"]["value"]
+                    if (
+                        self.coordinator.data["batteryFillLevel"] != None
+                        and self.coordinator.data["batteryFillLevel"]["value"] != None
+                    ):
+                        elecs["Battery Fill Level"] = self.coordinator.data[
+                            "batteryFillLevel"
+                        ]["value"]
 
-                    if self.coordinator.data["batteryChargeStatus"] != None and self.coordinator.data["batteryChargeStatus"]["value"] != None:
-                        elecs["Battery Charge Status"] = self.coordinator.data["batteryChargeStatus"]["value"]
+                    if (
+                        self.coordinator.data["chargerPowertype"] != None
+                        and self.coordinator.data["chargerPowertype"]["value"] != None
+                    ):
+                        elecs["Charger Power Type"] = self.coordinator.data[
+                            "chargerPowertype"
+                        ]["value"]
 
-                    if self.coordinator.data["batteryPerfStatus"] != None and self.coordinator.data["batteryPerfStatus"]["value"] != None:
-                        elecs["Battery Performance Status"] = self.coordinator.data["batteryPerfStatus"]["value"]
+                    if (
+                        self.coordinator.data["batteryChargeStatus"] != None
+                        and self.coordinator.data["batteryChargeStatus"]["value"]
+                        != None
+                    ):
+                        elecs["Battery Charge Status"] = self.coordinator.data[
+                            "batteryChargeStatus"
+                        ]["value"]
+
+                    if (
+                        self.coordinator.data["batteryPerfStatus"] != None
+                        and self.coordinator.data["batteryPerfStatus"]["value"] != None
+                    ):
+                        elecs["Battery Performance Status"] = self.coordinator.data[
+                            "batteryPerfStatus"
+                        ]["value"]
 
                     return elecs
             elif self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.coordinator.data:
                     return None
-                if self.coordinator.data[self.sensor] != None and self.coordinator.data[self.sensor]["zoneStatusData"] != None:
+                if (
+                    self.coordinator.data[self.sensor] != None
+                    and self.coordinator.data[self.sensor]["zoneStatusData"] != None
+                ):
                     zone = dict()
                     if self.coordinator.data[self.sensor]["zoneStatusData"] != None:
-                        for key, value in self.coordinator.data[self.sensor]["zoneStatusData"].items():
+                        for key, value in self.coordinator.data[self.sensor][
+                            "zoneStatusData"
+                        ].items():
                             zone["zone_" + key] = value["value"]
 
-                    if self.coordinator.data[self.sensor]["lightSwitchStatusData"] != None:
-                        for key, value in self.coordinator.data[self.sensor]["lightSwitchStatusData"].items():
+                    if (
+                        self.coordinator.data[self.sensor]["lightSwitchStatusData"]
+                        != None
+                    ):
+                        for key, value in self.coordinator.data[self.sensor][
+                            "lightSwitchStatusData"
+                        ].items():
                             zone[key] = value["value"]
 
-                    if self.coordinator.data[self.sensor]["zoneLightingFaultStatus"] != None:
-                        zone["zoneLightingFaultStatus"] = self.coordinator.data[self.sensor]["zoneLightingFaultStatus"]["value"]
-                    if self.coordinator.data[self.sensor]["zoneLightingShutDownWarning"] != None:
-                        zone["zoneLightingShutDownWarning"] = self.coordinator.data[self.sensor]["zoneLightingShutDownWarning"]["value"]
+                    if (
+                        self.coordinator.data[self.sensor]["zoneLightingFaultStatus"]
+                        != None
+                    ):
+                        zone["zoneLightingFaultStatus"] = self.coordinator.data[
+                            self.sensor
+                        ]["zoneLightingFaultStatus"]["value"]
+                    if (
+                        self.coordinator.data[self.sensor][
+                            "zoneLightingShutDownWarning"
+                        ]
+                        != None
+                    ):
+                        zone["zoneLightingShutDownWarning"] = self.coordinator.data[
+                            self.sensor
+                        ]["zoneLightingShutDownWarning"]["value"]
                     return zone
                 else:
                     return None
