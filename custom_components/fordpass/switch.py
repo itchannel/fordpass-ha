@@ -15,15 +15,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     #switches = [Switch(entry)]
     #async_add_entities(switches, False)
     for key, value in SWITCHES.items():
-        test = Switch(entry, key, config_entry.options)
+        sw = Switch(entry, key, config_entry.options)
         # Only add guard entity if supported by the car
         if key == "guardmode":
-            if test.coordinator.data["guardstatus"]["returnCode"] == 200:
-                async_add_entities([test], False)
+            if sw.coordinator.data["guardstatus"]["returnCode"] == 200:
+                async_add_entities([sw], False)
             else:
                 _LOGGER.debug("Guard mode not supported on this vehicle")
         else:
-            async_add_entities([test], False)
+            async_add_entities([sw], False)
 
 
 

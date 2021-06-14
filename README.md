@@ -6,6 +6,7 @@
 - https://github.com/clarkd - Initial Home Assistant automation idea and Python code (Lock/Unlock)
 - https://github.com/pinballnewf - Figuring out the application ID issue
 - https://github.com/degrashopper - Fixing 401 error for certain installs
+- https://github.com/tonesto7 - Extra window statuses and sensors
 
 ## Install
 Use HACS and add as a custom repo. Once the integration is installed go to your integrations and follow the configuration options to specify the below:
@@ -50,9 +51,11 @@ If you are experiencing any sign in issues, please trying clearing your tokens u
 - Supports Multiple Regions
 - Electric Vehicle Support
 - TPMS Sensors
+- Guard Mode (Only supported cars)
+- Deep sleep status
 
 
 ## Coming Soon
 
-- Alarm event (Anyone have the json output for this event would be appreciated :) )
-- Will address the bugs/requests by the end of the month busy with work currently.
+- Fordpass messages and alerts
+- Next service due
