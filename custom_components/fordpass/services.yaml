@@ -5,5 +5,7 @@ refresh_status:
       name: Vin
       description: "Parse a vin number to only refresh the specified vehicle (Default refreshes all added vehicles)"
       example: "1C4GJ25342B521742"
+      selector:
+        text:
 clear_tokens:
   description: "Clear the cached tokens"
