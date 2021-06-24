@@ -230,8 +230,8 @@ class Vehicle(object):
             params=params,
             headers=headers,
         )
-        _LOGGER.debug(r.text)
-        _LOGGER.debug(r.status_code)
+        return r.json()
+
 
     def start(self):
         """
