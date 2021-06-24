@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.18
+- Fix Guard mode error (Missing data array)
+
 ### Version 1.17
 - Added VIN option to UI
 - Added Guard mode switch (Need people to test as don't have access to a guard mode enabled vehicle)
