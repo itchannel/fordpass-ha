@@ -26,7 +26,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             async_add_entities([sw], False)
 
 
-
 class Switch(FordPassEntity, SwitchEntity):
     """Define the Switch for turning ignition off/on"""
 

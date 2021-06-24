@@ -31,16 +31,19 @@ SENSORS = {
     "windowPosition": {"icon": "mdi:car-door"},
     "lastRefresh": {"icon": "mdi:clock"},
     "elVeh": {"icon": "mdi:ev-station"},
-    "deepSleepInProgress": {"icon": "mdi:power-sleep", "name": "Deep Sleep Mode Active"},
-    "firmwareUpgInProgress": {"icon": "mdi:one-up", "name": "Firmware Update In Progress"},
+    "deepSleepInProgress": {
+        "icon": "mdi:power-sleep",
+        "name": "Deep Sleep Mode Active",
+    },
+    "firmwareUpgInProgress": {
+        "icon": "mdi:one-up",
+        "name": "Firmware Update In Progress",
+    },
     "remoteStartStatus": {"icon": "mdi:remote"},
     "zoneLighting": {"icon": "mdi:spotlight-beam"},
 }
 
-SWITCHES = {
-    "ignition" : {"icon": "hass:power"},
-    "guardmode" : {"icon": "mdi:shield-key"}
-}
+SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
 
 WINDOW_POSITIONS = {
     "CLOSED": {
