@@ -219,15 +219,19 @@ class Vehicle(object):
 
         params = {"lrdt": "01-01-1970 00:00:00"}
 
-        headers = {**apiHeaders, "auth-token": self.token}
+        headers = {
+            **apiHeaders,
+            "auth-token": self.token,
+            "Application-Id": self.region,
+        }
 
         r = requests.get(
             f"{guardUrl}/guardmode/v1/{self.vin}/session",
             params=params,
             headers=headers,
         )
-        _LOGGER.debug(r.text)
-        _LOGGER.debug(r.status_code)
+        return r.json()
+
 
     def start(self):
         """

@@ -18,10 +18,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         sw = Switch(entry, key, config_entry.options)
         # Only add guard entity if supported by the car
         if key == "guardmode":
-            if sw.coordinator.data["guardstatus"]["returnCode"] == 200:
-                async_add_entities([sw], False)
-            else:
-                _LOGGER.debug("Guard mode not supported on this vehicle")
+            if "guardstatus" in sw.coordinator.data:
+                if sw.coordinator.data["guardstatus"]["returnCode"] == 200:
+                    async_add_entities([sw], False)
+                else:
+                    _LOGGER.debug("Guard mode not supported on this vehicle")
         else:
             async_add_entities([sw], False)
 

@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.19
+- Added null guard status handling (effects some vehicles)
+
 ### Version 1.18
 - Fix Guard mode error (Missing data array)
 
