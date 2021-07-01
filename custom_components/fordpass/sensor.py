@@ -17,6 +17,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for key, value in SENSORS.items():
         sensor = CarSensor(entry, key, config_entry.options)
         # Add support for only adding compatible sensors for the given vehicle
+        _LOGGER.debug(sensor.coordinator.data)
         if key == "zoneLighting":
             if "zoneLighting" in sensor.coordinator.data:
                 async_add_entities([sensor], True)

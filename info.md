@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.20
+- Fixed incorrect reporting of guardmode switch status
+
 ### Version 1.19
 - Added null guard status handling (effects some vehicles)
 
