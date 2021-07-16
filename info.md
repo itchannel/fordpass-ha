@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.21
+- Error handling for null fuel and elVehDTE attributes. Thanks @wietseschmitt
+
 ### Version 1.20
 - Fixed incorrect reporting of guardmode switch status
 
