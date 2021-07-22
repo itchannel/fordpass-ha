@@ -32,7 +32,7 @@ guardUrl = "https://api.mps.ford.com/api"
 class Vehicle(object):
     # Represents a Ford vehicle, with methods for status and issuing commands
 
-    def __init__(self, username, password, vin, region, saveToken=False):
+    def __init__(self, username, password, vin, region, saveToken=False, configLocation=""):
         self.username = username
         self.password = password
         self.saveToken = saveToken
@@ -42,7 +42,11 @@ class Vehicle(object):
         self.expires = None
         self.expiresAt = None
         self.refresh_token = None
-        self.token_location = "custom_components/fordpass/fordpass_token.txt"
+        if configLocation == "":
+            self.token_location = "custom_components/fordpass/fordpass_token.txt"
+        else:
+            _LOGGER.debug(configLocation)
+            self.token_location = configLocation
 
     def auth(self):
         """Authenticate and store the token"""
