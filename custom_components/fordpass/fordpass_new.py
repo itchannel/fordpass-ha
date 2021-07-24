@@ -32,7 +32,9 @@ guardUrl = "https://api.mps.ford.com/api"
 class Vehicle(object):
     # Represents a Ford vehicle, with methods for status and issuing commands
 
-    def __init__(self, username, password, vin, region, saveToken=False, configLocation=""):
+    def __init__(
+        self, username, password, vin, region, saveToken=False, configLocation=""
+    ):
         self.username = username
         self.password = password
         self.saveToken = saveToken
@@ -235,7 +237,6 @@ class Vehicle(object):
             headers=headers,
         )
         return r.json()
-
 
     def start(self):
         """
