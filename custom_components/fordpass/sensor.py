@@ -254,9 +254,7 @@ class CarSensor(
                         self.coordinator.data["elVehDTE"] != None
                         and self.coordinator.data["elVehDTE"]["value"] != None
                     ):
-                        elecs["elVehDTE"] = self.coordinator.data["elVehDTE"][
-                            "value"
-                        ]
+                        elecs["elVehDTE"] = self.coordinator.data["elVehDTE"]["value"]
                     if (
                         self.coordinator.data["plugStatus"] != None
                         and self.coordinator.data["plugStatus"]["value"] != None

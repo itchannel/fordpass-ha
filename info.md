@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.22
+- Fix for custom config locations on certain HA installs
+
 ### Version 1.21
 - Error handling for null fuel and elVehDTE attributes. Thanks @wietseschmitt
 
