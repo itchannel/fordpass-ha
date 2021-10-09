@@ -24,7 +24,7 @@
             "init": {
                 "data": {
                     "pressure_unit": "Unit of Pressure",
-                    "distance-unit": "Unit of Distance"
+                    "distance_unit": "Unit of Distance"
                 },
                 "description": "Configure fordpass options"
             }
