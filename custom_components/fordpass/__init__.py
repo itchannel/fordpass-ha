@@ -91,10 +91,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_update_options(hass, config_entry):
     options = {CONF_PRESSURE_UNIT: config_entry.data.get(CONF_PRESSURE_UNIT, DEFAULT_PRESSURE_UNIT)}
-    hass.config_entries.async_update_entry(config_entry, options=options)
-
-async def async_update_options(hass, config_entry):
-    options = {CONF_DISTANCE_UNIT: config_entry.data.get(CONF_DISTANCE_UNIT, DEFAULT_DISTANCE_UNIT)}
+    options[CONF_DISTANCE_UNIT] = config_entry.data.get(CONF_DISTANCE_UNIT, DEFAULT_DISTANCE_UNIT)
     hass.config_entries.async_update_entry(config_entry, options=options)
 
 
