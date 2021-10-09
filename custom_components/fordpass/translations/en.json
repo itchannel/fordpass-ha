@@ -21,12 +21,13 @@
     },
     "options": {
         "step": {
-        "init": {
-            "data": {
-            "units": "Unit of Measurement"
-            },
-            "description": "Configure fordpass options"
-        }
+            "init": {
+                "data": {
+                    "pressure_unit": "Unit of Pressure",
+                    "distance-unit": "Unit of Distance"
+                },
+                "description": "Configure fordpass options"
+            }
         }
     },
     "title": "FordPass"

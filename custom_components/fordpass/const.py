@@ -11,8 +11,8 @@ VEHICLE = "Ford Vehicle"
 DEFAULT_PRESSURE_UNIT = "kPa"
 DEFAULT_DISTANCE_UNIT = "km"
 
-CONF_PRESSURE_UNIT = "units"
-CONF_DISTANCE_UNIT = "units"
+CONF_PRESSURE_UNIT = "pressure_unit"
+CONF_DISTANCE_UNIT = "distance_unit"
 
 PRESSURE_UNITS = ["PSI", "kPa"]
 DISTANCE_UNITS = ["mi", "km"]
