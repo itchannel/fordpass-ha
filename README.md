@@ -7,6 +7,7 @@
 - https://github.com/pinballnewf - Figuring out the application ID issue
 - https://github.com/degrashopper - Fixing 401 error for certain installs
 - https://github.com/tonesto7 - Extra window statuses and sensors
+- https://github.com/JacobWasFramed - Updated unit conversions
 
 ## Install
 Use HACS and add as a custom repo. Once the integration is installed go to your integrations and follow the configuration options to specify the below:

@@ -1,5 +1,9 @@
 
 # **Changelog**
+### Version 1.23
+- Add DistanceToEmpty Imperial Conversion
+- Seperated pressure and distance measurement unit selection
+
 ### Version 1.22
 - Fix for custom config locations on certain HA installs
 
