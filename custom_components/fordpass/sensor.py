@@ -169,48 +169,21 @@ class CarSensor(
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "tirePressure":
                 if self.coordinator.data["TPMS"] != None:
+
                     if self.options[CONF_UNIT] == "imperial":
                         sval = 0.1450377377
+                        rval = 1
                     else:
                         sval = 1
-                    return {
-                        "leftFrontTirePressure": round(
-                            float(
-                                self.coordinator.data["TPMS"]["leftFrontTirePressure"][
-                                    "value"
-                                ]
-                                or 0
-                            )
-                            * sval
-                        ),
-                        "rightFrontTirePressure": round(
-                            float(
-                                self.coordinator.data["TPMS"]["rightFrontTirePressure"][
-                                    "value"
-                                ]
-                                or 0
-                            )
-                            * sval
-                        ),
-                        "outerLeftRearTirePressure": round(
-                            float(
-                                self.coordinator.data["TPMS"][
-                                    "outerLeftRearTirePressure"
-                                ]["value"]
-                                or 0
-                            )
-                            * sval
-                        ),
-                        "outerRightRearTirePressure": round(
-                            float(
-                                self.coordinator.data["TPMS"][
-                                    "outerRightRearTirePressure"
-                                ]["value"]
-                                or 0
-                            )
-                            * sval
-                        ),
-                    }
+                        rval = 6.8947572932
+                    tirepress = {}
+                    for key, value in self.coordinator.data["TPMS"].items():
+                        if "TirePressure" in key and value is not None:
+                            if "recommended" in key:
+                                tirepress[key] = round(float(value["value"]) * rval)
+                            else:
+                                tirepress[key] = round(float(value["value"]) * sval)
+                    return tirepress
                 return None
             elif self.sensor == "gps":
                 if self.coordinator.data[self.sensor] == None:
