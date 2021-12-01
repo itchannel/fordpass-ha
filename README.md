@@ -7,6 +7,10 @@
 - https://github.com/pinballnewf - Figuring out the application ID issue
 - https://github.com/degrashopper - Fixing 401 error for certain installs
 - https://github.com/tonesto7 - Extra window statuses and sensors
+- https://github.com/JacobWasFramed - Updated unit conversions
+
+## 1.23 Breaking Change
+The way the units work has been changed so if updating please go to "Integrations" and click options on fordpass and choose your preferred units (miles/km etc) and restart HA. Not doing this will result in an error!!
 
 ## Install
 Use HACS and add as a custom repo. Once the integration is installed go to your integrations and follow the configuration options to specify the below:

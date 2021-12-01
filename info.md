@@ -1,5 +1,13 @@
 
 # **Changelog**
+### Version 1.23
+**Breaking Change**
+
+When installing this new version please go to "integrations" and click configure on Fordpass and choose your preferred units. Not doing this will result in an error!!
+
+- Fixed tyre pressure status when sensor missing or broke
+- Add DistanceToEmpty Imperial Conversion (Thanks @JacobWasFramed )
+- Seperated pressure and distance measurement unit selection (Thanks @JacobWasFramed)
 ### Version 1.22
 - Fix for custom config locations on certain HA installs
 

@@ -24,7 +24,8 @@
     "step": {
       "init": {
         "data": {
-          "units": "Unit of Measurement"
+          "pressure_unit": "Unit of Pressure",
+          "distance_unit": "Unit of Distance"
         },
         "description": "Configure fordpass options"
       }

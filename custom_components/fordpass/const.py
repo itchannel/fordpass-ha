@@ -8,10 +8,14 @@ MANUFACTURER = "Ford Motor Company"
 
 VEHICLE = "Ford Vehicle"
 
-DEFAULT_UNIT = "metric"
-CONF_UNIT = "units"
+DEFAULT_PRESSURE_UNIT = "kPa"
+DEFAULT_DISTANCE_UNIT = "km"
 
-CONF_UNITS = ["imperial", "metric"]
+CONF_PRESSURE_UNIT = "pressure_unit"
+CONF_DISTANCE_UNIT = "distance_unit"
+
+PRESSURE_UNITS = ["PSI", "kPa"]
+DISTANCE_UNITS = ["mi", "km"]
 
 
 REGION = "region"
