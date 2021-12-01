@@ -1,7 +1,8 @@
 
 # **Changelog**
 ### Version 1.23
-** Breaking Change **
+**Breaking Change**
+
 When installing this new version please go to "integrations" and click configure on Fordpass and choose your preferred units. Not doing this will result in an error!!
 
 - Fixed tyre pressure status when sensor missing or broke
