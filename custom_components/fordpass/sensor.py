@@ -5,7 +5,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle, dt
 
 from . import FordPassEntity
-from .const import CONF_UNIT, DOMAIN, SENSORS
+from .const import CONF_PRESSURE_UNIT, CONF_DISTANCE_UNIT, DOMAIN, SENSORS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,15 +43,15 @@ class CarSensor(
     def get_value(self, ftype):
         if ftype == "state":
             if self.sensor == "odometer":
-                if self.options[CONF_UNIT] == "imperial":
+                if self.options[CONF_DISTANCE_UNIT] == "mi":
                     return round(
                         float(self.coordinator.data[self.sensor]["value"]) / 1.60934
                     )
                 else:
                     return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "fuel":
-                if self.coordinator.data[self.sensor] == None:
-                    return None
+                if self.options[CONF_DISTANCE_UNIT] == "mi":
+                    self.coordinator.data["fuel"]["distanceToEmpty"] = round(float(self.coordinator.data["fuel"]["distanceToEmpty"]) / 1.60934)
                 return round(self.coordinator.data[self.sensor]["fuelLevel"])
             elif self.sensor == "battery":
                 return self.coordinator.data[self.sensor]["batteryHealth"]["value"]
@@ -120,7 +120,7 @@ class CarSensor(
                         return "Inactive"
         elif ftype == "measurement":
             if self.sensor == "odometer":
-                if self.options[CONF_UNIT] == "imperial":
+                if self.options[CONF_DISTANCE_UNIT] == "mi":
                     return "mi"
                 else:
                     return "km"
@@ -170,7 +170,7 @@ class CarSensor(
             elif self.sensor == "tirePressure":
                 if self.coordinator.data["TPMS"] != None:
 
-                    if self.options[CONF_UNIT] == "imperial":
+                    if self.options[CONF_PRESSURE_UNIT] == "PSI":
                         sval = 0.1450377377
                         rval = 1
                     else:

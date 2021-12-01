@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
-from .const import CONF_UNIT, DEFAULT_UNIT, DOMAIN, MANUFACTURER, REGION, VEHICLE, VIN
+from .const import CONF_PRESSURE_UNIT, CONF_DISTANCE_UNIT, DEFAULT_PRESSURE_UNIT, DEFAULT_DISTANCE_UNIT, DOMAIN, MANUFACTURER, REGION, VEHICLE, VIN
 from .fordpass_new import Vehicle
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Schema({})}, extra=vol.ALLOW_EXTRA)
@@ -90,7 +90,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 
 async def async_update_options(hass, config_entry):
-    options = {CONF_UNIT: config_entry.data.get(CONF_UNIT, DEFAULT_UNIT)}
+    options = {CONF_PRESSURE_UNIT: config_entry.data.get(CONF_PRESSURE_UNIT, DEFAULT_PRESSURE_UNIT)}
+    options[CONF_DISTANCE_UNIT] = config_entry.data.get(CONF_DISTANCE_UNIT, DEFAULT_DISTANCE_UNIT)
     hass.config_entries.async_update_entry(config_entry, options=options)
 
 

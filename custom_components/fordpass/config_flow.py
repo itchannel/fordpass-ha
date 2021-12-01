@@ -7,9 +7,12 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import callback
 
 from .const import (  # pylint:disable=unused-import
-    CONF_UNIT,
-    CONF_UNITS,
-    DEFAULT_UNIT,
+    CONF_PRESSURE_UNIT,
+    CONF_DISTANCE_UNIT,
+    DEFAULT_PRESSURE_UNIT,
+    DEFAULT_DISTANCE_UNIT,
+    PRESSURE_UNITS,
+    DISTANCE_UNITS,
     DOMAIN,
     REGION,
     REGION_OPTIONS,
@@ -94,9 +97,13 @@ class OptionsFlow(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
         options = {
             vol.Optional(
-                CONF_UNIT,
-                default=self.config_entry.options.get(CONF_UNIT, DEFAULT_UNIT),
-            ): vol.In(CONF_UNITS)
+                CONF_PRESSURE_UNIT,
+                default=self.config_entry.options.get(CONF_PRESSURE_UNIT, DEFAULT_PRESSURE_UNIT),
+            ): vol.In(PRESSURE_UNITS),
+            vol.Optional(
+                CONF_DISTANCE_UNIT,
+                default=self.config_entry.options.get(CONF_DISTANCE_UNIT, DEFAULT_DISTANCE_UNIT),
+            ): vol.In(DISTANCE_UNITS)
         }
 
         return self.async_show_form(step_id="init", data_schema=vol.Schema(options))
