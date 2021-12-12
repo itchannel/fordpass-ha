@@ -346,7 +346,7 @@ class CarSensor(
             elif self.sensor == "messages":
                 if self.coordinator.data["messages"] == None:
                     return None
-                else: 
+                else:
                     messages = dict()
                     for value in self.coordinator.data["messages"]:
 
