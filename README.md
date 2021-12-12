@@ -57,9 +57,9 @@ If you are experiencing any sign in issues, please trying clearing your tokens u
 - TPMS Sensors
 - Guard Mode (Only supported cars)
 - Deep sleep status
+- Fordpass messages and alerts
 
 
 ## Coming Soon
 
-- Fordpass messages and alerts
 - Next service due

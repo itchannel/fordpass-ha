@@ -11,7 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
     "Accept": "*/*",
     "Accept-Language": "en-us",
-    "User-Agent": "fordpass-ap/93 CFNetwork/1197 Darwin/20.0.0",
+    "User-Agent": "FordPass/5 CFNetwork/1197 Darwin/20.0.0",
     "Accept-Encoding": "gzip, deflate, br",
 }
 
@@ -32,6 +32,7 @@ guardUrl = "https://api.mps.ford.com/api"
 
 session = requests.Session()
 
+
 class Vehicle(object):
     # Represents a Ford vehicle, with methods for status and issuing commands
 
@@ -49,8 +50,8 @@ class Vehicle(object):
         self.refresh_token = None
         retry = Retry(connect=3, backoff_factor=0.5)
         adapter = HTTPAdapter(max_retries=retry)
-        session.mount('http://', adapter)
-        session.mount('https://', adapter)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
         if configLocation == "":
             self.token_location = "custom_components/fordpass/fordpass_token.txt"
         else:
@@ -224,6 +225,23 @@ class Vehicle(object):
                 result = r.json()
             return result["vehiclestatus"]
         else:
+            r.raise_for_status()
+
+    def messages(self):
+        self.__acquireToken()
+
+        headers = {
+            **apiHeaders,
+            "Auth-Token": self.token,
+            "Application-Id": self.region,
+        }
+        r = session.get(f"{guardUrl}/messagecenter/v3/messages?", headers=headers)
+        if r.status_code == 200:
+            result = r.json()
+            return result["result"]["messages"]
+            # _LOGGER.debug(result)
+        else:
+            _LOGGER.debug(r.text)
             r.raise_for_status()
 
     def guardStatus(self):

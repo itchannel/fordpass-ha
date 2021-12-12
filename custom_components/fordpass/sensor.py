@@ -121,6 +121,11 @@ class CarSensor(
                         return "Active"
                     else:
                         return "Inactive"
+            elif self.sensor == "messages":
+                if self.coordinator.data["messages"] == None:
+                    return None
+                else:
+                    return len(self.coordinator.data["messages"])
         elif ftype == "measurement":
             if self.sensor == "odometer":
                 if self.options[CONF_DISTANCE_UNIT] == "mi":
@@ -155,6 +160,8 @@ class CarSensor(
                 return None
             elif self.sensor == "remoteStartStatus":
                 return None
+            elif self.sensor == "messages":
+                return "Messages"
         elif ftype == "attribute":
             if self.sensor == "odometer":
                 return self.coordinator.data[self.sensor].items()
@@ -336,6 +343,15 @@ class CarSensor(
                     return None
                 else:
                     return self.coordinator.data["remoteStart"].items()
+            elif self.sensor == "messages":
+                if self.coordinator.data["messages"] == None:
+                    return None
+                else:
+                    messages = dict()
+                    for value in self.coordinator.data["messages"]:
+
+                        messages[value["messageSubject"]] = value["createdDate"]
+                    return messages
 
     @property
     def name(self):
