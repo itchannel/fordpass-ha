@@ -350,7 +350,7 @@ class CarSensor(
         return self.device_id
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         return self.get_value("attribute")
 
     @property

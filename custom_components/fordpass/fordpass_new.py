@@ -4,6 +4,8 @@ import os
 import time
 
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
@@ -28,6 +30,7 @@ baseUrl = "https://usapi.cv.ford.com/api"
 
 guardUrl = "https://api.mps.ford.com/api"
 
+session = requests.Session()
 
 class Vehicle(object):
     # Represents a Ford vehicle, with methods for status and issuing commands
@@ -44,6 +47,10 @@ class Vehicle(object):
         self.expires = None
         self.expiresAt = None
         self.refresh_token = None
+        retry = Retry(connect=3, backoff_factor=0.5)
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
         if configLocation == "":
             self.token_location = "custom_components/fordpass/fordpass_token.txt"
         else:
@@ -65,7 +72,7 @@ class Vehicle(object):
             "Content-Type": "application/x-www-form-urlencoded",
         }
         # Fetch OAUTH token stage 1
-        r = requests.post(
+        r = session.post(
             "https://sso.ci.ford.com/oidc/endpoint/default/token",
             data=data,
             headers=headers,
@@ -77,7 +84,7 @@ class Vehicle(object):
             data = {"code": result["access_token"]}
             headers = {**apiHeaders, "Application-Id": self.region}
             # Fetch OAUTH token stage 2 and refresh token
-            r = requests.put(
+            r = session.put(
                 "https://api.mps.ford.com/api/oauth2/v1/token",
                 data=json.dumps(data),
                 headers=headers,
@@ -99,7 +106,7 @@ class Vehicle(object):
         data = {"refresh_token": token["refresh_token"]}
         headers = {**apiHeaders, "Application-Id": self.region}
 
-        r = requests.put(
+        r = session.put(
             "https://api.mps.ford.com/api/oauth2/v1/refresh",
             data=json.dumps(data),
             headers=headers,
@@ -187,7 +194,7 @@ class Vehicle(object):
             "Application-Id": self.region,
         }
 
-        r = requests.get(
+        r = session.get(
             f"{baseUrl}/vehicles/v4/{self.vin}/status", params=params, headers=headers
         )
         if r.status_code == 200:
@@ -208,7 +215,7 @@ class Vehicle(object):
                 "auth-token": self.token,
                 "Application-Id": self.region,
             }
-            r = requests.get(
+            r = session.get(
                 f"{baseUrl}/vehicles/v4/{self.vin}/status",
                 params=params,
                 headers=headers,
@@ -231,7 +238,7 @@ class Vehicle(object):
             "Application-Id": self.region,
         }
 
-        r = requests.get(
+        r = session.get(
             f"{guardUrl}/guardmode/v1/{self.vin}/session",
             params=params,
             headers=headers,
