@@ -226,10 +226,11 @@ class Vehicle(object):
             return result["vehiclestatus"]
         else:
             r.raise_for_status()
-
     def messages(self):
         self.__acquireToken()
 
+    def messages(self):
+        self.__acquireToken()
         headers = {
             **apiHeaders,
             "Auth-Token": self.token,
@@ -243,6 +244,7 @@ class Vehicle(object):
         else:
             _LOGGER.debug(r.text)
             r.raise_for_status()
+
 
     def guardStatus(self):
         # WIP current being tested
