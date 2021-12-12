@@ -5,7 +5,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle, dt
 
 from . import FordPassEntity
-from .const import CONF_PRESSURE_UNIT, CONF_DISTANCE_UNIT, DOMAIN, SENSORS
+from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -51,7 +51,10 @@ class CarSensor(
                     return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "fuel":
                 if self.options[CONF_DISTANCE_UNIT] == "mi":
-                    self.coordinator.data["fuel"]["distanceToEmpty"] = round(float(self.coordinator.data["fuel"]["distanceToEmpty"]) / 1.60934)
+                    self.coordinator.data["fuel"]["distanceToEmpty"] = round(
+                        float(self.coordinator.data["fuel"]["distanceToEmpty"])
+                        / 1.60934
+                    )
                 return round(self.coordinator.data[self.sensor]["fuelLevel"])
             elif self.sensor == "battery":
                 return self.coordinator.data[self.sensor]["batteryHealth"]["value"]
