@@ -230,6 +230,8 @@ class Vehicle(object):
     def messages(self):
         self.__acquireToken()
 
+    def messages(self):
+        self.__acquireToken()
         headers = {
             **apiHeaders,
             "Auth-Token": self.token,
