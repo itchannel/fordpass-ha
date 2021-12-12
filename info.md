@@ -1,5 +1,9 @@
 
 # **Changelog**
+### Version 1.25
+- Updated user agent
+- Added messages sensor to show current messages in fordpass
+
 ### Version 1.24
 - Change device_state_attributes to extra_state_attributes (HA 2020.12.1)
 - Changed session timeout to cope with timeouts in fordpass API (Helps prevent 403 error's)

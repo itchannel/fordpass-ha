@@ -45,6 +45,7 @@ SENSORS = {
     },
     "remoteStartStatus": {"icon": "mdi:remote"},
     "zoneLighting": {"icon": "mdi:spotlight-beam"},
+    "messages": {"icon": "mdi:android-messages"}
 }
 
 SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}

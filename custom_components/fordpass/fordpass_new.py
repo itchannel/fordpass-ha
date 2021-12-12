@@ -11,7 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
     "Accept": "*/*",
     "Accept-Language": "en-us",
-    "User-Agent": "fordpass-ap/93 CFNetwork/1197 Darwin/20.0.0",
+    "User-Agent": "FordPass/5 CFNetwork/1197 Darwin/20.0.0",
     "Accept-Encoding": "gzip, deflate, br",
 }
 
@@ -225,7 +225,25 @@ class Vehicle(object):
             return result["vehiclestatus"]
         else:
             r.raise_for_status()
+    def messages(self):
+        self.__acquireToken()
 
+        headers = {
+            **apiHeaders,
+            "Auth-Token": self.token,
+            "Application-Id": self.region,
+        }
+        r = session.get(
+            f"{guardUrl}/messagecenter/v3/messages?", headers=headers
+        )
+        if r.status_code == 200:
+            result = r.json()
+            return result["result"]["messages"]
+            #_LOGGER.debug(result)
+        else:
+            _LOGGER.debug(r.text)
+            r.raise_for_status()
+            
     def guardStatus(self):
         # WIP current being tested
         self.__acquireToken()
