@@ -1,5 +1,9 @@
 
 # **Changelog**
+### Version 1.24
+- Change device_state_attributes to extra_state_attributes (HA 2020.12.1)
+- Changed session timeout to cope with timeouts in fordpass API (Helps prevent 403 error's)
+
 ### Version 1.23
 **Breaking Change**
 
