@@ -1,5 +1,7 @@
 
 # **Changelog**
+### Version 1.28
+- Added vin check on setup (Will check if given VIN is linked to the credentials)
 ### Version 1.27
 - Fix fuel level error
 - Add code for Vin debugging
