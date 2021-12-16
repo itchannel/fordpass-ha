@@ -242,27 +242,6 @@ class Vehicle(object):
         else:
             _LOGGER.debug(r.text)
             r.raise_for_status()
-            
-    def vehicles(self):
-        self.__acquireToken()
-
-        headers = {
-            **apiHeaders,
-            "Auth-Token": self.token,
-            "Application-Id": self.region,
-        }
-        r = session.get(
-            "https://services.cx.ford.com/api/dashboard/v1/users/vehicles", headers=headers
-        )
-        if r.status_code == 200:
-            result = r.json()
-            
-            
-            _LOGGER.debug(result)
-            return result["vehicleCapabilities"]
-        else:
-            _LOGGER.debug(r.text)
-            r.raise_for_status()
 
     def vehicles(self):
         self.__acquireToken()
@@ -280,7 +259,7 @@ class Vehicle(object):
             result = r.json()
 
             _LOGGER.debug(result)
-            return result["vehicleCapabilities"]
+            return result
         else:
             _LOGGER.debug(r.text)
             r.raise_for_status()
