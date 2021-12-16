@@ -52,6 +52,12 @@ async def validate_input(hass: core.HomeAssistant, data):
         raise InvalidVin from ex
 
 
+    try:
+        result3 = await hass.async_add_executor_job(vehicle.vehicles)
+        # raise InvalidVin
+    except Exception as ex:
+        raise InvalidVin from ex
+
     if not result:
         _LOGGER.error("Failed to authenticate with fordpass")
         raise CannotConnect

@@ -51,7 +51,7 @@ class CarSensor(
                     else:
                         return self.coordinator.data[self.sensor]["value"]
                 else:
-                        return self.coordinator.data[self.sensor]["value"]
+                    return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "fuel":
                 if self.coordinator.data[self.sensor] == None:
                     return None
