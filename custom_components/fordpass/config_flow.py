@@ -45,11 +45,13 @@ async def validate_input(hass: core.HomeAssistant, data):
     except Exception as ex:
         raise InvalidAuth from ex
         
-    try:
-        result3 = await hass.async_add_executor_job(vehicle.vehicles)
-        #raise InvalidVin
-    except Exception as ex:
-        raise InvalidVin from ex
+    result3 = await hass.async_add_executor_job(vehicle.vehicles)
+    vinfound = False
+    for car in result3:
+            if car["vin"] == data[VIN]:
+                vinfound = True
+    if vinfound == False:
+        raise InvalidVin
 
 
     if not result:
