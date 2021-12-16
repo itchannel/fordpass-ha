@@ -43,18 +43,18 @@ class CarSensor(
     def get_value(self, ftype):
         if ftype == "state":
             if self.sensor == "odometer":
-                if self.options[CONF_DISTANCE_UNIT] == "mi":
-                    return round(
-                        float(self.coordinator.data[self.sensor]["value"]) / 1.60934
-                    )
+                if self.options[CONF_DISTANCE_UNIT] != None:
+                    if self.options[CONF_DISTANCE_UNIT] == "mi":
+                        return round(
+                            float(self.coordinator.data[self.sensor]["value"]) / 1.60934
+                        )
+                    else:
+                        return self.coordinator.data[self.sensor]["value"]
                 else:
-                    return self.coordinator.data[self.sensor]["value"]
+                        return self.coordinator.data[self.sensor]["value"]
             elif self.sensor == "fuel":
-                if self.options[CONF_DISTANCE_UNIT] == "mi":
-                    self.coordinator.data["fuel"]["distanceToEmpty"] = round(
-                        float(self.coordinator.data["fuel"]["distanceToEmpty"])
-                        / 1.60934
-                    )
+                if self.coordinator.data[self.sensor] == None:
+                    return None
                 return round(self.coordinator.data[self.sensor]["fuelLevel"])
             elif self.sensor == "battery":
                 return self.coordinator.data[self.sensor]["batteryHealth"]["value"]
@@ -168,6 +168,11 @@ class CarSensor(
             elif self.sensor == "fuel":
                 if self.coordinator.data[self.sensor] == None:
                     return None
+                if self.options[CONF_DISTANCE_UNIT] == "mi":
+                    self.coordinator.data["fuel"]["distanceToEmpty"] = round(
+                        float(self.coordinator.data["fuel"]["distanceToEmpty"])
+                        / 1.60934
+                    )
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "battery":
                 return {
