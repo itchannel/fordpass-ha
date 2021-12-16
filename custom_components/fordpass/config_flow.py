@@ -42,9 +42,15 @@ async def validate_input(hass: core.HomeAssistant, data):
 
     try:
         result = await hass.async_add_executor_job(vehicle.auth)
-
     except Exception as ex:
         raise InvalidAuth from ex
+        
+    try:
+        result3 = await hass.async_add_executor_job(vehicle.vehicles)
+        #raise InvalidVin
+    except Exception as ex:
+        raise InvalidVin from ex
+
 
     if not result:
         _LOGGER.error("Failed to authenticate with fordpass")
@@ -72,6 +78,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "cannot_connect"
             except InvalidAuth:
                 errors["base"] = "invalid_auth"
+            except InvalidVin:
+                errors["base"] = "invalid_vin"
             except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected exception")
                 errors["base"] = "unknown"
@@ -119,3 +127,6 @@ class CannotConnect(exceptions.HomeAssistantError):
 
 class InvalidAuth(exceptions.HomeAssistantError):
     """Error to indicate there is invalid auth."""
+
+class InvalidVin(exceptions.HomeAssistantError):
+    """Error to indicate the wrong vin"""
