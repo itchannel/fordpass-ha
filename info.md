@@ -1,5 +1,8 @@
 
 # **Changelog**
+### Version 1.27
+- Fix fuel level error
+- Add code for Vin debugging
 ### Version 1.25
 - Updated user agent
 - Added messages sensor to show current messages in fordpass
