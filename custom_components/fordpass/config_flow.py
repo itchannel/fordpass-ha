@@ -51,7 +51,7 @@ async def validate_input(hass: core.HomeAssistant, data):
             if car["vin"] == data[VIN]:
                 vinfound = True
     if vinfound == False:
-        raise InvalidVin
+        _LOGGER.debug("Vin not found in account, Is your VIN valid?")
 
 
     if not result:
