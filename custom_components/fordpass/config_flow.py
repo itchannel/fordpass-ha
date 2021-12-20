@@ -44,15 +44,14 @@ async def validate_input(hass: core.HomeAssistant, data):
         result = await hass.async_add_executor_job(vehicle.auth)
     except Exception as ex:
         raise InvalidAuth from ex
-        
+
     result3 = await hass.async_add_executor_job(vehicle.vehicles)
     vinfound = False
     for car in result3:
-            if car["vin"] == data[VIN]:
-                vinfound = True
+        if car["vin"] == data[VIN]:
+            vinfound = True
     if vinfound == False:
         _LOGGER.debug("Vin not found in account, Is your VIN valid?")
-
 
     if not result:
         _LOGGER.error("Failed to authenticate with fordpass")
@@ -129,6 +128,7 @@ class CannotConnect(exceptions.HomeAssistantError):
 
 class InvalidAuth(exceptions.HomeAssistantError):
     """Error to indicate there is invalid auth."""
+
 
 class InvalidVin(exceptions.HomeAssistantError):
     """Error to indicate the wrong vin"""
