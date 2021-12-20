@@ -1,5 +1,9 @@
 
 # **Changelog**
+### Version 1.29
+- Disabled guard mode
+- Fixed elvDTE units
+- set Vin check on install to warning only (Lincoln cars don't show in ford database)
 ### Version 1.28
 - Added vin check on setup (Will check if given VIN is linked to the credentials)
 ### Version 1.27
