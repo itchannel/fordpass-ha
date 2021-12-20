@@ -52,7 +52,7 @@ async def validate_input(hass: core.HomeAssistant, data):
             vinfound = True
     if vinfound == False:
         _LOGGER.debug("Vin not found in account, Is your VIN valid?")
-
+        
     if not result:
         _LOGGER.error("Failed to authenticate with fordpass")
         raise CannotConnect
