@@ -1,6 +1,5 @@
 
 # **Changelog**
-### Version 1.30
 - Fix for elvDTE error
 ### Version 1.29
 - Disabled guard mode
