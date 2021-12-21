@@ -101,13 +101,13 @@ class CarSensor(
                     if self.options[CONF_DISTANCE_UNIT] != None:
                         if self.options[CONF_DISTANCE_UNIT] == "mi":
                             return round(
-                                float(self.coordinator.data[self.sensor]["value"])
+                                float(self.coordinator.data["elVehDTE"]["value"])
                                 / 1.60934
                             )
                         else:
-                            return self.coordinator.data[self.sensor]["value"]
+                            return self.coordinator.data["elVehDTE"]["value"]
                     else:
-                        return self.coordinator.data[self.sensor]["value"]
+                        return self.coordinator.data["elVehDTE"]["value"]
                 else:
                     return "Unsupported"
             elif self.sensor == "zoneLighting":
