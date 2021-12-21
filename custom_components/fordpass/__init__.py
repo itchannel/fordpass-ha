@@ -169,9 +169,9 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
                 )
 
                 # Temporarily removed due to Ford backend API changes
-                #data["guardstatus"] = await self._hass.async_add_executor_job(
+                # data["guardstatus"] = await self._hass.async_add_executor_job(
                 #    self.vehicle.guardStatus  # Fetch new status
-                #)
+                # )
 
                 data["messages"] = await self._hass.async_add_executor_job(
                     self.vehicle.messages

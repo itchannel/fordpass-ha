@@ -101,7 +101,8 @@ class CarSensor(
                     if self.options[CONF_DISTANCE_UNIT] != None:
                         if self.options[CONF_DISTANCE_UNIT] == "mi":
                             return round(
-                                float(self.coordinator.data[self.sensor]["value"]) / 1.60934
+                                float(self.coordinator.data[self.sensor]["value"])
+                                / 1.60934
                             )
                         else:
                             return self.coordinator.data[self.sensor]["value"]
