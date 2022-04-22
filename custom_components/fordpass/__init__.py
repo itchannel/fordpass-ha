@@ -149,7 +149,7 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
         """Initialize the coordinator and set up the Vehicle object."""
         self._hass = hass
         self.vin = vin
-        configPath = hass.config.path("custom_components/fordpass/fordpass_token.txt")
+        configPath = hass.config.path("custom_components/fordpass/" + user + "_fordpass_token.txt")
         self.vehicle = Vehicle(user, password, vin, region, saveToken, configPath)
         self._available = True
 
