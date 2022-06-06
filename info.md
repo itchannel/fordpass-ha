@@ -1,6 +1,7 @@
 
 # **Changelog**
-- Fix for elvDTE error
+## Version 1.32
+- Fix hacs.json compliance
 ## Version 1.31
 - Fix for multiple accounts
 ## Version 1.30
