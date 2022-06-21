@@ -107,7 +107,7 @@ class Vehicle(object):
         data = {"refresh_token": token["refresh_token"]}
         headers = {**apiHeaders, "Application-Id": self.region}
 
-        r = session.put(
+        r = session.post(
             "https://api.mps.ford.com/api/token/v2/cat-with-refresh-token",
             data=json.dumps(data),
             headers=headers,
