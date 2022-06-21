@@ -10,4 +10,5 @@
     "zeroconf": [],
     "homekit": {},
     "dependencies": [],
+    "codeowners": ["@itchannel"]
   }
