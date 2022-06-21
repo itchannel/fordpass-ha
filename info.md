@@ -2,7 +2,7 @@
 # **Changelog**
 ## Version 1.32
 - Fix auth flow to comply with new endpoints
-*Warning - If you encounter auth errors please delete the 
+**Warning - If you encounter auth errors please delete the token file located in the install directory or use the "delete_token" service**
 ## Version 1.31
 - Fix for multiple accounts
 ## Version 1.30
