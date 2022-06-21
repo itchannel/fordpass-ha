@@ -1,7 +1,8 @@
 
 # **Changelog**
 ## Version 1.32
-- Fix hacs.json compliance
+- Fix auth flow to comply with new endpoints
+*Warning - If you encounter auth errors please delete the 
 ## Version 1.31
 - Fix for multiple accounts
 ## Version 1.30
