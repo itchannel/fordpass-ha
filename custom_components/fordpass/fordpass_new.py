@@ -82,11 +82,11 @@ class Vehicle(object):
         if r.status_code == 200:
             _LOGGER.debug("Succesfully fetched token Stage1")
             result = r.json()
-            data = {"code": result["access_token"]}
+            data = {"ciToken": result["access_token"]}
             headers = {**apiHeaders, "Application-Id": self.region}
             # Fetch OAUTH token stage 2 and refresh token
-            r = session.put(
-                "https://api.mps.ford.com/api/oauth2/v1/token",
+            r = session.post(
+                "https://api.mps.ford.com/api/token/v2/cat-with-ci-access-token",
                 data=json.dumps(data),
                 headers=headers,
             )
@@ -107,8 +107,8 @@ class Vehicle(object):
         data = {"refresh_token": token["refresh_token"]}
         headers = {**apiHeaders, "Application-Id": self.region}
 
-        r = session.put(
-            "https://api.mps.ford.com/api/oauth2/v1/refresh",
+        r = session.post(
+            "https://api.mps.ford.com/api/token/v2/cat-with-refresh-token",
             data=json.dumps(data),
             headers=headers,
         )
