@@ -1,5 +1,7 @@
 
 # **Changelog**
+## Version 1.33
+- Fix occasional hacs error due to git tag issue
 ## Version 1.32
 - Fix auth flow to comply with new endpoints
 **Warning - If you encounter auth errors please delete the token file located in the install directory or use the "delete_token" service**
