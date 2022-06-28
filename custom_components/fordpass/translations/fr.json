@@ -1,0 +1,35 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Le compte est déjà configuré"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Authentification invalide",
+            "invalid_vin": "Le NIV n'est pas valide pour ce compte",
+            "unknown": "Erreur inconnue"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "password": "Mot de Passe FordPass",
+                    "username": "Utilisateur FordPass (Email)",
+                    "vin": "NIV",
+                    "region" : "Région FordPass"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "pressure_unit": "Unité de pression",
+                    "distance_unit": "Unité de distance"
+                },
+                "description": "Configuration de Fordpass"
+            }
+        }
+    }, 
+    "title": "Fordpass"
+}
