@@ -66,6 +66,11 @@ class Vehicle(object):
     def base64UrlEncode(self,data):
         return urlsafe_b64encode(data).rstrip(b'=')
 
+    def generate_hash(self, code):
+        m = hashlib.sha256()
+        m.update(code.encode('utf-8'))
+        return self.base64UrlEncode(m.digest()).decode('utf-8')
+
 
     def auth(self):
         _LOGGER.debug("New System")
@@ -76,23 +81,18 @@ class Vehicle(object):
             'Content-Type': 'application/json',
         }
         code1 = ''.join(random.choice(string.ascii_lowercase) for i in range(43))
-        m = hashlib.sha256()
-        m.update(code1.encode('utf-8'))
-        code_verifier = self.base64UrlEncode(m.digest()).decode('utf-8')
-
-        #exit()
+        code_verifier = self.generate_hash(code1)
         url1 = "https://sso.ci.ford.com/v1.0/endpoint/default/authorize?redirect_uri=fordapp://userauthorized&response_type=code&scope=openid&max_age=3600&client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&code_challenge=" + code_verifier + "&code_challenge_method=S256"
         r = session.get(
             url1,
             headers=headers,
-            #allow_redirects=False
         )
-        #print(r.text)
+
         test = re.findall('data-ibm-login-url="(.*)"\s', r.text)[0]
         nextUrl = "https://sso.ci.ford.com" + test
 
 
-        
+        # Auth Step2
         headers = {
             **defaultHeaders,
             "Content-Type": "application/x-www-form-urlencoded",
@@ -112,14 +112,12 @@ class Vehicle(object):
 
         )
 
-
         if r.status_code == 302:
             nextUrl = r.headers["Location"]
         else:
             r.raise_for_status()
 
-        # Auth Step4 
-
+        # Auth Step3
         headers = {
             **defaultHeaders,
             'Content-Type': 'application/json',
@@ -131,21 +129,19 @@ class Vehicle(object):
             allow_redirects=False
         )
 
+                
+
 
         if r.status_code == 302:
             nextUrl = r.headers["Location"]
             query = requests.utils.urlparse(nextUrl).query
             params = dict(x.split('=') for x in query.split('&'))
-            #print(params)
             code = params["code"]
             grant_id = params["grant_id"]
-            #print(code)
-            #print(grant_id)
         else:
             r.raise_for_status()
 
-        # Auth Step5
-
+        # Auth Step4        
         headers = {
             **defaultHeaders,
             "Content-Type": "application/x-www-form-urlencoded",
@@ -154,10 +150,7 @@ class Vehicle(object):
         data = {
             "client_id": "9fb503e0-715b-47e8-adfd-ad4b7770f73b",
             "grant_type": "authorization_code",
-            #"scope": "openid",
-            #"redirect_uri": "https://www.ford.com/support/vehicle-dashboard",
             "redirect_uri": 'fordapp://userauthorized',
-            #"resource": "",
             "grant_id": grant_id,
             "code": code,
             "code_verifier": code1
@@ -175,9 +168,11 @@ class Vehicle(object):
             result = r.json()
             if result["access_token"]:
                 access_token = result["access_token"]
+        else:
+            r.raise_for_status()
 
 
-        # Step 6 Auth
+        # Auth Step5
         data = {"ciToken": access_token}
         headers = {**apiHeaders, "Application-Id": self.region}
         r = session.post(
@@ -197,6 +192,8 @@ class Vehicle(object):
                 self.writeToken(result)
             session.cookies.clear()
             return True
+        else:
+            r.raise_for_status()
 
     def refreshToken(self, token):
         # Token is invalid so let's try refreshing it
