@@ -195,7 +195,7 @@ class Vehicle(object):
             if self.saveToken:
                 result["expiry_date"] = time.time() + result["expires_in"]
                 self.writeToken(result)
-
+            session.cookies.clear()
             return True
 
     def refreshToken(self, token):
