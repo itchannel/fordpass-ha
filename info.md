@@ -1,5 +1,7 @@
 
 # **Changelog**
+## Version 1.34
+- Change oauth flow for latest Fordpass changes
 ## Version 1.33
 - Fix occasional hacs error due to git tag issue
 ## Version 1.32

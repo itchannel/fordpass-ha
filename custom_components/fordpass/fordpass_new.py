@@ -1,9 +1,14 @@
+import hashlib
 import json
 import logging
 import os
+import random
+import re
+import requests
+import string
 import time
 
-import requests
+from base64 import urlsafe_b64encode, urlsafe_b64decode
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
@@ -58,47 +63,135 @@ class Vehicle(object):
             _LOGGER.debug(configLocation)
             self.token_location = configLocation
 
+    def base64UrlEncode(self,data):
+        return urlsafe_b64encode(data).rstrip(b'=')
+
+    def generate_hash(self, code):
+        m = hashlib.sha256()
+        m.update(code.encode('utf-8'))
+        return self.base64UrlEncode(m.digest()).decode('utf-8')
+
+
     def auth(self):
-        """Authenticate and store the token"""
-
-        data = {
-            "client_id": "9fb503e0-715b-47e8-adfd-ad4b7770f73b",
-            "grant_type": "password",
-            "username": self.username,
-            "password": self.password,
+        _LOGGER.debug("New System")
+        """New Authentication System """
+        # Auth Step1
+        headers = {
+            **defaultHeaders,
+            'Content-Type': 'application/json',
         }
+        code1 = ''.join(random.choice(string.ascii_lowercase) for i in range(43))
+        code_verifier = self.generate_hash(code1)
+        url1 = "https://sso.ci.ford.com/v1.0/endpoint/default/authorize?redirect_uri=fordapp://userauthorized&response_type=code&scope=openid&max_age=3600&client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&code_challenge=" + code_verifier + "&code_challenge_method=S256"
+        r = session.get(
+            url1,
+            headers=headers,
+        )
 
+        test = re.findall('data-ibm-login-url="(.*)"\s', r.text)[0]
+        nextUrl = "https://sso.ci.ford.com" + test
+
+
+        # Auth Step2
         headers = {
             **defaultHeaders,
             "Content-Type": "application/x-www-form-urlencoded",
         }
-        # Fetch OAUTH token stage 1
+        data = {
+            "operation": "verify",
+            "login-form-type": "password",
+            "username" : self.username,
+            "password" : self.password
+
+        }
+        r = session.post(
+            nextUrl,
+            headers=headers,
+            data = data,
+            allow_redirects=False
+
+        )
+
+        if r.status_code == 302:
+            nextUrl = r.headers["Location"]
+        else:
+            r.raise_for_status()
+
+        # Auth Step3
+        headers = {
+            **defaultHeaders,
+            'Content-Type': 'application/json',
+        }
+
+        r = session.get(
+            nextUrl,
+            headers = headers,
+            allow_redirects=False
+        )
+
+                
+
+
+        if r.status_code == 302:
+            nextUrl = r.headers["Location"]
+            query = requests.utils.urlparse(nextUrl).query
+            params = dict(x.split('=') for x in query.split('&'))
+            code = params["code"]
+            grant_id = params["grant_id"]
+        else:
+            r.raise_for_status()
+
+        # Auth Step4        
+        headers = {
+            **defaultHeaders,
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+
+        data = {
+            "client_id": "9fb503e0-715b-47e8-adfd-ad4b7770f73b",
+            "grant_type": "authorization_code",
+            "redirect_uri": 'fordapp://userauthorized',
+            "grant_id": grant_id,
+            "code": code,
+            "code_verifier": code1
+            }
+
         r = session.post(
             "https://sso.ci.ford.com/oidc/endpoint/default/token",
-            data=data,
+             headers = headers,
+             data = data
+
+        )
+
+
+        if r.status_code == 200:
+            result = r.json()
+            if result["access_token"]:
+                access_token = result["access_token"]
+        else:
+            r.raise_for_status()
+
+
+        # Auth Step5
+        data = {"ciToken": access_token}
+        headers = {**apiHeaders, "Application-Id": self.region}
+        r = session.post(
+            "https://api.mps.ford.com/api/token/v2/cat-with-ci-access-token",
+            data=json.dumps(data),
             headers=headers,
         )
 
         if r.status_code == 200:
-            _LOGGER.debug("Succesfully fetched token Stage1")
             result = r.json()
-            data = {"ciToken": result["access_token"]}
-            headers = {**apiHeaders, "Application-Id": self.region}
-            # Fetch OAUTH token stage 2 and refresh token
-            r = session.post(
-                "https://api.mps.ford.com/api/token/v2/cat-with-ci-access-token",
-                data=json.dumps(data),
-                headers=headers,
-            )
-            if r.status_code == 200:
-                result = r.json()
-                self.token = result["access_token"]
-                self.refresh_token = result["refresh_token"]
-                self.expiresAt = time.time() + result["expires_in"]
-                if self.saveToken:
-                    result["expiry_date"] = time.time() + result["expires_in"]
-                    self.writeToken(result)
-                return True
+
+            self.token = result["access_token"]
+            self.refresh_token = result["refresh_token"]
+            self.expiresAt = time.time() + result["expires_in"]
+            if self.saveToken:
+                result["expiry_date"] = time.time() + result["expires_in"]
+                self.writeToken(result)
+            session.cookies.clear()
+            return True
         else:
             r.raise_for_status()
 
