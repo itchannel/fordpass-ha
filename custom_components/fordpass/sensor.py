@@ -39,6 +39,8 @@ class CarSensor(
         self._attr = {}
         self.coordinator = coordinator
         self._device_id = "fordpass_" + sensor
+        # Required for HA 2022.7
+        self.coordinator_context = object()
 
     def get_value(self, ftype):
         if ftype == "state":

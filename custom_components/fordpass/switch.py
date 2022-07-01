@@ -35,6 +35,8 @@ class Switch(FordPassEntity, SwitchEntity):
         self._device_id = "fordpass_" + switch
         self.switch = switch
         self.coordinator = coordinator
+        # Required for HA 2022.7
+        self.coordinator_context = object()
 
     async def async_turn_on(self, **kwargs):
         if self.switch == "ignition":
