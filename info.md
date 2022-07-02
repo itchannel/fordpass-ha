@@ -1,15 +1,18 @@
 
-# **Changelog**
-## Version 1.34
+## **Changelog**
+### Version 1.35
+- Remove deprecated dotted module
+- Add coordinator context for HA 2022.7
+### Version 1.34
 - Change oauth flow for latest Fordpass changes
-## Version 1.33
+### Version 1.33
 - Fix occasional hacs error due to git tag issue
-## Version 1.32
+### Version 1.32
 - Fix auth flow to comply with new endpoints
 **Warning - If you encounter auth errors please delete the token file located in the install directory or use the "delete_token" service**
-## Version 1.31
+### Version 1.31
 - Fix for multiple accounts
-## Version 1.30
+### Version 1.30
 - Fix for elvDTE error
 ### Version 1.29
 - Disabled guard mode

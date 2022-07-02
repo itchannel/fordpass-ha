@@ -5,7 +5,6 @@ from datetime import timedelta
 
 import async_timeout
 import voluptuous as vol
-from dotted.collection import DottedDict
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -182,7 +181,7 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
                     _LOGGER.info("Restored connection to FordPass for %s", self.vin)
                     self._available = True
 
-                return DottedDict(data)
+                return data
         except Exception as ex:
             self._available = False  # Mark as unavailable
             _LOGGER.warning(str(ex))
