@@ -1,0 +1,35 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Dieses Konto wurde bereits konfiguriert"
+        },
+        "error": {
+            "cannot_connect": "Verbindungsfehler",
+            "invalid_auth": "Ungültige Zugangsdaten",
+            "invalid_vin": "Die angegebene FIN ist nicht im angegebenen Konto hinterlegt",
+            "unknown": "Unerwarteter Fehler"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "password": "FordPass Passwort",
+                    "username": "FordPass Benutzername (Email)",
+                    "vin": "FIN",
+                    "region" : "FordPass Region"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "pressure_unit": "Druckeinheit",
+                    "distance_unit": "Maßeinheit für die Entfernung"
+                },
+                "description": "Konfiguration der FordPass-Optionen"
+            }
+        }
+    }, 
+    "title": "FordPass"
+}
