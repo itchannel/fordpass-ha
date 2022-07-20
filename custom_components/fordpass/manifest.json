@@ -4,7 +4,7 @@
     "config_flow": true,
     "documentation": "https://github.com/itchannel/fordpass-ha",
     "issue_tracker": "https://github.com/itchannel/fordpass-ha/issues",
-    "version": "0.1.35",
+    "version": "0.1.36",
     "requirements": [],
     "ssdp": [],
     "zeroconf": [],
