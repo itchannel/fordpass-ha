@@ -1,5 +1,8 @@
 
 ## **Changelog**
+### Version 1.36
+- Remove vehicle list endpoint on setup
+- Add dutch translation (Thanks @Bert-R)
 ### Version 1.35
 - Remove deprecated dotted module
 - Add coordinator context for HA 2022.7
