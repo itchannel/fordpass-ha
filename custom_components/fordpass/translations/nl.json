@@ -1,0 +1,35 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Account is al geconfigureerd"
+        },
+        "error": {
+            "cannot_connect": "Kan geen verbinding maken",
+            "invalid_auth": "Onjuiste logingegevens",
+            "invalid_vin": "VIN niet bekend onder opgegeven account",
+            "unknown": "Onbekende fout"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "password": "FordPass wachtwoord",
+                    "username": "FordPass gebruikersnaam (e-mailadres)",
+                    "vin": "VIN",
+                    "region" : "FordPass regio"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "pressure_unit": "Eenheid voor luchtdruk",
+                    "distance_unit": "Eenheid voor afstand"
+                },
+                "description": "Instellingen FordPass"
+            }
+        }
+    }, 
+    "title": "FordPass"
+}
