@@ -1,5 +1,7 @@
 
 ## **Changelog**
+### Version 1.37
+- Update messages icon to new format
 ### Version 1.36
 - Remove vehicle list endpoint on setup
 - Add dutch translation (Thanks @Bert-R)
