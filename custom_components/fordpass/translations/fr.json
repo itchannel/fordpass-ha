@@ -4,7 +4,7 @@
             "already_configured": "Le compte est déjà configuré"
         },
         "error": {
-            "cannot_connect": "Failed to connect",
+            "cannot_connect": "Impossible de se connecter",
             "invalid_auth": "Authentification invalide",
             "invalid_vin": "Le NIV n'est pas valide pour ce compte",
             "unknown": "Erreur inconnue"
