@@ -26,7 +26,7 @@ REGION = "region"
 REGION_OPTIONS = ["UK&Europe", "Australia", "North America & Canada"]
 
 SENSORS = {
-    "odometer": {"icon": "mdi:counter"},
+    "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance"},
     "fuel": {"icon": "mdi:gas-station"},
     "battery": {"icon": "mdi:car-battery"},
     "oil": {"icon": "mdi:oil"},
