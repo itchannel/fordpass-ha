@@ -4,8 +4,15 @@ from datetime import datetime, timedelta
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle, dt
 
+from homeassistant.components.sensor import (
+    SensorEntity,
+    SensorDeviceClass,
+    SensorStateClass
+)
+
 from . import FordPassEntity
 from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,7 +37,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class CarSensor(
     FordPassEntity,
-    Entity,
+    SensorEntity,
 ):
     def __init__(self, coordinator, sensor, options):
 
@@ -394,9 +401,29 @@ class CarSensor(
         return self.get_value("attribute")
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         return self.get_value("measurement")
 
     @property
     def icon(self):
         return SENSORS[self.sensor]["icon"]
+
+    @property
+    def state_class(self):
+        if "state_class" in SENSORS[self.sensor]:
+            if SENSORS[self.sensor]["state_class"] is "total":
+                return SensorStateClass.TOTAL
+            elif SENSORS[self.sensor]["state_class"] is "measurement":
+                return SensorStateClass.MEASUREMENT
+            else:
+                return None
+        else:
+            return None
+
+    @property
+    def device_class(self):
+        if "device_class" in SENSORS[self.sensor]:
+            if SENSORS[self.sensor]["device_class"] is "distance":
+                return SensorDeviceClass.DISTANCE
+            else:
+                return None

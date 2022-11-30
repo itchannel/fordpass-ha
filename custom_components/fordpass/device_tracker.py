@@ -53,7 +53,7 @@ class CarTracker(FordPassEntity, TrackerEntity):
 
     @property
     def extra_state_attributes(self):
-        return self.coordinator.data[self.sensor].items()
+        return None
 
     @property
     def icon(self):

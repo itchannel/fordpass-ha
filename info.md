@@ -1,5 +1,8 @@
 
 ## **Changelog**
+### Version 1.39
+- added statistics support to odometer sensor
+- Fixed device_tracker not working correctly in automations
 ### Version 1.38
 - Changed the default update interval from 5 minutes to 15 minutes (Reduce Ford API Requests)
 - Add ability to change this interval in integration options (WARNING! setting this too low will result in your Fordpass account being locked!!!!)
