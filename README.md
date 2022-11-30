@@ -66,3 +66,7 @@ If you are experiencing any sign in issues, please trying clearing your tokens u
 ## Coming Soon
 
 - Next service due
+
+## Disclaimer
+
+This integration is not officially supported by Ford and as such using this integration could result in your account being locked out!
