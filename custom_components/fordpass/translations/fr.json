@@ -25,7 +25,8 @@
             "init": {
                 "data": {
                     "pressure_unit": "Unité de pression",
-                    "distance_unit": "Unité de distance"
+                    "distance_unit": "Unité de distance",
+                    "update_interval": "Intervalle pour interroger l'API Fordpass (secondes)"
                 },
                 "description": "Configuration de Fordpass"
             }

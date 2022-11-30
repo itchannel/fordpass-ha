@@ -25,6 +25,8 @@ from .const import (
     REGION,
     VEHICLE,
     VIN,
+    UPDATE_INTERVAL,
+    UPDATE_INTERVAL_DEFAULT
 )
 from .fordpass_new import Vehicle
 
@@ -34,7 +36,6 @@ PLATFORMS = ["lock", "sensor", "switch", "device_tracker"]
 
 _LOGGER = logging.getLogger(__name__)
 
-SCAN_INTERVAL = timedelta(seconds=300)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
@@ -48,6 +49,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     user = entry.data[CONF_USERNAME]
     password = entry.data[CONF_PASSWORD]
     vin = entry.data[VIN]
+    if UPDATE_INTERVAL in entry.options:
+        update_interval = entry.options[UPDATE_INTERVAL]
+    else:
+        update_interval = UPDATE_INTERVAL_DEFAULT
+    _LOGGER.debug(update_interval)
     for ar in entry.data:
         _LOGGER.debug(ar)
     if REGION in entry.data.keys():
@@ -56,7 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     else:
         _LOGGER.debug("CANT GET REGION")
         region = "North America & Canada"
-    coordinator = FordPassDataUpdateCoordinator(hass, user, password, vin, region, 1)
+    coordinator = FordPassDataUpdateCoordinator(hass, user, password, vin, region, update_interval, 1)
 
     await coordinator.async_refresh()  # Get initial data
 
@@ -144,7 +150,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
     """DataUpdateCoordinator to handle fetching new data about the vehicle."""
 
-    def __init__(self, hass, user, password, vin, region, saveToken=False):
+    def __init__(self, hass, user, password, vin, region, update_interval, saveToken=False):
         """Initialize the coordinator and set up the Vehicle object."""
         self._hass = hass
         self.vin = vin
@@ -156,7 +162,7 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=SCAN_INTERVAL,
+            update_interval=timedelta(seconds=update_interval),
         )
 
     async def _async_update_data(self):

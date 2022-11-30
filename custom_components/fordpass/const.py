@@ -17,6 +17,9 @@ CONF_DISTANCE_UNIT = "distance_unit"
 PRESSURE_UNITS = ["PSI", "kPa"]
 DISTANCE_UNITS = ["mi", "km"]
 
+UPDATE_INTERVAL = "update_interval"
+UPDATE_INTERVAL_DEFAULT = 900
+
 
 REGION = "region"
 
