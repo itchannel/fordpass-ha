@@ -263,6 +263,14 @@ class CarSensor(
                         ]
 
                     if (
+                        self.coordinator.data["chargingStatus"] != None
+                        and self.coordinator.data["chargingStatus"]["value"] != None
+                    ):
+                        elecs["Charging Status"] = self.coordinator.data[
+                            "chargingStatus"
+                        ]["value"]
+
+                    if (
                         self.coordinator.data["chargeStartTime"] != None
                         and self.coordinator.data["chargeStartTime"]["value"] != None
                     ):
