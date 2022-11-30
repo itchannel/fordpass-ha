@@ -114,9 +114,9 @@ class CarSensor(
                                 / 1.60934
                             )
                         else:
-                            return self.coordinator.data["elVehDTE"]["value"]
+                            return float(self.coordinator.data["elVehDTE"]["value"])
                     else:
-                        return self.coordinator.data["elVehDTE"]["value"]
+                        return float(self.coordinator.data["elVehDTE"]["value"])
                 else:
                     return "Unsupported"
             elif self.sensor == "zoneLighting":
