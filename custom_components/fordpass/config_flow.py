@@ -17,6 +17,8 @@ from .const import (  # pylint:disable=unused-import
     REGION,
     REGION_OPTIONS,
     VIN,
+    UPDATE_INTERVAL,
+    UPDATE_INTERVAL_DEFAULT
 )
 from .fordpass_new import Vehicle
 
