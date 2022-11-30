@@ -118,6 +118,12 @@ class OptionsFlow(config_entries.OptionsFlow):
                     CONF_DISTANCE_UNIT, DEFAULT_DISTANCE_UNIT
                 ),
             ): vol.In(DISTANCE_UNITS),
+            vol.Optional(
+                UPDATE_INTERVAL,
+                default=self.config_entry.options.get(
+                    UPDATE_INTERVAL, UPDATE_INTERVAL_DEFAULT
+                ),
+            ): int,
         }
 
         return self.async_show_form(step_id="init", data_schema=vol.Schema(options))

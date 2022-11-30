@@ -26,7 +26,7 @@ from .const import (
     VEHICLE,
     VIN,
     UPDATE_INTERVAL,
-    DEFAULT_INTERVAL_DEFAULT
+    UPDATE_INTERVAL_DEFAULT
 )
 from .fordpass_new import Vehicle
 
@@ -62,7 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     else:
         _LOGGER.debug("CANT GET REGION")
         region = "North America & Canada"
-    coordinator = FordPassDataUpdateCoordinator(hass, user, password, vin, region, 1, update_interval)
+    coordinator = FordPassDataUpdateCoordinator(hass, user, password, vin, region, update_interval, 1)
 
     await coordinator.async_refresh()  # Get initial data
 
@@ -150,7 +150,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
     """DataUpdateCoordinator to handle fetching new data about the vehicle."""
 
-    def __init__(self, hass, user, password, vin, region, saveToken=False, update_interval):
+    def __init__(self, hass, user, password, vin, region, update_interval, saveToken=False):
         """Initialize the coordinator and set up the Vehicle object."""
         self._hass = hass
         self.vin = vin
