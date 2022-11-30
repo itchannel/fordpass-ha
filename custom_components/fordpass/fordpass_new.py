@@ -10,7 +10,7 @@ import time
 
 from base64 import urlsafe_b64encode, urlsafe_b64decode
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 
 _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
