@@ -348,7 +348,8 @@ class CarSensor(
                         for key, value in self.coordinator.data[self.sensor][
                             "lightSwitchStatusData"
                         ].items():
-                            zone[key] = value["value"]
+                            if "value" in value:
+                                zone[key] = value["value"]
 
                     if (
                         self.coordinator.data[self.sensor]["zoneLightingFaultStatus"]
