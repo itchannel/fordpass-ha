@@ -348,7 +348,7 @@ class CarSensor(
                         for key, value in self.coordinator.data[self.sensor][
                             "lightSwitchStatusData"
                         ].items():
-                            if "value" in value:
+                            if value is not None:
                                 zone[key] = value["value"]
 
                     if (
