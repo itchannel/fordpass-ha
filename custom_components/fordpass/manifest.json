@@ -2,6 +2,7 @@
     "domain": "fordpass",
     "name": "FordPass",
     "config_flow": true,
+    "integration_type": "device",
     "documentation": "https://github.com/itchannel/fordpass-ha",
     "issue_tracker": "https://github.com/itchannel/fordpass-ha/issues",
     "version": "0.1.40",
