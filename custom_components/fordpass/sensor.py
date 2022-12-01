@@ -297,9 +297,9 @@ class CarSensor(
                         self.coordinator.data["batteryFillLevel"] != None
                         and self.coordinator.data["batteryFillLevel"]["value"] != None
                     ):
-                        elecs["Battery Fill Level"] = self.coordinator.data[
+                        elecs["Battery Fill Level"] = int(self.coordinator.data[
                             "batteryFillLevel"
-                        ]["value"]
+                        ]["value"])
 
                     if (
                         self.coordinator.data["chargerPowertype"] != None
