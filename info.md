@@ -3,6 +3,8 @@
 ### Version 1.40
 - Fix empty value bug for lighting attributes
 - Fix casting bug for elvehdte and batterly level
+- Fix empty but not null string for tire pressure 
+- Add BAR units to options
 ### Version 1.39
 - added statistics support to odometer sensor
 - Fixed device_tracker not working correctly in automations
