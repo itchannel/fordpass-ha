@@ -206,12 +206,15 @@ class CarSensor(
                     if self.options[CONF_PRESSURE_UNIT] == "PSI":
                         sval = 0.1450377377
                         rval = 1
+                    if self.options[CONF_PRESSURE_UNIT] == "BAR":
+                        sval = 0.01
+                        rval = 0.0689475729
                     else:
                         sval = 1
                         rval = 6.8947572932
                     tirepress = {}
                     for key, value in self.coordinator.data["TPMS"].items():
-                        if "TirePressure" in key and value is not None:
+                        if "TirePressure" in key and value is not None and value is not '':
                             if "recommended" in key:
                                 tirepress[key] = round(float(value["value"]) * rval)
                             else:
