@@ -114,9 +114,9 @@ class CarSensor(
                                 / 1.60934
                             )
                         else:
-                            return self.coordinator.data["elVehDTE"]["value"]
+                            return float(self.coordinator.data["elVehDTE"]["value"])
                     else:
-                        return self.coordinator.data["elVehDTE"]["value"]
+                        return float(self.coordinator.data["elVehDTE"]["value"])
                 else:
                     return "Unsupported"
             elif self.sensor == "zoneLighting":
@@ -206,16 +206,22 @@ class CarSensor(
                     if self.options[CONF_PRESSURE_UNIT] == "PSI":
                         sval = 0.1450377377
                         rval = 1
+                        decimal = 0
+                    if self.options[CONF_PRESSURE_UNIT] == "BAR":
+                        sval = 0.01
+                        rval = 0.0689475729
+                        decimal = 2
                     else:
                         sval = 1
                         rval = 6.8947572932
+                        decimal = 0
                     tirepress = {}
                     for key, value in self.coordinator.data["TPMS"].items():
-                        if "TirePressure" in key and value is not None:
+                        if "TirePressure" in key and value is not None and value is not '':
                             if "recommended" in key:
-                                tirepress[key] = round(float(value["value"]) * rval)
+                                tirepress[key] = round(float(value["value"]) * rval, decimal)
                             else:
-                                tirepress[key] = round(float(value["value"]) * sval)
+                                tirepress[key] = round(float(value["value"]) * sval, decimal)
                     return tirepress
                 return None
             elif self.sensor == "gps":
@@ -297,9 +303,9 @@ class CarSensor(
                         self.coordinator.data["batteryFillLevel"] != None
                         and self.coordinator.data["batteryFillLevel"]["value"] != None
                     ):
-                        elecs["Battery Fill Level"] = self.coordinator.data[
+                        elecs["Battery Fill Level"] = int(self.coordinator.data[
                             "batteryFillLevel"
-                        ]["value"]
+                        ]["value"])
 
                     if (
                         self.coordinator.data["chargerPowertype"] != None
@@ -348,7 +354,8 @@ class CarSensor(
                         for key, value in self.coordinator.data[self.sensor][
                             "lightSwitchStatusData"
                         ].items():
-                            zone[key] = value["value"]
+                            if value is not None:
+                                zone[key] = value["value"]
 
                     if (
                         self.coordinator.data[self.sensor]["zoneLightingFaultStatus"]
