@@ -42,7 +42,7 @@ class CarSensor(
     def __init__(self, coordinator, sensor, options):
 
         self.sensor = sensor
-        self.options = options
+        self.fordoptions = options
         self._attr = {}
         self.coordinator = coordinator
         self._device_id = "fordpass_" + sensor
@@ -52,8 +52,8 @@ class CarSensor(
     def get_value(self, ftype):
         if ftype == "state":
             if self.sensor == "odometer":
-                if self.options[CONF_DISTANCE_UNIT] != None:
-                    if self.options[CONF_DISTANCE_UNIT] == "mi":
+                if self.fordoptions[CONF_DISTANCE_UNIT] != None:
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                         return round(
                             float(self.coordinator.data[self.sensor]["value"]) / 1.60934
                         )
@@ -107,8 +107,8 @@ class CarSensor(
                 )
             elif self.sensor == "elVeh":
                 if self.coordinator.data["elVehDTE"] != None:
-                    if self.options[CONF_DISTANCE_UNIT] != None:
-                        if self.options[CONF_DISTANCE_UNIT] == "mi":
+                    if self.fordoptions[CONF_DISTANCE_UNIT] != None:
+                        if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                             return round(
                                 float(self.coordinator.data["elVehDTE"]["value"])
                                 / 1.60934
@@ -146,7 +146,7 @@ class CarSensor(
                     return len(self.coordinator.data["messages"])
         elif ftype == "measurement":
             if self.sensor == "odometer":
-                if self.options[CONF_DISTANCE_UNIT] == "mi":
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                     return "mi"
                 else:
                     return "km"
@@ -186,7 +186,7 @@ class CarSensor(
             elif self.sensor == "fuel":
                 if self.coordinator.data[self.sensor] == None:
                     return None
-                if self.options[CONF_DISTANCE_UNIT] == "mi":
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                     self.coordinator.data["fuel"]["distanceToEmpty"] = round(
                         float(self.coordinator.data["fuel"]["distanceToEmpty"])
                         / 1.60934
@@ -203,11 +203,11 @@ class CarSensor(
             elif self.sensor == "tirePressure":
                 if self.coordinator.data["TPMS"] != None:
 
-                    if self.options[CONF_PRESSURE_UNIT] == "PSI":
+                    if self.fordoptions[CONF_PRESSURE_UNIT] == "PSI":
                         sval = 0.1450377377
                         rval = 1
                         decimal = 0
-                    if self.options[CONF_PRESSURE_UNIT] == "BAR":
+                    if self.fordoptions[CONF_PRESSURE_UNIT] == "BAR":
                         sval = 0.01
                         rval = 0.0689475729
                         decimal = 2
