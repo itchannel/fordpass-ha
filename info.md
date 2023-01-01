@@ -1,5 +1,7 @@
 
 ## **Changelog**
+### Version 1.41
+- Fix options error in HA 2023
 ### Version 1.40
 - Fix empty value bug for lighting attributes
 - Fix casting bug for elvehdte and batterly level
