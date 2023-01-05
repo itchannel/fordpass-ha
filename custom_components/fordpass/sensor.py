@@ -201,19 +201,15 @@ class CarSensor(
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "tirePressure":
                 if self.coordinator.data["TPMS"] != None:
-                    _LOGGER.debug(self.fordoptions[CONF_PRESSURE_UNIT])
                     if self.fordoptions[CONF_PRESSURE_UNIT] == "PSI":
-                        _LOGGER.debug("DOING PSI")
                         sval = 0.1450377377
                         rval = 1
                         decimal = 0
                     elif self.fordoptions[CONF_PRESSURE_UNIT] == "BAR":
-                        _LOGGER.debug("DOING bar")
                         sval = 0.01
                         rval = 0.0689475729
                         decimal = 2
                     elif self.fordoptions[CONF_PRESSURE_UNIT] == "kPa":
-                        _LOGGER.debug("DOING kpa")
                         sval = 1
                         rval = 6.8947572932
                         decimal = 0
@@ -226,14 +222,8 @@ class CarSensor(
                         if "TirePressure" in key and value is not None and value is not '':
                             if "recommended" in key:
                                 tirepress[key] = round(float(value["value"]) * rval, decimal)
-                                _LOGGER.debug(key)
-                                _LOGGER.debug("Recommended Original: " + str(float(value["value"])))
-                                _LOGGER.debug("Recommended Converted: " + str(tirepress[key]))
                             else:
                                 tirepress[key] = round(float(value["value"]) * sval, decimal)
-                                _LOGGER.debug(key)
-                                _LOGGER.debug("Actual Original: " + str(float(value["value"])))
-                                _LOGGER.debug("Actual Converted: " + str(tirepress[key]))
                     return tirepress
                 return None
             elif self.sensor == "gps":

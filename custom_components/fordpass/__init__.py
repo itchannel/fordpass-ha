@@ -181,7 +181,7 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
                 data["messages"] = await self._hass.async_add_executor_job(
                     self.vehicle.messages
                 )
-
+                _LOGGER.debug(data)
                 # If data has now been fetched but was previously unavailable, log and reset
                 if not self._available:
                     _LOGGER.info("Restored connection to FordPass for %s", self.vin)
