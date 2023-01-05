@@ -1,5 +1,6 @@
-
 ## **Changelog**
+### Version 1.42
+- Fix incorrect tire pressure units (Thanks @costr for debugging)
 ### Version 1.41
 - Fix options error in HA 2023
 ### Version 1.40
