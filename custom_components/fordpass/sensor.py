@@ -24,7 +24,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for key, value in SENSORS.items():
         sensor = CarSensor(entry, key, config_entry.options)
         # Add support for only adding compatible sensors for the given vehicle
-        _LOGGER.debug(sensor.coordinator.data)
         if key == "zoneLighting":
             if "zoneLighting" in sensor.coordinator.data:
                 async_add_entities([sensor], True)
@@ -202,26 +201,39 @@ class CarSensor(
                 return self.coordinator.data[self.sensor].items()
             elif self.sensor == "tirePressure":
                 if self.coordinator.data["TPMS"] != None:
-
+                    _LOGGER.debug(self.fordoptions[CONF_PRESSURE_UNIT])
                     if self.fordoptions[CONF_PRESSURE_UNIT] == "PSI":
+                        _LOGGER.debug("DOING PSI")
                         sval = 0.1450377377
                         rval = 1
                         decimal = 0
-                    if self.fordoptions[CONF_PRESSURE_UNIT] == "BAR":
+                    elif self.fordoptions[CONF_PRESSURE_UNIT] == "BAR":
+                        _LOGGER.debug("DOING bar")
                         sval = 0.01
                         rval = 0.0689475729
                         decimal = 2
-                    else:
+                    elif self.fordoptions[CONF_PRESSURE_UNIT] == "kPa":
+                        _LOGGER.debug("DOING kpa")
                         sval = 1
                         rval = 6.8947572932
+                        decimal = 0
+                    else:
+                        sval = 1
+                        rval = 1
                         decimal = 0
                     tirepress = {}
                     for key, value in self.coordinator.data["TPMS"].items():
                         if "TirePressure" in key and value is not None and value is not '':
                             if "recommended" in key:
                                 tirepress[key] = round(float(value["value"]) * rval, decimal)
+                                _LOGGER.debug(key)
+                                _LOGGER.debug("Recommended Original: " + str(float(value["value"])))
+                                _LOGGER.debug("Recommended Converted: " + str(tirepress[key]))
                             else:
                                 tirepress[key] = round(float(value["value"]) * sval, decimal)
+                                _LOGGER.debug(key)
+                                _LOGGER.debug("Actual Original: " + str(float(value["value"])))
+                                _LOGGER.debug("Actual Converted: " + str(tirepress[key]))
                     return tirepress
                 return None
             elif self.sensor == "gps":
