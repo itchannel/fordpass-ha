@@ -1,4 +1,6 @@
 ## **Changelog**
+### Version 1.43
+- Add DPF status on supported vehicles
 ### Version 1.42
 - Fix incorrect tire pressure units (Thanks @costr for debugging)
 ### Version 1.41
