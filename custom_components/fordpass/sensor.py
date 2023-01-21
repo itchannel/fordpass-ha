@@ -101,7 +101,7 @@ class CarSensor(
             elif self.sensor == "lastRefresh":
                 return dt.as_local(
                     datetime.strptime(
-                        self.coordinator.data[self.sensor], "%m-%d-%Y %H:%M:%S"
+                        self.coordinator.data[self.sensor] + "+0000", "%m-%d-%Y %H:%M:%S%z"
                     )
                 )
             elif self.sensor == "elVeh":
