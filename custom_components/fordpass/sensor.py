@@ -237,7 +237,7 @@ class CarSensor(
                         decimal = 0
                     tirepress = {}
                     for key, value in self.coordinator.data["TPMS"].items():
-                        if "TirePressure" in key and value is not None and value is not '':
+                        if "TirePressure" in key and value is not None and value != '':
                             if "recommended" in key:
                                 tirepress[key] = round(float(value["value"]) * rval, decimal)
                             else:
@@ -442,9 +442,9 @@ class CarSensor(
     @property
     def state_class(self):
         if "state_class" in SENSORS[self.sensor]:
-            if SENSORS[self.sensor]["state_class"] is "total":
+            if SENSORS[self.sensor]["state_class"] == "total":
                 return SensorStateClass.TOTAL
-            elif SENSORS[self.sensor]["state_class"] is "measurement":
+            elif SENSORS[self.sensor]["state_class"] == "measurement":
                 return SensorStateClass.MEASUREMENT
             else:
                 return None
@@ -454,7 +454,7 @@ class CarSensor(
     @property
     def device_class(self):
         if "device_class" in SENSORS[self.sensor]:
-            if SENSORS[self.sensor]["device_class"] is "distance":
+            if SENSORS[self.sensor]["device_class"] == "distance":
                 return SensorDeviceClass.DISTANCE
             else:
                 return None
