@@ -4,14 +4,14 @@ import logging
 from homeassistant.components.lock import LockEntity
 
 from . import FordPassEntity
-from .const import DOMAIN
+from .const import DOMAIN, COORDINATOR
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the lock from the config."""
-    entry = hass.data[DOMAIN][config_entry.entry_id]
+    entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
 
     locks = [Lock(entry)]
     async_add_entities(locks, False)

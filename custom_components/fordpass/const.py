@@ -20,6 +20,8 @@ DISTANCE_UNITS = ["mi", "km"]
 UPDATE_INTERVAL = "update_interval"
 UPDATE_INTERVAL_DEFAULT = 900
 
+COORDINATOR = "coordinator"
+
 
 REGION = "region"
 

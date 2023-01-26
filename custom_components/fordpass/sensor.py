@@ -11,7 +11,7 @@ from homeassistant.components.sensor import (
 )
 
 from . import FordPassEntity
-from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS
+from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Entities from the config."""
-    entry = hass.data[DOMAIN][config_entry.entry_id]
+    entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
     sensors = []
     for key, value in SENSORS.items():
         sensor = CarSensor(entry, key, config_entry.options)

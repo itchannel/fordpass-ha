@@ -3,14 +3,14 @@ import logging
 from homeassistant.components.switch import SwitchEntity
 
 from . import FordPassEntity
-from .const import DOMAIN, SWITCHES
+from .const import DOMAIN, SWITCHES, COORDINATOR
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Switch from the config."""
-    entry = hass.data[DOMAIN][config_entry.entry_id]
+    entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
 
     # switches = [Switch(entry)]
     # async_add_entities(switches, False)
