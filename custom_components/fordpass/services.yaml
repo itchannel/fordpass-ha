@@ -9,3 +9,6 @@ refresh_status:
         text:
 clear_tokens:
   description: "Clear the cached tokens"
+reload:
+  name: Reload
+  description: "Reload the Fordpass Integration"

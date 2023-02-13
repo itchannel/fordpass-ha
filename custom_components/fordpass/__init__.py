@@ -93,8 +93,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     async def async_clear_tokens_service(service_call):
         await hass.async_add_executor_job(clear_tokens, hass, service_call, coordinator)
 
-    async def async_clear_tokens_service(service_call):
-        await hass.async_add_executor_job(clear_tokens, hass, service_call, coordinator)
+
+    async def handle_reload(service):
+        """Handle reload service call."""
+        _LOGGER.debug("Reloading Integration")
+
+        current_entries = hass.config_entries.async_entries(DOMAIN)
+        reload_tasks = [
+            hass.config_entries.async_reload(entry.entry_id)
+            for entry in current_entries
+        ]
+
+        await asyncio.gather(*reload_tasks)
 
     hass.services.async_register(
         DOMAIN,
@@ -105,6 +115,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         DOMAIN,
         "clear_tokens",
         async_clear_tokens_service,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "reload",
+        handle_reload
     )
 
     return True
