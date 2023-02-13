@@ -11,7 +11,7 @@ from homeassistant.components.sensor import (
 )
 
 from . import FordPassEntity
-from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS
+from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -19,20 +19,26 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Entities from the config."""
-    entry = hass.data[DOMAIN][config_entry.entry_id]
-
+    entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
+    sensors = []
     for key, value in SENSORS.items():
         sensor = CarSensor(entry, key, config_entry.options)
         # Add support for only adding compatible sensors for the given vehicle
         if key == "zoneLighting":
             if "zoneLighting" in sensor.coordinator.data:
-                async_add_entities([sensor], True)
+                sensors.append(sensor)
         elif key == "elVeh":
             if sensor.coordinator.data["elVehDTE"] != None:
-                async_add_entities([sensor], True)
+                sensors.append(sensor)
+        elif key == "dieselSystemStatus":
+            if "dieselSystemStatus" in sensor.coordinator.data and sensor.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"] != None:
+                sensors.append(sensor)
+        elif key == "exhaustFluidLevel":
+            if "exhaustFluidLevel" in sensor.coordinator.data and sensor.coordinator.data["dieselSystemStatus"]["exhaustFluidLevel"] != None:
+                sensors.append(sensor)
         else:
-            async_add_entities([sensor], True)
-
+            sensors.append(sensor)
+    async_add_entities(sensors, True)
 
 class CarSensor(
     FordPassEntity,
@@ -143,6 +149,16 @@ class CarSensor(
                     return None
                 else:
                     return len(self.coordinator.data["messages"])
+            elif self.sensor == "dieselSystemStatus":
+                if self.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"] != None:
+                    return self.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"]
+                else:
+                    return "Not Supported"
+            elif self.sensor == "exhaustFluidLevel":
+                if "value" in self.coordinator.data["dieselSystemStatus"]["exhaustFluidLevel"]:
+                    return self.coordinator.data["dieselSystemStatus"]["exhaustFluidLevel"]["value"]
+                else:
+                    return "Not Supported"
         elif ftype == "measurement":
             if self.sensor == "odometer":
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
@@ -179,6 +195,8 @@ class CarSensor(
                 return None
             elif self.sensor == "messages":
                 return "Messages"
+            elif self.sensor == "exhaustFluidLevel":
+                return "%"
         elif ftype == "attribute":
             if self.sensor == "odometer":
                 return self.coordinator.data[self.sensor].items()
@@ -219,7 +237,7 @@ class CarSensor(
                         decimal = 0
                     tirepress = {}
                     for key, value in self.coordinator.data["TPMS"].items():
-                        if "TirePressure" in key and value is not None and value is not '':
+                        if "TirePressure" in key and value is not None and value != '':
                             if "recommended" in key:
                                 tirepress[key] = round(float(value["value"]) * rval, decimal)
                             else:
@@ -392,6 +410,10 @@ class CarSensor(
 
                         messages[value["messageSubject"]] = value["createdDate"]
                     return messages
+            elif self.sensor == "dieselSystemStatus":
+                return self.coordinator.data["dieselSystemStatus"]
+            elif self.sensor == "exhaustFluidLevel":
+                return self.coordinator.data["dieselSystemStatus"]
 
     @property
     def name(self):
@@ -420,9 +442,9 @@ class CarSensor(
     @property
     def state_class(self):
         if "state_class" in SENSORS[self.sensor]:
-            if SENSORS[self.sensor]["state_class"] is "total":
+            if SENSORS[self.sensor]["state_class"] == "total":
                 return SensorStateClass.TOTAL
-            elif SENSORS[self.sensor]["state_class"] is "measurement":
+            elif SENSORS[self.sensor]["state_class"] == "measurement":
                 return SensorStateClass.MEASUREMENT
             else:
                 return None
@@ -432,7 +454,7 @@ class CarSensor(
     @property
     def device_class(self):
         if "device_class" in SENSORS[self.sensor]:
-            if SENSORS[self.sensor]["device_class"] is "distance":
+            if SENSORS[self.sensor]["device_class"] == "distance":
                 return SensorDeviceClass.DISTANCE
             else:
                 return None
