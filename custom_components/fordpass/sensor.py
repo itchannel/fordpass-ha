@@ -92,12 +92,11 @@ class CarSensor(
             elif self.sensor == "windowPosition":
                 if self.coordinator.data[self.sensor] == None:
                     return "Unsupported"
+                status = "Closed"
                 for key, value in self.coordinator.data[self.sensor].items():
-                    if "open" in value["value"].lower():
-                        return "Open"
-                    elif "closed" in value["value"].lower():
-                        return "Closed"
-                return "Unsupported"
+                    if "open" or "btwn" in value["value"].lower():
+                        status = "Open"
+                return status
             elif self.sensor == "lastRefresh":
                 return dt.as_local(
                     datetime.strptime(
