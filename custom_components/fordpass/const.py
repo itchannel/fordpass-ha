@@ -20,6 +20,8 @@ DISTANCE_UNITS = ["mi", "km"]
 UPDATE_INTERVAL = "update_interval"
 UPDATE_INTERVAL_DEFAULT = 900
 
+COORDINATOR = "coordinator"
+
 
 REGION = "region"
 
@@ -49,6 +51,8 @@ SENSORS = {
     "remoteStartStatus": {"icon": "mdi:remote"},
     "zoneLighting": {"icon": "mdi:spotlight-beam"},
     "messages": {"icon": "mdi:message-text"},
+    "dieselSystemStatus": {"icon": "mdi:smoking-pipe"},
+    "exhaustFluidLevel": {"icon": "mdi:barrel"}
 }
 
 SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}

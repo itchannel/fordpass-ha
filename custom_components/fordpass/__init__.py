@@ -26,7 +26,8 @@ from .const import (
     VEHICLE,
     VIN,
     UPDATE_INTERVAL,
-    UPDATE_INTERVAL_DEFAULT
+    UPDATE_INTERVAL_DEFAULT,
+    COORDINATOR
 )
 from .fordpass_new import Vehicle
 
@@ -66,13 +67,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     await coordinator.async_refresh()  # Get initial data
 
+    fordpass_options_listener = entry.add_update_listener(options_update_listener)
+
     if not entry.options:
         await async_update_options(hass, entry)
 
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN][entry.entry_id] = {
+        COORDINATOR : coordinator,
+        "fordpass_options_listener": fordpass_options_listener
+    }
 
     for component in PLATFORMS:
         hass.async_create_task(
@@ -115,6 +121,11 @@ async def async_update_options(hass, config_entry):
     )
     hass.config_entries.async_update_entry(config_entry, options=options)
 
+async def options_update_listener(
+    hass: HomeAssistant,  entry: ConfigEntry 
+    ):
+        _LOGGER.debug("OPTIONS CHANGE")
+        await hass.config_entries.async_reload(entry.entry_id)
 
 def refresh_status(hass, service, coordinator):
     _LOGGER.debug("Running Service")
@@ -141,6 +152,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
             ]
         )
     )
+    hass.data[DOMAIN][entry.entry_id]["fordpass_options_listener"]()
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
 
