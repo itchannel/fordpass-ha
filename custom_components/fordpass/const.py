@@ -52,7 +52,10 @@ SENSORS = {
     "zoneLighting": {"icon": "mdi:spotlight-beam"},
     "messages": {"icon": "mdi:message-text"},
     "dieselSystemStatus": {"icon": "mdi:smoking-pipe"},
-    "exhaustFluidLevel": {"icon": "mdi:barrel"}
+    "filterRegenerationStatus": {"icon": "mdi:smoking-pipe"},
+    "exhaustFluidLevel": {"icon": "mdi:barrel"},
+    "filterSoot": {"icon": "mdi:barrel"},
+    "ureaRange": {"icon": "mdi:barrel"},
 }
 
 SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
