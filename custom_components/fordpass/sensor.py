@@ -28,22 +28,22 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             if "zoneLighting" in sensor.coordinator.data:
                 sensors.append(sensor)
         elif key == "elVeh":
-            if sensor.coordinator.data["elVehDTE"] != None:
+            if sensor.coordinator.data["elVehDTE"]:
                 sensors.append(sensor)
         elif key == "dieselSystemStatus":
-            if sensor.coordinator.data.get("dieselSystemStatus") != None:
+            if sensor.coordinator.data.get("dieselSystemStatus"):
                 sensors.append(sensor)
         elif key == "filterRegenerationStatus":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus") != None:
+            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus"):
                 sensors.append(sensor)
         elif key == "exhaustFluidLevel":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("exhaustFluidLevel") != None:
+            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("exhaustFluidLevel"):
                 sensors.append(sensor)
         elif key == "filterSoot":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterSoot") != None:
+            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterSoot"):
                 sensors.append(sensor)
         elif key == "ureaRange":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("ureaRange") != None:
+            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("ureaRange"):
                 sensors.append(sensor)
         else:
             sensors.append(sensor)
