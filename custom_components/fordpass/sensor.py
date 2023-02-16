@@ -158,15 +158,15 @@ class CarSensor(
                 else:
                     return len(self.coordinator.data["messages"])
             elif self.sensor == "dieselSystemStatus":
-                if self.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"] != None:
-                    return self.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"]
-                else:
-                    return "Not Supported"
+                return self.coordinator.data.get("dieselSystemStatus", "Not Supported")
             elif self.sensor == "exhaustFluidLevel":
-                if "value" in self.coordinator.data["dieselSystemStatus"]["exhaustFluidLevel"]:
-                    return self.coordinator.data["dieselSystemStatus"]["exhaustFluidLevel"]["value"]
-                else:
-                    return "Not Supported"
+                return self.coordinator.data.get("dieselSystemStatus", {}).get("exhaustFluidLevel", {}).get("value", "Not Supported")
+            elif self.sensor == "filterSoot":
+                return self.coordinator.data.get("dieselSystemStatus", {}).get("filterSoot", {}).get("value", "Not Supported")
+            elif self.sensor == "ureaRange":
+                return self.coordinator.data.get("dieselSystemStatus", {}).get("ureaRange", {}).get("value", "Not Supported")
+            elif self.sensor == "filterRegenerationStatus":
+                return self.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus", {}).get("value", "Not Supported")
         elif ftype == "measurement":
             if self.sensor == "odometer":
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
@@ -420,8 +420,14 @@ class CarSensor(
                     return messages
             elif self.sensor == "dieselSystemStatus":
                 return self.coordinator.data["dieselSystemStatus"]
+            elif self.sensor == "filterRegenerationStatus":
+                return self.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus")
             elif self.sensor == "exhaustFluidLevel":
-                return self.coordinator.data["dieselSystemStatus"]
+                return self.coordinator.data.get("dieselSystemStatus", {}).get("exhaustFluidLevel")
+            elif self.sensor == "filterSoot":
+                return self.coordinator.data.get("dieselSystemStatus", {}).get("filterSoot")
+            elif self.sensor == "ureaRange":
+                return self.coordinator.data.get("dieselSystemStatus", {}).get("ureaRange")
 
     @property
     def name(self):
