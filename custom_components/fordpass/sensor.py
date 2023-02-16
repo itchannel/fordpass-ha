@@ -31,13 +31,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             if sensor.coordinator.data["elVehDTE"] != None:
                 sensors.append(sensor)
         elif key == "dieselSystemStatus":
-            if "dieselSystemStatus" in sensor.coordinator.data:
-                if "filterRegenerationStatus" in sensor.coordinator.data["dieselSystemStatus"]:
-                    sensors.append(sensor)
+            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus"):
+                sensors.append(sensor)
         elif key == "exhaustFluidLevel":
-            if "exhaustFluidLevel" in sensor.coordinator.data:
-                if "exhaustFluidLevel" in sensor.coordinator.data["dieselSystemStatus"]:
-                    sensors.append(sensor)
+            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("exhaustFluidLevel"):
+                sensors.append(sensor)
         else:
             sensors.append(sensor)
     async_add_entities(sensors, True)
