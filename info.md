@@ -1,4 +1,6 @@
 ## **Changelog**
+### Version 1.45
+- Fix window position reporting as open always
 ### Version 1.44
 - Fix incorrect window position status
 - Add reload integration service 

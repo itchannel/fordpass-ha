@@ -100,7 +100,7 @@ class CarSensor(
                     return "Unsupported"
                 status = "Closed"
                 for key, value in self.coordinator.data[self.sensor].items():
-                    if "open" or "btwn" in value["value"].lower():
+                    if "open" in value["value"].lower():
                         status = "Open"
                 return status
             elif self.sensor == "lastRefresh":
