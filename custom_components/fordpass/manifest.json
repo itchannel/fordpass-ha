@@ -5,7 +5,7 @@
     "integration_type": "device",
     "documentation": "https://github.com/itchannel/fordpass-ha",
     "issue_tracker": "https://github.com/itchannel/fordpass-ha/issues",
-    "version": "0.1.43",
+    "version": "0.1.45",
     "requirements": [],
     "ssdp": [],
     "zeroconf": [],
