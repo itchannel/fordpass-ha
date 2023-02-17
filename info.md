@@ -1,4 +1,11 @@
 ## **Changelog**
+### Version 1.46
+- Fix diesel filter error
+### Version 1.45
+- Fix window position reporting as open always
+### Version 1.44
+- Fix incorrect window position status
+- Add reload integration service 
 ### Version 1.43
 - Add DPF status on supported vehicles
 - Incorrect vehicle refresh time (@ronytomen)
