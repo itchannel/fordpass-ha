@@ -158,15 +158,30 @@ class CarSensor(
                 else:
                     return len(self.coordinator.data["messages"])
             elif self.sensor == "dieselSystemStatus":
-                return self.coordinator.data.get("dieselSystemStatus", "Not Supported")
+                if self.coordinator.data.get("dieselSystemStatus"):
+                    return self.coordinator.data.get("dieselSystemStatus")
+                else:
+                    return "Not Supported"
             elif self.sensor == "exhaustFluidLevel":
-                return self.coordinator.data.get("dieselSystemStatus", {}).get("exhaustFluidLevel", {}).get("value", "Not Supported")
+                if self.coordinator.data.get("dieselSystemStatus") and self.coordinator.data.get("dieselSystemStatus").get("exhaustFluidLevel"):
+                    return self.coordinator.data.get("dieselSystemStatus").get("exhaustFluidLevel").get("value")
+                else:
+                    return "Not Supported"
             elif self.sensor == "filterSoot":
-                return self.coordinator.data.get("dieselSystemStatus", {}).get("filterSoot", {}).get("value", "Not Supported")
+                if self.coordinator.data.get("dieselSystemStatus") and self.coordinator.data.get("dieselSystemStatus").get("filterSoot"):
+                    return self.coordinator.data.get("dieselSystemStatus").get("filterSoot").get("value")
+                else:
+                    return "Not Supported"
             elif self.sensor == "ureaRange":
-                return self.coordinator.data.get("dieselSystemStatus", {}).get("ureaRange", {}).get("value", "Not Supported")
+                if self.coordinator.data.get("dieselSystemStatus") and self.coordinator.data.get("dieselSystemStatus").get("ureaRange"):
+                    return self.coordinator.data.get("dieselSystemStatus").get("ureaRange").get("value")
+                else:
+                    return "Not Supported"
             elif self.sensor == "filterRegenerationStatus":
-                return self.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus", {}).get("value", "Not Supported")
+                if self.coordinator.data.get("dieselSystemStatus") and self.coordinator.data.get("dieselSystemStatus").get("filterRegenerationStatus"):
+                    return self.coordinator.data.get("dieselSystemStatus").get("filterRegenerationStatus").get("value")
+                else:
+                    return "Not Supported"
         elif ftype == "measurement":
             if self.sensor == "odometer":
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
