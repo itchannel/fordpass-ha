@@ -34,16 +34,16 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             if sensor.coordinator.data.get("dieselSystemStatus"):
                 sensors.append(sensor)
         elif key == "filterRegenerationStatus":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus"):
+            if sensor.coordinator.data.get("dieselSystemStatus") and sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus"):
                 sensors.append(sensor)
         elif key == "exhaustFluidLevel":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("exhaustFluidLevel"):
+            if sensor.coordinator.data.get("dieselSystemStatus") and sensor.coordinator.data.get("dieselSystemStatus", {}).get("exhaustFluidLevel"):
                 sensors.append(sensor)
         elif key == "filterSoot":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterSoot"):
+            if sensor.coordinator.data.get("dieselSystemStatus") and sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterSoot"):
                 sensors.append(sensor)
         elif key == "ureaRange":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}).get("ureaRange"):
+            if sensor.coordinator.data.get("dieselSystemStatus") and sensor.coordinator.data.get("dieselSystemStatus", {}).get("ureaRange"):
                 sensors.append(sensor)
         else:
             sensors.append(sensor)
