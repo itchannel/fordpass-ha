@@ -1,0 +1,36 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Konto ist bereits konfiguriert"
+        },
+        "error": {
+            "cannot_connect": "Verbindungsfehler",
+            "invalid_auth": "Authentifizierungsfehler",
+            "invalid_vin": "Die FIN kann nicht in deinem Konto gefunden werden",
+            "unknown": "Unbekannter Fehler"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "password": "FordPass Password",
+                    "username": "FordPass Username (E-Mail)",
+                    "vin": "FIN",
+                    "region" : "FordPass Region"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "pressure_unit": "Maßeinheit für Druck",
+                    "distance_unit": "Maßeinheit für Entfernung",
+                    "update_interval": "Aktualisierungsintervall FordPass-API (Sekunden)"
+                },
+                "description": "Optionen konfigurieren"
+            }
+        }
+    }, 
+    "title": "FordPass"
+}
