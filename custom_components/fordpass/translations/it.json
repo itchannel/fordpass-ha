@@ -1,0 +1,36 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Account già configurato"
+        },
+        "error": {
+            "cannot_connect": "Errore di collegamento",
+            "invalid_auth": "Errore di autenticazione",
+            "invalid_vin": "VIN non trovato nel tuo account",
+            "unknown": "Errore sconosciuto"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "password": "FordPass Password",
+                    "username": "FordPass Username (Email)",
+                    "vin": "VIN",
+                    "region" : "FordPass Regione"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "pressure_unit": "Unità di misura della pressione",
+                    "distance_unit": "Unità di misura della distanza",
+                    "update_interval": "Intervallo di aggiornamento della FordPass-API (secondi)"
+                },
+                "description": "Configurazione delle opzioni"
+            }
+        }
+    }, 
+    "title": "FordPass"
+}
