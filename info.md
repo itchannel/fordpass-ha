@@ -3,6 +3,7 @@
 - Add poll_api service to allow for manual refreshing of data outside of poll interval (e.g. poll more when driving)
 - Add option to disable distance conversion when units displaying wrong in certain countries
 - Add device_class to "last_refresh" sensor
+- Add Locking/Unlocking status to lock entity
 ### Version 1.46
 - Fix diesel filter error
 ### Version 1.45
