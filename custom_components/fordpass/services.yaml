@@ -12,3 +12,6 @@ clear_tokens:
 reload:
   name: Reload
   description: "Reload the Fordpass Integration"
+poll_api:
+  name: Poll API
+  description: "Manually poll API for data update (Warning: doing this too often could result in a ban)"

@@ -93,6 +93,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     async def async_clear_tokens_service(service_call):
         await hass.async_add_executor_job(clear_tokens, hass, service_call, coordinator)
 
+    async def poll_api_service(service_call):
+        await coordinator.async_request_refresh()
+
 
     async def handle_reload(service):
         """Handle reload service call."""
@@ -121,6 +124,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         DOMAIN,
         "reload",
         handle_reload
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "poll_api",
+        poll_api_service
     )
 
     return True
