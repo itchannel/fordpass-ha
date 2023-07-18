@@ -11,7 +11,7 @@ from homeassistant.components.sensor import (
 )
 
 from . import FordPassEntity
-from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR
+from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR, DISTANCE_CONVERSION_DISABLED
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -61,9 +61,13 @@ class CarSensor(
             if self.sensor == "odometer":
                 if self.fordoptions[CONF_DISTANCE_UNIT] != None:
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        return round(
-                            float(self.coordinator.data[self.sensor]["value"]) / 1.60934
-                        )
+                        if self.fordoptions[DISTANCE_CONVERSION_DISABLED] == True:
+                            return self.coordinator.data[self.sensor]["value"]
+                        else:
+                            return round(
+                                float(self.coordinator.data[self.sensor]["value"]) / 1.60934
+                            )
+                        
                     else:
                         return self.coordinator.data[self.sensor]["value"]
                 else:
