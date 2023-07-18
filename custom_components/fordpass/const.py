@@ -40,7 +40,7 @@ SENSORS = {
     "ignitionStatus": {"icon": "hass:power"},
     "doorStatus": {"icon": "mdi:car-door"},
     "windowPosition": {"icon": "mdi:car-door"},
-    "lastRefresh": {"icon": "mdi:clock"},
+    "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp"},
     "elVeh": {"icon": "mdi:ev-station"},
     "deepSleepInProgress": {
         "icon": "mdi:power-sleep",

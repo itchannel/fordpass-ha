@@ -461,5 +461,6 @@ class CarSensor(
         if "device_class" in SENSORS[self.sensor]:
             if SENSORS[self.sensor]["device_class"] == "distance":
                 return SensorDeviceClass.DISTANCE
-            else:
-                return None
+            if SENSORS[self.sensor]["device_class"] == "timestamp":
+                return SensorDeviceClass.TIMESTAMP
+            return None
