@@ -26,6 +26,7 @@
                 "data": {
                     "pressure_unit": "Eenheid voor luchtdruk",
                     "distance_unit": "Eenheid voor afstand",
+                    "distance_conversion": "Deaktiver avstandskonvertering",
                     "update_interval": "Interval om Fordpass API te peilen (seconden)"
                 },
                 "description": "Instellingen FordPass"

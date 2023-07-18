@@ -9,8 +9,9 @@
     "integration_type": "device",
     "iot_class": "cloud_polling",
     "issue_tracker": "https://github.com/itchannel/fordpass-ha/issues",
+    "loggers": ["custom_components.fordpass"],
     "requirements": [],
     "ssdp": [],
-    "version": "0.1.46",
+    "version": "0.1.47",
     "zeroconf": []
   }

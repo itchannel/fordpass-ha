@@ -16,7 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
     "Accept": "*/*",
     "Accept-Language": "en-us",
-    "User-Agent": "FordPass/5 CFNetwork/1197 Darwin/20.0.0",
+    "User-Agent": "FordPass/23 CFNetwork/1408.0.4 Darwin/22.5.0",
     "Accept-Encoding": "gzip, deflate, br",
 }
 
@@ -289,7 +289,7 @@ class Vehicle(object):
         }
 
         r = session.get(
-            f"{baseUrl}/vehicles/v4/{self.vin}/status", params=params, headers=headers
+            f"{baseUrl}/vehicles/v5/{self.vin}/status", params=params, headers=headers
         )
         if r.status_code == 200:
             result = r.json()

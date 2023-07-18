@@ -18,7 +18,9 @@ from .const import (  # pylint:disable=unused-import
     REGION_OPTIONS,
     VIN,
     UPDATE_INTERVAL,
-    UPDATE_INTERVAL_DEFAULT
+    UPDATE_INTERVAL_DEFAULT,
+    DISTANCE_CONVERSION_DISABLED,
+    DISTANCE_CONVERSION_DISABLED_DEFAULT
 )
 from .fordpass_new import Vehicle
 
@@ -120,6 +122,12 @@ class OptionsFlow(config_entries.OptionsFlow):
                     CONF_DISTANCE_UNIT, DEFAULT_DISTANCE_UNIT
                 ),
             ): vol.In(DISTANCE_UNITS),
+            vol.Optional(
+                DISTANCE_CONVERSION_DISABLED,
+                default = self.config_entry.options.get(
+                    DISTANCE_CONVERSION_DISABLED, DISTANCE_CONVERSION_DISABLED_DEFAULT
+                ),
+            ): bool,
             vol.Optional(
                 UPDATE_INTERVAL,
                 default=self.config_entry.options.get(

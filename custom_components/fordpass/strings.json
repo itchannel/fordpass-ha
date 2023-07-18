@@ -27,6 +27,7 @@
         "data": {
           "pressure_unit": "Unit of Pressure",
           "distance_unit": "Unit of Distance",
+          "distance_conversion": "Disable distance conversion",
           "update_interval": "Interval to poll Fordpass API (Seconds)"
         },
         "description": "Configure fordpass options"
