@@ -200,6 +200,11 @@ class CarSensor(
                 return None
             elif self.sensor == "messages":
                 return "Messages"
+            elif self.sensor == "elVeh":
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                    return "mi"
+                else:
+                    return "km"
             elif self.sensor == "exhaustFluidLevel":
                 return "%"
         elif ftype == "attribute":
