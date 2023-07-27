@@ -61,7 +61,7 @@ class CarSensor(
             if self.sensor == "odometer":
                 if self.fordoptions[CONF_DISTANCE_UNIT] != None:
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        if self.fordoptions[DISTANCE_CONVERSION_DISABLED] == True:
+                        if DISTANCE_CONVERSION_DISABLED in self.fordoptions and self.fordoptions[DISTANCE_CONVERSION_DISABLED] == True:
                             return self.coordinator.data[self.sensor]["value"]
                         else:
                             return round(
