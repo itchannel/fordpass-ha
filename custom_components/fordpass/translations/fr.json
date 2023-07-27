@@ -1,7 +1,8 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Le compte est déjà configuré"
+            "already_configured": "Le compte est déjà configuré",
+            "no_vehicles": "Aucun véhicule en compte ou tous sont déjà configurés"
         },
         "error": {
             "cannot_connect": "Impossible de se connecter",

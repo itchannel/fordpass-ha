@@ -48,6 +48,7 @@ class Vehicle(object):
         self.password = password
         self.saveToken = saveToken
         self.region = region_lookup[region]
+        self.region2 = region
         self.vin = vin
         self.token = None
         self.expires = None
@@ -176,7 +177,7 @@ class Vehicle(object):
         data = {"ciToken": access_token}
         headers = {**apiHeaders, "Application-Id": self.region}
         r = session.post(
-            f"{guardUrl}/api/token/v2/cat-with-ci-access-token",
+            f"{guardUrl}/token/v2/cat-with-ci-access-token",
             data=json.dumps(data),
             headers=headers,
         )
@@ -201,7 +202,7 @@ class Vehicle(object):
         headers = {**apiHeaders, "Application-Id": self.region}
 
         r = session.post(
-            f"https://{guardUrl}/api/token/v2/cat-with-refresh-token",
+            f"https://{guardUrl}/token/v2/cat-with-refresh-token",
             data=json.dumps(data),
             headers=headers,
         )
@@ -339,16 +340,32 @@ class Vehicle(object):
     def vehicles(self):
         self.__acquireToken()
 
+        if (self.region2 == "Australia"):
+            countryheader = "AUS"
+        elif (self.region2 == "North America & Canada"):
+            countryheader = "USA"
+        elif (self.region2 == "UK&Europe"):
+            countryheader = "GBR"
+        else:
+            countryheader = "USA"
         headers = {
             **apiHeaders,
             "Auth-Token": self.token,
             "Application-Id": self.region,
+            "Countrycode": countryheader,
+            "Locale": "EN-US"
         }
-        r = session.get(
-            baseUrl + "/expdashboard/v1/details/",
+
+
+        data = {
+            "dashboardRefreshRequest":"All"
+        }
+        r = session.post(
+            guardUrl + "/expdashboard/v1/details/",
             headers=headers,
+            data=json.dumps(data)
         )
-        if r.status_code == 200:
+        if r.status_code == 207:
             result = r.json()
 
             _LOGGER.debug(result)

@@ -1,7 +1,8 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Account is al geconfigureerd"
+            "already_configured": "Account is al geconfigureerd",
+            "no_vehicles": "Geen voertuigen op account of ze zijn allemaal al geconfigureerd"
         },
         "error": {
             "cannot_connect": "Kan geen verbinding maken",
