@@ -160,6 +160,7 @@ def refresh_status(hass, service, coordinator):
         _LOGGER.debug("Invalid VIN")
     elif status == 200:
         _LOGGER.debug("Refresh Sent")
+    
 
 
 def clear_tokens(hass, service, coordinator):
