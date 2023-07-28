@@ -32,8 +32,8 @@ region_lookup = {
 }
 
 baseUrl = "https://usapi.cv.ford.com/api"
-
 guardUrl = "https://api.mps.ford.com/api"
+ssoUrl = "https://sso.ci.ford.com"
 
 session = requests.Session()
 
@@ -48,6 +48,7 @@ class Vehicle(object):
         self.password = password
         self.saveToken = saveToken
         self.region = region_lookup[region]
+        self.region2 = region
         self.vin = vin
         self.token = None
         self.expires = None
@@ -82,14 +83,14 @@ class Vehicle(object):
         }
         code1 = ''.join(random.choice(string.ascii_lowercase) for i in range(43))
         code_verifier = self.generate_hash(code1)
-        url1 = "https://sso.ci.ford.com/v1.0/endpoint/default/authorize?redirect_uri=fordapp://userauthorized&response_type=code&scope=openid&max_age=3600&client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&code_challenge=" + code_verifier + "&code_challenge_method=S256"
+        url1 = f"{ssoUrl}/v1.0/endpoint/default/authorize?redirect_uri=fordapp://userauthorized&response_type=code&scope=openid&max_age=3600&client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&code_challenge={code_verifier}&code_challenge_method=S256"
         r = session.get(
             url1,
             headers=headers,
         )
 
         test = re.findall('data-ibm-login-url="(.*)"\s', r.text)[0]
-        nextUrl = "https://sso.ci.ford.com" + test
+        nextUrl = ssoUrl + test
 
 
         # Auth Step2
@@ -157,7 +158,7 @@ class Vehicle(object):
             }
 
         r = session.post(
-            "https://sso.ci.ford.com/oidc/endpoint/default/token",
+            f"{ssoUrl}/oidc/endpoint/default/token",
              headers = headers,
              data = data
 
@@ -176,7 +177,7 @@ class Vehicle(object):
         data = {"ciToken": access_token}
         headers = {**apiHeaders, "Application-Id": self.region}
         r = session.post(
-            "https://api.mps.ford.com/api/token/v2/cat-with-ci-access-token",
+            f"{guardUrl}/token/v2/cat-with-ci-access-token",
             data=json.dumps(data),
             headers=headers,
         )
@@ -201,7 +202,7 @@ class Vehicle(object):
         headers = {**apiHeaders, "Application-Id": self.region}
 
         r = session.post(
-            "https://api.mps.ford.com/api/token/v2/cat-with-refresh-token",
+            f"{guardUrl}/token/v2/cat-with-refresh-token",
             data=json.dumps(data),
             headers=headers,
         )
@@ -339,16 +340,32 @@ class Vehicle(object):
     def vehicles(self):
         self.__acquireToken()
 
+        if (self.region2 == "Australia"):
+            countryheader = "AUS"
+        elif (self.region2 == "North America & Canada"):
+            countryheader = "USA"
+        elif (self.region2 == "UK&Europe"):
+            countryheader = "GBR"
+        else:
+            countryheader = "USA"
         headers = {
             **apiHeaders,
             "Auth-Token": self.token,
             "Application-Id": self.region,
+            "Countrycode": countryheader,
+            "Locale": "EN-US"
         }
-        r = session.get(
-            "https://services.cx.ford.com/api/dashboard/v1/users/vehicles",
+
+
+        data = {
+            "dashboardRefreshRequest":"All"
+        }
+        r = session.post(
+            guardUrl + "/expdashboard/v1/details/",
             headers=headers,
+            data=json.dumps(data)
         )
-        if r.status_code == 200:
+        if r.status_code == 207:
             result = r.json()
 
             _LOGGER.debug(result)
@@ -481,6 +498,9 @@ class Vehicle(object):
 
         if command.status_code == 200:
             result = command.json()
-            return self.__pollStatus(url, result["commandId"])
+            if "commandId" in result:
+                return self.__pollStatus(url, result["commandId"])
+            else:
+                return False
         else:
-            command.raise_for_status()
+            return False

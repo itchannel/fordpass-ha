@@ -1,11 +1,12 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Account is already configured"
+            "already_configured": "Account is already configured",
+            "no_vehicles": "No vehicles on account or all are configured already"
         },
         "error": {
             "cannot_connect": "Failed to connect",
-            "invalid_auth": "Invalid authentication",
+            "invalid_auth": "Invalid Credentials",
             "invalid_vin": "Vin not found for given account",
             "unknown": "Unexpected error"
         },
@@ -33,5 +34,29 @@
             }
         }
     }, 
+    "services": {
+        "refresh_status": {
+            "name": "Refresh Vehicle Status",
+            "description": "Poll car for latest status (Takes up to 5mins to update once this function has been run!)",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "Parse a vin number to only refresh the specified vehicle (Default refreshes all added vehicles)"
+                }
+            }
+        },
+        "clear_tokens": {
+            "name": "Clear Tokens",
+            "description": "Clear the token cache"
+        },
+        "reload": {
+            "name": "Reload",
+            "description": "Reload the Fordpass Integration"
+        },
+        "poll_api": {
+            "name": "Poll API",
+            "description": "Manually poll API for data update (Warning: doing this too often could result in a ban)"
+        }
+    },
     "title": "Fordpass"
 }

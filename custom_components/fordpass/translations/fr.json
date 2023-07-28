@@ -1,7 +1,8 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Le compte est déjà configuré"
+            "already_configured": "Le compte est déjà configuré",
+            "no_vehicles": "Aucun véhicule en compte ou tous sont déjà configurés"
         },
         "error": {
             "cannot_connect": "Impossible de se connecter",
@@ -33,5 +34,29 @@
             }
         }
     }, 
+    "services": {
+        "refresh_status": {
+            "name": "Actualiser l'état du véhicule",
+            "description": "Sonder la voiture pour le dernier statut (Prend jusqu'à 5 minutes pour mettre à jour une fois que cette fonction a été exécutée !)",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "Analyser un numéro vin pour actualiser uniquement le véhicule spécifié (la valeur par défaut actualise tous les véhicules ajoutés)"
+                }
+            }
+        },
+        "clear_tokens": {
+            "name": "Effacer les jetons",
+            "description": "Vider le cache des jetons"
+        },
+        "reload": {
+            "name": "Recharger",
+            "description": "Recharger l'intégration Fordpass"
+        },
+        "poll_api": {
+            "name": "API de sondage",
+            "description": "Interroger manuellement l'API pour la mise à jour des données (Attention : le faire trop souvent pourrait entraîner une interdiction)"
+        }
+    },
     "title": "Fordpass"
 }

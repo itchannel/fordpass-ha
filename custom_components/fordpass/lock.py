@@ -13,8 +13,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the lock from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
 
-    locks = [Lock(entry)]
-    async_add_entities(locks, False)
+    lock = Lock(entry)
+    if lock.coordinator.data.get("lockStatus", {}) and lock.coordinator.data["lockStatus"]["value"] != "ERROR":
+        async_add_entities([lock], False)
+    else:
+        _LOGGER.debug("Ford model doesn't support remote locking")
 
 
 class Lock(FordPassEntity, LockEntity):

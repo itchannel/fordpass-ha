@@ -1,7 +1,8 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Account is al geconfigureerd"
+            "already_configured": "Account is al geconfigureerd",
+            "no_vehicles": "Geen voertuigen op account of ze zijn allemaal al geconfigureerd"
         },
         "error": {
             "cannot_connect": "Kan geen verbinding maken",
@@ -33,5 +34,29 @@
             }
         }
     }, 
+    "services": {
+        "refresh_status": {
+            "name": "Voertuigstatus vernieuwen",
+            "description": "Poll auto voor de laatste status (duurt tot 5 minuten om te updaten zodra deze functie is uitgevoerd!)",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "Parseer een chassisnummer om alleen het opgegeven voertuig te vernieuwen (standaard vernieuwt alle toegevoegde voertuigen)"
+                }
+            }
+        },
+        "clear_tokens": {
+            "name": "Tokens wissen",
+            "description": "Wis de tokencache"
+        },
+        "reload": {
+            "name": "herladen",
+            "description": "Laad de Fordpass-integratie opnieuw"
+        },
+        "poll_api": {
+            "name": "Poll API",
+            "description": "API handmatig peilen voor gegevensupdate (Waarschuwing: als u dit te vaak doet, kan dit resulteren in een ban)"
+        }
+    },
     "title": "FordPass"
 }

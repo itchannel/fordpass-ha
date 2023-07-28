@@ -49,6 +49,7 @@ class Switch(FordPassEntity, SwitchEntity):
                 self.coordinator.vehicle.enableGuard
             )
             await self.coordinator.async_request_refresh()
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         if self.switch == "ignition":
@@ -61,6 +62,7 @@ class Switch(FordPassEntity, SwitchEntity):
                 self.coordinator.vehicle.disableGuard
             )
             await self.coordinator.async_request_refresh()
+        self.async_write_ha_state()
 
     @property
     def name(self):
