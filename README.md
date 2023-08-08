@@ -12,8 +12,9 @@
 - https://github.com/JacobWasFramed - Updated unit conversions
 - https://github.com/heehoo59 - French Translation
 
-## 1.23 Breaking Change
-The way the units work has been changed so if updating please go to "Integrations" and click options on fordpass and choose your preferred units (miles/km etc) and restart HA. Not doing this will result in an error!!
+## 1.47 Change
+If you are experiencing issues with the odometer displaying wrong, please try enabling the checkbox in options for "Disable Distance Conversion"
+
 
 ## Install
 Use HACS and add as a custom repo. Once the integration is installed go to your integrations and follow the configuration options to specify the below:
@@ -37,6 +38,8 @@ Click on options and choose imperial or metric to display in km/miles. Takes eff
 ### Clear Tokens
 If you are experiencing any sign in issues, please trying clearing your tokens using the "clear_tokens" service call.
 
+### Poll API
+This service allows you to manually refresh/poll the API without waiting the set poll interval. Handy if you need quicker updates e.g. when driving for gps coordinates
 
 
 ## Currently Working
@@ -63,9 +66,6 @@ If you are experiencing any sign in issues, please trying clearing your tokens u
 - Fordpass messages and alerts
 
 
-## Coming Soon
-
-- Next service due
 
 ## Disclaimer
 

@@ -1,4 +1,15 @@
 ## **Changelog**
+### Version 1.48
+- Add translations for service strings
+- Fix error on odometer missing config
+- Handle unsupported car locks
+- Add Units for elVeh DTE
+### Version 1.47
+- Add poll_api service to allow for manual refreshing of data outside of poll interval (e.g. poll more when driving)
+- Add option to disable distance conversion when units displaying wrong in certain countries
+- Add device_class to "last_refresh" sensor
+- Add Locking/Unlocking status to lock entity
+- Enabled support for debugging via the UI
 ### Version 1.46
 - Fix diesel filter error
 ### Version 1.45

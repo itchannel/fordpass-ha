@@ -16,6 +16,8 @@ CONF_DISTANCE_UNIT = "distance_unit"
 
 PRESSURE_UNITS = ["PSI", "kPa", "BAR"]
 DISTANCE_UNITS = ["mi", "km"]
+DISTANCE_CONVERSION_DISABLED = "distance_conversion"
+DISTANCE_CONVERSION_DISABLED_DEFAULT = False
 
 UPDATE_INTERVAL = "update_interval"
 UPDATE_INTERVAL_DEFAULT = 900
@@ -38,7 +40,7 @@ SENSORS = {
     "ignitionStatus": {"icon": "hass:power"},
     "doorStatus": {"icon": "mdi:car-door"},
     "windowPosition": {"icon": "mdi:car-door"},
-    "lastRefresh": {"icon": "mdi:clock"},
+    "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp"},
     "elVeh": {"icon": "mdi:ev-station"},
     "deepSleepInProgress": {
         "icon": "mdi:power-sleep",
