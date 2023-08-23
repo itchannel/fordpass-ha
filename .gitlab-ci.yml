@@ -4,7 +4,7 @@ before_script:
   #- cp /etc/gitlab-runner/certs/ca.crt /usr/local/share/ca-certificates/ca.crt
   #- update-ca-certificates
   - python3 --version
-  - pip install -r requirements.txt
+  #- pip install -r requirements.txt
   - pip install bandit
 
 stages:
