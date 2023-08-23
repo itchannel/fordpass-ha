@@ -5,6 +5,8 @@ before_script:
   #- update-ca-certificates
   - python3 --version
   #- pip install -r requirements.txt
+  - pip install flake8
+  - pip install pylint
   - pip install bandit
 
 stages:
