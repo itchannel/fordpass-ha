@@ -1,0 +1,22 @@
+image: "python:3.11"
+
+before_script:
+  #- cp /etc/gitlab-runner/certs/ca.crt /usr/local/share/ca-certificates/ca.crt
+  #- update-ca-certificates
+  - python3 --version
+  - pip install -r requirements.txt
+  - pip install bandit
+
+stages:
+  - Static Analysis
+
+
+
+
+static_analysis:
+  stage: Static Analysis
+  tags: ["dev","python"]
+  allow_failure: true
+  script:
+  - flake8 --max-line-length=120 
+  - pylint . --recursive=y --function-naming-style=camelCase --method-naming-style=camelCase --disable=W0613,C0115
