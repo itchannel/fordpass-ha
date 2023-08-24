@@ -75,8 +75,7 @@ class Switch(FordPassEntity, SwitchEntity):
         if self.switch == "ignition":
             """Determine if the vehicle is started."""
             if (
-                self.coordinator.data is None
-                or self.coordinator.data["remoteStartStatus"] is None
+                self.coordinator.data is None or self.coordinator.data["remoteStartStatus"] is None
             ):
                 return None
             return self.coordinator.data["remoteStartStatus"]["value"]

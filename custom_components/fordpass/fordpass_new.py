@@ -111,7 +111,7 @@ class Vehicle(object):
         )
 
         if r.status_code == 302:
-            nextUrl=r.headers["Location"]
+            nextUrl = r.headers["Location"]
         else:
             r.raise_for_status()
 
@@ -123,12 +123,9 @@ class Vehicle(object):
 
         r = session.get(
             nextUrl,
-            headers = headers,
+            headers=headers,
             allow_redirects=False
         )
-
-                
-
 
         if r.status_code == 302:
             nextUrl = r.headers["Location"]
@@ -139,7 +136,7 @@ class Vehicle(object):
         else:
             r.raise_for_status()
 
-        # Auth Step4        
+        # Auth Step4
         headers = {
             **defaultHeaders,
             "Content-Type": "application/x-www-form-urlencoded",
@@ -152,15 +149,14 @@ class Vehicle(object):
             "grant_id": grant_id,
             "code": code,
             "code_verifier": code1
-            }
+        }
 
         r = session.post(
             f"{ssoUrl}/oidc/endpoint/default/token",
-             headers = headers,
-             data = data
+            headers=headers,
+            data=data
 
         )
-
 
         if r.status_code == 200:
             result = r.json()
@@ -168,7 +164,6 @@ class Vehicle(object):
                 access_token = result["access_token"]
         else:
             r.raise_for_status()
-
 
         # Auth Step5
         data = {"ciToken": access_token}
@@ -238,7 +233,7 @@ class Vehicle(object):
                 _LOGGER.debug("No token, or has expired, requesting new token")
                 self.refreshToken(data)
                 # self.auth()
-        if self.token == None:
+        if self.token is None:
             # No existing token exists so refreshing library
             self.auth()
         else:
@@ -353,9 +348,8 @@ class Vehicle(object):
             "Locale": "EN-US"
         }
 
-
         data = {
-            "dashboardRefreshRequest":"All"
+            "dashboardRefreshRequest": "All"
         }
         r = session.post(
             guardUrl + "/expdashboard/v1/details/",

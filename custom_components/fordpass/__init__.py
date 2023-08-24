@@ -145,11 +145,9 @@ async def async_update_options(hass, config_entry):
     hass.config_entries.async_update_entry(config_entry, options=options)
 
 
-async def options_update_listener(
-    hass: HomeAssistant,  entry: ConfigEntry
-    ):
-        _LOGGER.debug("OPTIONS CHANGE")
-        await hass.config_entries.async_reload(entry.entry_id)
+async def options_update_listener(hass: HomeAssistant, entry: ConfigEntry):
+    _LOGGER.debug("OPTIONS CHANGE")
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 def refresh_status(hass, service, coordinator):

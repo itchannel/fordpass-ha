@@ -116,7 +116,7 @@ class OptionsFlow(config_entries.OptionsFlow):
             ): vol.In(DISTANCE_UNITS),
             vol.Optional(
                 DISTANCE_CONVERSION_DISABLED,
-                default = self.config_entry.options.get(
+                default=self.config_entry.options.get(
                     DISTANCE_CONVERSION_DISABLED, DISTANCE_CONVERSION_DISABLED_DEFAULT
                 ),
             ): bool,
