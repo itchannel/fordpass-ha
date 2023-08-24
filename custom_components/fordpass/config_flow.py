@@ -42,22 +42,14 @@ async def validate_input(hass: core.HomeAssistant, data):
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
     _LOGGER.debug(data[REGION])
-    configPath = hass.config.path("custom_components/fordpass/" + data[CONF_USERNAME] + "_fordpass_token.txt")
-    vehicle = Vehicle(data[CONF_USERNAME], data[CONF_PASSWORD], data[VIN], data[REGION], 1, configPath)
+    config_path = hass.config.path("custom_components/fordpass/" + data[CONF_USERNAME] + "_fordpass_token.txt")
+    vehicle = Vehicle(data[CONF_USERNAME], data[CONF_PASSWORD], data[VIN], data[REGION], 1, config_path)
 
     try:
         result = await hass.async_add_executor_job(vehicle.auth)
     except Exception as ex:
         raise InvalidAuth from ex
 
-    #result3 = await hass.async_add_executor_job(vehicle.vehicles)
-    # Disabled due to API change
-    #vinfound = False
-    #for car in result3:
-    #    if car["vin"] == data[VIN]:
-    #        vinfound = True
-    #if vinfound == False:
-    #    _LOGGER.debug("Vin not found in account, Is your VIN valid?")
     if not result:
         _LOGGER.error("Failed to authenticate with fordpass")
         raise CannotConnect
@@ -107,6 +99,7 @@ class OptionsFlow(config_entries.OptionsFlow):
         self.config_entry = config_entry
 
     async def async_step_init(self, user_input=None):
+        """Options Flow steps"""
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
         options = {
@@ -124,7 +117,7 @@ class OptionsFlow(config_entries.OptionsFlow):
             ): vol.In(DISTANCE_UNITS),
             vol.Optional(
                 DISTANCE_CONVERSION_DISABLED,
-                default = self.config_entry.options.get(
+                default=self.config_entry.options.get(
                     DISTANCE_CONVERSION_DISABLED, DISTANCE_CONVERSION_DISABLED_DEFAULT
                 ),
             ): bool,

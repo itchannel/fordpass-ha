@@ -38,7 +38,6 @@ PLATFORMS = ["lock", "sensor", "switch", "device_tracker"]
 _LOGGER = logging.getLogger(__name__)
 
 
-
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the FordPass component."""
     hass.data.setdefault(DOMAIN, {})
@@ -55,8 +54,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     else:
         update_interval = UPDATE_INTERVAL_DEFAULT
     _LOGGER.debug(update_interval)
-    for ar in entry.data:
-        _LOGGER.debug(ar)
+    for ar_entry in entry.data:
+        _LOGGER.debug(ar_entry)
     if REGION in entry.data.keys():
         _LOGGER.debug(entry.data[REGION])
         region = entry.data[REGION]
@@ -76,7 +75,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         raise ConfigEntryNotReady
 
     hass.data[DOMAIN][entry.entry_id] = {
-        COORDINATOR : coordinator,
+        COORDINATOR: coordinator,
         "fordpass_options_listener": fordpass_options_listener
     }
 
@@ -95,7 +94,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     async def poll_api_service(service_call):
         await coordinator.async_request_refresh()
-
 
     async def handle_reload(service):
         """Handle reload service call."""
@@ -136,6 +134,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 
 async def async_update_options(hass, config_entry):
+    """Update options entries on change"""
     options = {
         CONF_PRESSURE_UNIT: config_entry.data.get(
             CONF_PRESSURE_UNIT, DEFAULT_PRESSURE_UNIT
@@ -146,16 +145,18 @@ async def async_update_options(hass, config_entry):
     )
     hass.config_entries.async_update_entry(config_entry, options=options)
 
-async def options_update_listener(
-    hass: HomeAssistant,  entry: ConfigEntry 
-    ):
-        _LOGGER.debug("OPTIONS CHANGE")
-        await hass.config_entries.async_reload(entry.entry_id)
+
+async def options_update_listener(hass: HomeAssistant, entry: ConfigEntry):
+    """Options listener to refresh config entries on option change"""
+    _LOGGER.debug("OPTIONS CHANGE")
+    await hass.config_entries.async_reload(entry.entry_id)
+
 
 def refresh_status(hass, service, coordinator):
+    """Get latest vehicle status from vehicle, actively polls the car"""
     _LOGGER.debug("Running Service")
     vin = service.data.get("vin", "")
-    status = coordinator.vehicle.requestUpdate(vin)
+    status = coordinator.vehicle.request_update(vin)
     if status == 401:
         _LOGGER.debug("Invalid VIN")
     elif status == 200:
@@ -164,8 +165,9 @@ def refresh_status(hass, service, coordinator):
 
 
 def clear_tokens(hass, service, coordinator):
+    """Clear the token file in config directory, only use in emergency"""
     _LOGGER.debug("Clearing Tokens")
-    coordinator.vehicle.clearToken()
+    coordinator.vehicle.clear_token()
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -188,12 +190,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
     """DataUpdateCoordinator to handle fetching new data about the vehicle."""
 
-    def __init__(self, hass, user, password, vin, region, update_interval, saveToken=False):
+    def __init__(self, hass, user, password, vin, region, update_interval, save_token=False):
         """Initialize the coordinator and set up the Vehicle object."""
         self._hass = hass
         self.vin = vin
-        configPath = hass.config.path("custom_components/fordpass/" + user + "_fordpass_token.txt")
-        self.vehicle = Vehicle(user, password, vin, region, saveToken, configPath)
+        config_path = hass.config.path("custom_components/fordpass/" + user + "_fordpass_token.txt")
+        self.vehicle = Vehicle(user, password, vin, region, save_token, config_path)
         self._available = True
 
         super().__init__(

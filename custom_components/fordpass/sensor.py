@@ -1,8 +1,8 @@
+"""All vehicle sensors from the accessible by the API"""
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from homeassistant.helpers.entity import Entity
-from homeassistant.util import Throttle, dt
+from homeassistant.util import dt
 
 from homeassistant.components.sensor import (
     SensorEntity,
@@ -21,14 +21,14 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Entities from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
     sensors = []
-    for key, value in SENSORS.items():
+    for key in SENSORS:
         sensor = CarSensor(entry, key, config_entry.options)
         # Add support for only adding compatible sensors for the given vehicle
         if key == "zoneLighting":
             if "zoneLighting" in sensor.coordinator.data:
                 sensors.append(sensor)
         elif key == "elVeh":
-            if sensor.coordinator.data["elVehDTE"] != None:
+            if sensor.coordinator.data["elVehDTE"] is not None:
                 sensors.append(sensor)
         elif key == "dieselSystemStatus":
             if sensor.coordinator.data.get("dieselSystemStatus", {}):
@@ -42,11 +42,18 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             sensors.append(sensor)
     async_add_entities(sensors, True)
 
+
 class CarSensor(
     FordPassEntity,
     SensorEntity,
 ):
     def __init__(self, coordinator, sensor, options):
+
+        super().__init__(
+            device_id="fordpass_" + sensor,
+            name="fordpass_" + sensor,
+            coordinator=coordinator
+        )
 
         self.sensor = sensor
         self.fordoptions = options
@@ -57,187 +64,172 @@ class CarSensor(
         self.coordinator_context = object()
 
     def get_value(self, ftype):
+        """Get sensor value and attributes from coordinator data"""
         if ftype == "state":
             if self.sensor == "odometer":
-                if self.fordoptions[CONF_DISTANCE_UNIT] != None:
+                if self.fordoptions[CONF_DISTANCE_UNIT] is not None:
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        if DISTANCE_CONVERSION_DISABLED in self.fordoptions and self.fordoptions[DISTANCE_CONVERSION_DISABLED] == True:
+                        if DISTANCE_CONVERSION_DISABLED in self.fordoptions and self.fordoptions[DISTANCE_CONVERSION_DISABLED] is True:
                             return self.coordinator.data[self.sensor]["value"]
-                        else:
-                            return round(
-                                float(self.coordinator.data[self.sensor]["value"]) / 1.60934
-                            )
-                        
-                    else:
-                        return self.coordinator.data[self.sensor]["value"]
-                else:
+                        return round(
+                            float(self.coordinator.data[self.sensor]["value"]) / 1.60934
+                        )
                     return self.coordinator.data[self.sensor]["value"]
-            elif self.sensor == "fuel":
-                if self.coordinator.data[self.sensor] == None:
+                return self.coordinator.data[self.sensor]["value"]
+            if self.sensor == "fuel":
+                if self.coordinator.data[self.sensor] is None:
                     return None
                 return round(self.coordinator.data[self.sensor]["fuelLevel"])
-            elif self.sensor == "battery":
+            if self.sensor == "battery":
                 return self.coordinator.data[self.sensor]["batteryHealth"]["value"]
-            elif self.sensor == "oil":
+            if self.sensor == "oil":
                 return self.coordinator.data[self.sensor]["oilLife"]
-            elif self.sensor == "tirePressure":
+            if self.sensor == "tirePressure":
                 return self.coordinator.data[self.sensor]["value"]
-            elif self.sensor == "gps":
-                if self.coordinator.data[self.sensor] == None:
+            if self.sensor == "gps":
+                if self.coordinator.data[self.sensor] is None:
                     return "Unsupported"
                 return self.coordinator.data[self.sensor]["gpsState"]
-            elif self.sensor == "alarm":
+            if self.sensor == "alarm":
                 return self.coordinator.data[self.sensor]["value"]
-            elif self.sensor == "ignitionStatus":
+            if self.sensor == "ignitionStatus":
                 return self.coordinator.data[self.sensor]["value"]
-            elif self.sensor == "firmwareUpgInProgress":
+            if self.sensor == "firmwareUpgInProgress":
                 return self.coordinator.data[self.sensor]["value"]
-            elif self.sensor == "deepSleepInProgress":
+            if self.sensor == "deepSleepInProgress":
                 return self.coordinator.data[self.sensor]["value"]
-            elif self.sensor == "doorStatus":
+            if self.sensor == "doorStatus":
                 for key, value in self.coordinator.data[self.sensor].items():
                     if value["value"] == "Invalid":
                         continue
                     if value["value"] != "Closed":
                         return "Open"
                 return "Closed"
-            elif self.sensor == "windowPosition":
-                if self.coordinator.data[self.sensor] == None:
+            if self.sensor == "windowPosition":
+                if self.coordinator.data[self.sensor] is None:
                     return "Unsupported"
                 status = "Closed"
                 for key, value in self.coordinator.data[self.sensor].items():
                     if "open" in value["value"].lower():
                         status = "Open"
                 return status
-            elif self.sensor == "lastRefresh":
+            if self.sensor == "lastRefresh":
                 return dt.as_local(
                     datetime.strptime(
                         self.coordinator.data[self.sensor] + "+0000", "%m-%d-%Y %H:%M:%S%z"
                     )
                 )
-            elif self.sensor == "elVeh":
-                if self.coordinator.data["elVehDTE"] != None:
-                    if self.fordoptions[CONF_DISTANCE_UNIT] != None:
+            if self.sensor == "elVeh":
+                if self.coordinator.data["elVehDTE"] is not None:
+                    if self.fordoptions[CONF_DISTANCE_UNIT] is not None:
                         if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                             return round(
-                                float(self.coordinator.data["elVehDTE"]["value"])
-                                / 1.60934
+                                float(self.coordinator.data["elVehDTE"]["value"]) / 1.60934
                             )
-                        else:
-                            return float(self.coordinator.data["elVehDTE"]["value"])
-                    else:
                         return float(self.coordinator.data["elVehDTE"]["value"])
-                else:
-                    return "Unsupported"
-            elif self.sensor == "zoneLighting":
+                    return float(self.coordinator.data["elVehDTE"]["value"])
+                return "Unsupported"
+            if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.coordinator.data:
                     return "Unsupported"
                 if (
-                    self.coordinator.data["zoneLighting"] != None
-                    and self.coordinator.data["zoneLighting"]["activationData"] != None
+                    self.coordinator.data["zoneLighting"] is not None and self.coordinator.data["zoneLighting"]["activationData"] is not None
                 ):
                     return self.coordinator.data["zoneLighting"]["activationData"][
                         "value"
                     ]
-                else:
-                    return "Unsupported"
-            elif self.sensor == "remoteStartStatus":
-                if self.coordinator.data["remoteStartStatus"] == None:
+                return "Unsupported"
+            if self.sensor == "remoteStartStatus":
+                if self.coordinator.data["remoteStartStatus"] is None:
                     return None
-                else:
-                    if self.coordinator.data["remoteStartStatus"]["value"] == 1:
-                        return "Active"
-                    else:
-                        return "Inactive"
-            elif self.sensor == "messages":
-                if self.coordinator.data["messages"] == None:
+                if self.coordinator.data["remoteStartStatus"]["value"] == 1:
+                    return "Active"
+                return "Inactive"
+            if self.sensor == "messages":
+                if self.coordinator.data["messages"] is None:
                     return None
-                else:
-                    return len(self.coordinator.data["messages"])
-            elif self.sensor == "dieselSystemStatus":
-                if self.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"] != None:
+                return len(self.coordinator.data["messages"])
+            if self.sensor == "dieselSystemStatus":
+                if self.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"] is not None:
                     return self.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"]
-                else:
-                    return "Not Supported"
-            elif self.sensor == "exhaustFluidLevel":
+                return "Not Supported"
+            if self.sensor == "exhaustFluidLevel":
                 if "value" in self.coordinator.data["dieselSystemStatus"]["exhaustFluidLevel"]:
                     return self.coordinator.data["dieselSystemStatus"]["exhaustFluidLevel"]["value"]
-                else:
-                    return "Not Supported"
-        elif ftype == "measurement":
+                return "Not Supported"
+            return None
+        if ftype == "measurement":
             if self.sensor == "odometer":
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                     return "mi"
-                else:
-                    return "km"
-            elif self.sensor == "fuel":
+                return "km"
+            if self.sensor == "fuel":
                 return "%"
-            elif self.sensor == "battery":
+            if self.sensor == "battery":
                 return None
-            elif self.sensor == "oil":
+            if self.sensor == "oil":
                 return None
-            elif self.sensor == "tirePressure":
+            if self.sensor == "tirePressure":
                 return None
-            elif self.sensor == "gps":
+            if self.sensor == "gps":
                 return None
-            elif self.sensor == "alarm":
+            if self.sensor == "alarm":
                 return None
-            elif self.sensor == "ignitionStatus":
+            if self.sensor == "ignitionStatus":
                 return None
-            elif self.sensor == "firmwareUpgInProgress":
+            if self.sensor == "firmwareUpgInProgress":
                 return None
-            elif self.sensor == "deepSleepInProgress":
+            if self.sensor == "deepSleepInProgress":
                 return None
-            elif self.sensor == "doorStatus":
+            if self.sensor == "doorStatus":
                 return None
-            elif self.sensor == "windowsPosition":
+            if self.sensor == "windowsPosition":
                 return None
-            elif self.sensor == "lastRefresh":
+            if self.sensor == "lastRefresh":
                 return None
-            elif self.sensor == "zoneLighting":
+            if self.sensor == "zoneLighting":
                 return None
-            elif self.sensor == "remoteStartStatus":
+            if self.sensor == "remoteStartStatus":
                 return None
-            elif self.sensor == "messages":
+            if self.sensor == "messages":
                 return "Messages"
-            elif self.sensor == "elVeh":
+            if self.sensor == "elVeh":
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                     return "mi"
-                else:
-                    return "km"
-            elif self.sensor == "exhaustFluidLevel":
+                return "km"
+            if self.sensor == "exhaustFluidLevel":
                 return "%"
-        elif ftype == "attribute":
+            return None
+        if ftype == "attribute":
             if self.sensor == "odometer":
                 return self.coordinator.data[self.sensor].items()
-            elif self.sensor == "fuel":
-                if self.coordinator.data[self.sensor] == None:
+            if self.sensor == "fuel":
+                if self.coordinator.data[self.sensor] is None:
                     return None
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                     self.coordinator.data["fuel"]["distanceToEmpty"] = round(
-                        float(self.coordinator.data["fuel"]["distanceToEmpty"])
-                        / 1.60934
+                        float(self.coordinator.data["fuel"]["distanceToEmpty"]) / 1.60934
                     )
                 return self.coordinator.data[self.sensor].items()
-            elif self.sensor == "battery":
+            if self.sensor == "battery":
                 return {
                     "Battery Voltage": self.coordinator.data[self.sensor][
                         "batteryStatusActual"
                     ]["value"]
                 }
-            elif self.sensor == "oil":
+            if self.sensor == "oil":
                 return self.coordinator.data[self.sensor].items()
-            elif self.sensor == "tirePressure":
-                if self.coordinator.data["TPMS"] != None:
+            if self.sensor == "tirePressure":
+                if self.coordinator.data["TPMS"] is not None:
                     if self.fordoptions[CONF_PRESSURE_UNIT] == "PSI":
                         sval = 0.1450377377
                         rval = 1
                         decimal = 0
-                    elif self.fordoptions[CONF_PRESSURE_UNIT] == "BAR":
+                    if self.fordoptions[CONF_PRESSURE_UNIT] == "BAR":
                         sval = 0.01
                         rval = 0.0689475729
                         decimal = 2
-                    elif self.fordoptions[CONF_PRESSURE_UNIT] == "kPa":
+                    if self.fordoptions[CONF_PRESSURE_UNIT] == "kPa":
                         sval = 1
                         rval = 6.8947572932
                         decimal = 0
@@ -254,27 +246,27 @@ class CarSensor(
                                 tirepress[key] = round(float(value["value"]) * sval, decimal)
                     return tirepress
                 return None
-            elif self.sensor == "gps":
-                if self.coordinator.data[self.sensor] == None:
+            if self.sensor == "gps":
+                if self.coordinator.data[self.sensor] is None:
                     return None
                 return self.coordinator.data[self.sensor].items()
-            elif self.sensor == "alarm":
+            if self.sensor == "alarm":
                 return self.coordinator.data[self.sensor].items()
-            elif self.sensor == "ignitionStatus":
+            if self.sensor == "ignitionStatus":
                 return self.coordinator.data[self.sensor].items()
-            elif self.sensor == "firmwareUpgInProgress":
+            if self.sensor == "firmwareUpgInProgress":
                 return self.coordinator.data[self.sensor].items()
-            elif self.sensor == "deepSleepInProgress":
+            if self.sensor == "deepSleepInProgress":
                 return self.coordinator.data[self.sensor].items()
-            elif self.sensor == "doorStatus":
-                doors = dict()
+            if self.sensor == "doorStatus":
+                doors = {}
                 for key, value in self.coordinator.data[self.sensor].items():
                     doors[key] = value["value"]
                 return doors
-            elif self.sensor == "windowPosition":
-                if self.coordinator.data[self.sensor] == None:
+            if self.sensor == "windowPosition":
+                if self.coordinator.data[self.sensor] is None:
                     return None
-                windows = dict()
+                windows = {}
                 for key, value in self.coordinator.data[self.sensor].items():
                     windows[key] = value["value"]
                     if "open" in value["value"].lower():
@@ -285,93 +277,81 @@ class CarSensor(
                     elif "closed" in value["value"].lower():
                         windows[key] = "Closed"
                 return windows
-            elif self.sensor == "lastRefresh":
+            if self.sensor == "lastRefresh":
                 return None
-            elif self.sensor == "elVeh":
-                if self.coordinator.data["elVehDTE"] == None:
+            if self.sensor == "elVeh":
+                if self.coordinator.data["elVehDTE"] is None:
                     return None
-                else:
-                    elecs = dict()
-                    if (
-                        self.coordinator.data["elVehDTE"] != None
-                        and self.coordinator.data["elVehDTE"]["value"] != None
-                    ):
-                        elecs["elVehDTE"] = self.coordinator.data["elVehDTE"]["value"]
-                    if (
-                        self.coordinator.data["plugStatus"] != None
-                        and self.coordinator.data["plugStatus"]["value"] != None
-                    ):
-                        elecs["Plug Status"] = self.coordinator.data["plugStatus"][
-                            "value"
-                        ]
+                elecs = {}
+                if (
+                    self.coordinator.data["elVehDTE"] is not None and self.coordinator.data["elVehDTE"]["value"] is not None
+                ):
+                    elecs["elVehDTE"] = self.coordinator.data["elVehDTE"]["value"]
+                if (
+                    self.coordinator.data["plugStatus"] is not None and self.coordinator.data["plugStatus"]["value"] is not None
+                ):
+                    elecs["Plug Status"] = self.coordinator.data["plugStatus"][
+                        "value"
+                    ]
 
-                    if (
-                        self.coordinator.data["chargingStatus"] != None
-                        and self.coordinator.data["chargingStatus"]["value"] != None
-                    ):
-                        elecs["Charging Status"] = self.coordinator.data[
-                            "chargingStatus"
-                        ]["value"]
+                if (
+                    self.coordinator.data["chargingStatus"] is not None and self.coordinator.data["chargingStatus"]["value"] is not None
+                ):
+                    elecs["Charging Status"] = self.coordinator.data[
+                        "chargingStatus"
+                    ]["value"]
 
-                    if (
-                        self.coordinator.data["chargeStartTime"] != None
-                        and self.coordinator.data["chargeStartTime"]["value"] != None
-                    ):
-                        elecs["Charge Start Time"] = self.coordinator.data[
-                            "chargeStartTime"
-                        ]["value"]
+                if (
+                    self.coordinator.data["chargeStartTime"] is not None and self.coordinator.data["chargeStartTime"]["value"] is not None
+                ):
+                    elecs["Charge Start Time"] = self.coordinator.data[
+                        "chargeStartTime"
+                    ]["value"]
 
-                    if (
-                        self.coordinator.data["chargeEndTime"] != None
-                        and self.coordinator.data["chargeEndTime"]["value"] != None
-                    ):
-                        elecs["Charge End Time"] = self.coordinator.data[
-                            "chargeEndTime"
-                        ]["value"]
+                if (
+                    self.coordinator.data["chargeEndTime"] is not None and self.coordinator.data["chargeEndTime"]["value"] is not None
+                ):
+                    elecs["Charge End Time"] = self.coordinator.data[
+                        "chargeEndTime"
+                    ]["value"]
 
-                    if (
-                        self.coordinator.data["batteryFillLevel"] != None
-                        and self.coordinator.data["batteryFillLevel"]["value"] != None
-                    ):
-                        elecs["Battery Fill Level"] = int(self.coordinator.data[
-                            "batteryFillLevel"
-                        ]["value"])
+                if (
+                    self.coordinator.data["batteryFillLevel"] is not None and self.coordinator.data["batteryFillLevel"]["value"] is not None
+                ):
+                    elecs["Battery Fill Level"] = int(self.coordinator.data[
+                        "batteryFillLevel"
+                    ]["value"])
 
-                    if (
-                        self.coordinator.data["chargerPowertype"] != None
-                        and self.coordinator.data["chargerPowertype"]["value"] != None
-                    ):
-                        elecs["Charger Power Type"] = self.coordinator.data[
-                            "chargerPowertype"
-                        ]["value"]
+                if (
+                    self.coordinator.data["chargerPowertype"] is not None and self.coordinator.data["chargerPowertype"]["value"] is not None
+                ):
+                    elecs["Charger Power Type"] = self.coordinator.data[
+                        "chargerPowertype"
+                    ]["value"]
 
-                    if (
-                        self.coordinator.data["batteryChargeStatus"] != None
-                        and self.coordinator.data["batteryChargeStatus"]["value"]
-                        != None
-                    ):
-                        elecs["Battery Charge Status"] = self.coordinator.data[
-                            "batteryChargeStatus"
-                        ]["value"]
+                if (
+                    self.coordinator.data["batteryChargeStatus"] is not None and self.coordinator.data["batteryChargeStatus"]["value"] is not None
+                ):
+                    elecs["Battery Charge Status"] = self.coordinator.data[
+                        "batteryChargeStatus"
+                    ]["value"]
 
-                    if (
-                        self.coordinator.data["batteryPerfStatus"] != None
-                        and self.coordinator.data["batteryPerfStatus"]["value"] != None
-                    ):
-                        elecs["Battery Performance Status"] = self.coordinator.data[
-                            "batteryPerfStatus"
-                        ]["value"]
+                if (
+                    self.coordinator.data["batteryPerfStatus"] is not None and self.coordinator.data["batteryPerfStatus"]["value"] is not None
+                ):
+                    elecs["Battery Performance Status"] = self.coordinator.data[
+                        "batteryPerfStatus"
+                    ]["value"]
 
-                    return elecs
-            elif self.sensor == "zoneLighting":
+                return elecs
+            if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.coordinator.data:
                     return None
                 if (
-                    self.coordinator.data[self.sensor] != None
-                    and self.coordinator.data[self.sensor]["zoneStatusData"] != None
+                    self.coordinator.data[self.sensor] is not None and self.coordinator.data[self.sensor]["zoneStatusData"] is not None
                 ):
-                    zone = dict()
-                    if self.coordinator.data[self.sensor]["zoneStatusData"] != None:
+                    zone = {}
+                    if self.coordinator.data[self.sensor]["zoneStatusData"] is not None:
                         for key, value in self.coordinator.data[self.sensor][
                             "zoneStatusData"
                         ].items():
@@ -379,7 +359,7 @@ class CarSensor(
 
                     if (
                         self.coordinator.data[self.sensor]["lightSwitchStatusData"]
-                        != None
+                        is not None
                     ):
                         for key, value in self.coordinator.data[self.sensor][
                             "lightSwitchStatusData"
@@ -389,7 +369,7 @@ class CarSensor(
 
                     if (
                         self.coordinator.data[self.sensor]["zoneLightingFaultStatus"]
-                        != None
+                        is not None
                     ):
                         zone["zoneLightingFaultStatus"] = self.coordinator.data[
                             self.sensor
@@ -398,74 +378,79 @@ class CarSensor(
                         self.coordinator.data[self.sensor][
                             "zoneLightingShutDownWarning"
                         ]
-                        != None
+                        is not None
                     ):
                         zone["zoneLightingShutDownWarning"] = self.coordinator.data[
                             self.sensor
                         ]["zoneLightingShutDownWarning"]["value"]
                     return zone
-                else:
+                return None
+            if self.sensor == "remoteStartStatus":
+                if self.coordinator.data["remoteStart"] is None:
                     return None
-            elif self.sensor == "remoteStartStatus":
-                if self.coordinator.data["remoteStart"] == None:
+                return self.coordinator.data["remoteStart"].items()
+            if self.sensor == "messages":
+                if self.coordinator.data["messages"] is None:
                     return None
-                else:
-                    return self.coordinator.data["remoteStart"].items()
-            elif self.sensor == "messages":
-                if self.coordinator.data["messages"] == None:
-                    return None
-                else:
-                    messages = dict()
-                    for value in self.coordinator.data["messages"]:
+                messages = {}
+                for value in self.coordinator.data["messages"]:
 
-                        messages[value["messageSubject"]] = value["createdDate"]
-                    return messages
-            elif self.sensor == "dieselSystemStatus":
+                    messages[value["messageSubject"]] = value["createdDate"]
+                return messages
+            if self.sensor == "dieselSystemStatus":
                 return self.coordinator.data["dieselSystemStatus"]
-            elif self.sensor == "exhaustFluidLevel":
+            if self.sensor == "exhaustFluidLevel":
                 return self.coordinator.data["dieselSystemStatus"]
+            return None
+        return None
 
     @property
     def name(self):
+        """Return Sensor Name"""
         return "fordpass_" + self.sensor
 
     @property
     def state(self):
+        """Return Sensor State"""
         return self.get_value("state")
 
     @property
     def device_id(self):
+        """Return Sensor Device ID"""
         return self.device_id
 
     @property
     def extra_state_attributes(self):
+        """Return sensor attributes"""
         return self.get_value("attribute")
 
     @property
     def native_unit_of_measurement(self):
+        """Return sensor measurement"""
         return self.get_value("measurement")
 
     @property
     def icon(self):
+        """Return sensor icon"""
         return SENSORS[self.sensor]["icon"]
 
     @property
     def state_class(self):
+        """Return sensor state_class for statistics"""
         if "state_class" in SENSORS[self.sensor]:
             if SENSORS[self.sensor]["state_class"] == "total":
                 return SensorStateClass.TOTAL
-            elif SENSORS[self.sensor]["state_class"] == "measurement":
+            if SENSORS[self.sensor]["state_class"] == "measurement":
                 return SensorStateClass.MEASUREMENT
-            else:
-                return None
-        else:
             return None
+        return None
 
     @property
     def device_class(self):
+        """Return sensor device class for statistics"""
         if "device_class" in SENSORS[self.sensor]:
             if SENSORS[self.sensor]["device_class"] == "distance":
                 return SensorDeviceClass.DISTANCE
             if SENSORS[self.sensor]["device_class"] == "timestamp":
                 return SensorDeviceClass.TIMESTAMP
-            return None
+        return None
