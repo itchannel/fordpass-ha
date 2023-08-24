@@ -18,7 +18,14 @@
                     "vin": "NIV",
                     "region" : "Région FordPass"
                 }
-            }
+            },
+            "vehicle": {
+                "title": "Sélectionnez le véhicule à ajouter",
+                "description": "Seuls les véhicules non ajoutés actuellement seront affichés",
+                "data": {
+                  "vin": "VIN"
+                }
+              }
         }
     },
     "options": {
