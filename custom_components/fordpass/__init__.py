@@ -161,7 +161,6 @@ def refresh_status(hass, service, coordinator):
         _LOGGER.debug("Invalid VIN")
     elif status == 200:
         _LOGGER.debug("Refresh Sent")
-    
 
 
 def clear_tokens(hass, service, coordinator):
@@ -170,21 +169,13 @@ def clear_tokens(hass, service, coordinator):
     coordinator.vehicle.clear_token()
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    unload_ok = all(
-        await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(entry, component)
-                for component in PLATFORMS
-            ]
-        )
-    )
-    hass.data[DOMAIN][entry.entry_id]["fordpass_options_listener"]()
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
 
-    return unload_ok
+    if await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
+        hass.data[DOMAIN].pop(entry.entry_id)
+        return True
+    return False
 
 
 class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
@@ -220,6 +211,9 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
 
                 data["messages"] = await self._hass.async_add_executor_job(
                     self.vehicle.messages
+                )
+                data["vehicles"] = await self._hass.async_add_executor_job(
+                    self.vehicle.vehicles
                 )
                 _LOGGER.debug(data)
                 # If data has now been fetched but was previously unavailable, log and reset
@@ -264,8 +258,15 @@ class FordPassEntity(CoordinatorEntity):
         if self._device_id is None:
             return None
 
+        model = "unknown"
+        if self.coordinator.data["vehicles"] is not None:
+            for vehicle in self.coordinator.data["vehicles"]["vehicleProfile"]:
+                if vehicle["VIN"] == self.coordinator.vin:
+                    model = f"{vehicle['year']} {vehicle['model']}"
+
         return {
             "identifiers": {(DOMAIN, self.coordinator.vin)},
             "name": f"{VEHICLE} ({self.coordinator.vin})",
+            "model": f"{model}",
             "manufacturer": MANUFACTURER,
         }
