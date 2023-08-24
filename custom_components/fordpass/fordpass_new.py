@@ -197,7 +197,7 @@ class Vehicle:
         headers = {**apiHeaders, "Application-Id": self.region}
 
         response = session.post(
-            f"https://{GUARD_URL}/token/v2/cat-with-refresh-token",
+            f"{GUARD_URL}/token/v2/cat-with-refresh-token",
             data=json.dumps(data),
             headers=headers,
         )
