@@ -18,7 +18,14 @@
                     "vin": "VIN",
                     "region" : "FordPass Region"
                 }
-            }
+            },
+            "vehicle": {
+                "title": "Select vehicle to add",
+                "description": "Only vehicles not currently added will be shown",
+                "data": {
+                  "vin": "VIN"
+                }
+              }
         }
     },
     "options": {
