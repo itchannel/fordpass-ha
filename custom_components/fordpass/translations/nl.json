@@ -18,7 +18,14 @@
                     "vin": "VIN",
                     "region" : "FordPass regio"
                 }
-            }
+            },
+            "vehicle": {
+                "title": "Velg kjøretøy som skal legges til",
+                "description": "Kun kjøretøy som ikke er lagt til for øyeblikket, vises",
+                "data": {
+                  "vin": "VIN"
+                }
+              }
         }
     },
     "options": {

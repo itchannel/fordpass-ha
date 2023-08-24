@@ -30,10 +30,18 @@ DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
-        vol.Required(VIN): vol.All(str, vol.Length(min=17, max=17)),
         vol.Required(REGION): vol.In(REGION_OPTIONS),
     }
 )
+
+
+@callback
+def configured_vehicles(hass):
+    """Return a list of configured vehicles"""
+    return {
+        entry.data[VIN]
+        for entry in hass.config_entries.async_entries(DOMAIN)
+    }
 
 
 async def validate_input(hass: core.HomeAssistant, data):
@@ -43,19 +51,22 @@ async def validate_input(hass: core.HomeAssistant, data):
     """
     _LOGGER.debug(data[REGION])
     config_path = hass.config.path("custom_components/fordpass/" + data[CONF_USERNAME] + "_fordpass_token.txt")
-    vehicle = Vehicle(data[CONF_USERNAME], data[CONF_PASSWORD], data[VIN], data[REGION], 1, config_path)
+    vehicle = Vehicle(data[CONF_USERNAME], data[CONF_PASSWORD], "", data[REGION], 1, config_path)
 
     try:
         result = await hass.async_add_executor_job(vehicle.auth)
     except Exception as ex:
         raise InvalidAuth from ex
 
+    if result:
+        vehicles = await(hass.async_add_executor_job(vehicle.vehicles))
+
     if not result:
         _LOGGER.error("Failed to authenticate with fordpass")
         raise CannotConnect
 
     # Return info that you want to store in the config entry.
-    return {"title": f"Vehicle ({data[VIN]})"}
+    return vehicles
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -70,7 +81,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 info = await validate_input(self.hass, user_input)
-                return self.async_create_entry(title=info["title"], data=user_input)
+                self.login_input = user_input
+                self.vehicles = info["userVehicles"]["vehicleDetails"]
+                return await self.async_step_vehicle()
+                # return self.async_create_entry(title=info["title"], data=user_input)
             except CannotConnect:
                 print("EXCEPT")
                 errors["base"] = "cannot_connect"
@@ -84,6 +98,35 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
+        )
+
+    async def async_step_vehicle(self, user_input=None):
+        """Show user vehicle selection form"""
+        if user_input is not None:
+            _LOGGER.debug("Checking Vehicle is accessible")
+            self.login_input[VIN] = user_input["vin"]
+            _LOGGER.debug(self.login_input)
+            return self.async_create_entry(title=f"Vehicle ({user_input[VIN]})", data=self.login_input)
+
+        _LOGGER.debug(self.vehicles)
+
+        configured = configured_vehicles(self.hass)
+        _LOGGER.debug(configured)
+        avaliable_vehicles = {}
+        for vehicle in self.vehicles:
+            _LOGGER.debug(vehicle)
+            if vehicle["VIN"] not in configured:
+                avaliable_vehicles[vehicle["VIN"]] = vehicle["nickName"] + f" ({vehicle['VIN']})"
+
+        if not avaliable_vehicles:
+            _LOGGER.debug("No Vehicles?")
+            return self.async_abort(reason="no_vehicles")
+        return self.async_show_form(
+            step_id="vehicle",
+            data_schema=vol.Schema(
+                {vol.Required(VIN): vol.In(avaliable_vehicles)}
+            ),
+            errors={}
         )
 
     @staticmethod
