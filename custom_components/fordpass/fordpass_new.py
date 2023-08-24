@@ -8,7 +8,7 @@ import requests
 import string
 import time
 
-from base64 import urlsafe_b64encode, urlsafe_b64decode
+from base64 import urlsafe_b64encode
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -64,14 +64,13 @@ class Vehicle(object):
             _LOGGER.debug(configLocation)
             self.token_location = configLocation
 
-    def base64UrlEncode(self,data):
+    def base64UrlEncode(self, data):
         return urlsafe_b64encode(data).rstrip(b'=')
 
     def generate_hash(self, code):
         m = hashlib.sha256()
         m.update(code.encode('utf-8'))
         return self.base64UrlEncode(m.digest()).decode('utf-8')
-
 
     def auth(self):
         _LOGGER.debug("New System")
@@ -92,7 +91,6 @@ class Vehicle(object):
         test = re.findall('data-ibm-login-url="(.*)"\s', r.text)[0]
         nextUrl = ssoUrl + test
 
-
         # Auth Step2
         headers = {
             **defaultHeaders,
@@ -101,20 +99,19 @@ class Vehicle(object):
         data = {
             "operation": "verify",
             "login-form-type": "password",
-            "username" : self.username,
-            "password" : self.password
+            "username": self.username,
+            "password": self.password
 
         }
         r = session.post(
             nextUrl,
             headers=headers,
-            data = data,
+            data=data,
             allow_redirects=False
-
         )
 
         if r.status_code == 302:
-            nextUrl = r.headers["Location"]
+            nextUrl=r.headers["Location"]
         else:
             r.raise_for_status()
 

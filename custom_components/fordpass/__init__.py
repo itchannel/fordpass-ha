@@ -38,7 +38,6 @@ PLATFORMS = ["lock", "sensor", "switch", "device_tracker"]
 _LOGGER = logging.getLogger(__name__)
 
 
-
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the FordPass component."""
     hass.data.setdefault(DOMAIN, {})
@@ -76,7 +75,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         raise ConfigEntryNotReady
 
     hass.data[DOMAIN][entry.entry_id] = {
-        COORDINATOR : coordinator,
+        COORDINATOR: coordinator,
         "fordpass_options_listener": fordpass_options_listener
     }
 
@@ -95,7 +94,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     async def poll_api_service(service_call):
         await coordinator.async_request_refresh()
-
 
     async def handle_reload(service):
         """Handle reload service call."""
@@ -146,11 +144,13 @@ async def async_update_options(hass, config_entry):
     )
     hass.config_entries.async_update_entry(config_entry, options=options)
 
+
 async def options_update_listener(
-    hass: HomeAssistant,  entry: ConfigEntry 
+    hass: HomeAssistant,  entry: ConfigEntry
     ):
         _LOGGER.debug("OPTIONS CHANGE")
         await hass.config_entries.async_reload(entry.entry_id)
+
 
 def refresh_status(hass, service, coordinator):
     _LOGGER.debug("Running Service")

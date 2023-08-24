@@ -1,5 +1,4 @@
 import logging
-from datetime import timedelta
 
 from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
@@ -15,7 +14,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
 
     # Added a check to see if the car supports GPS
-    if entry.data["gps"] != None:
+    if entry.data["gps"] is not None:
         async_add_entities([CarTracker(entry, "gps")], True)
     else:
         _LOGGER.debug("Vehicle does not support GPS")
