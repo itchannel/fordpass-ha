@@ -21,4 +21,4 @@ static_analysis:
   allow_failure: true
   script:
   - flake8 --max-line-length=280 --ignore=W605
-  - pylint . --recursive=y --function-naming-style=camelCase --method-naming-style=camelCase --disable=W0613,C0115,w605
+  - pylint . --recursive=y --function-naming-style=camelCase --method-naming-style=camelCase --disable=W0613,C0115
