@@ -53,7 +53,7 @@ class CarSensor(
             device_id="fordpass_" + sensor,
             name="fordpass_" + sensor,
             coordinator=coordinator
-            )
+        )
 
         self.sensor = sensor
         self.fordoptions = options

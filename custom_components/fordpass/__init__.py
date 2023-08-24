@@ -156,7 +156,7 @@ def refresh_status(hass, service, coordinator):
     """Get latest vehicle status from vehicle, actively polls the car"""
     _LOGGER.debug("Running Service")
     vin = service.data.get("vin", "")
-    status = coordinator.vehicle.requestUpdate(vin)
+    status = coordinator.vehicle.request_update(vin)
     if status == 401:
         _LOGGER.debug("Invalid VIN")
     elif status == 200:
@@ -166,7 +166,7 @@ def refresh_status(hass, service, coordinator):
 def clear_tokens(hass, service, coordinator):
     """Clear the token file in config directory, only use in emergency"""
     _LOGGER.debug("Clearing Tokens")
-    coordinator.vehicle.clearToken()
+    coordinator.vehicle.clear_token()
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
