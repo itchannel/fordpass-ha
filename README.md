@@ -12,6 +12,9 @@
 - https://github.com/JacobWasFramed - Updated unit conversions
 - https://github.com/heehoo59 - French Translation
 
+## 1.50 Change
+As of 1.50 VIN number is no longer required for setup. Integration should display a list of vehicles associated with your Fordpass account
+
 ## 1.47 Change
 If you are experiencing issues with the odometer displaying wrong, please try enabling the checkbox in options for "Disable Distance Conversion"
 
@@ -20,7 +23,7 @@ If you are experiencing issues with the odometer displaying wrong, please try en
 Use HACS and add as a custom repo. Once the integration is installed go to your integrations and follow the configuration options to specify the below:
 - Username (Fordpass App)
 - Password (Fordpass App)
-- VIN Number
+- VIN Number (Not required in 1.50)
 - Region (Where you are based, required for tokens to work correctly)
 
 ## Usage

@@ -1,5 +1,5 @@
+"""Vehicle Tracker Sensor"""
 import logging
-from datetime import timedelta
 
 from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
@@ -15,7 +15,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
 
     # Added a check to see if the car supports GPS
-    if entry.data["gps"] != None:
+    if entry.data["gps"] is not None:
         async_add_entities([CarTracker(entry, "gps")], True)
     else:
         _LOGGER.debug("Vehicle does not support GPS")
@@ -23,6 +23,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class CarTracker(FordPassEntity, TrackerEntity):
     def __init__(self, coordinator, sensor):
+
+        super().__init__(
+            device_id="fordpass_" + sensor,
+            name="fordpass_" + sensor,
+            coordinator=coordinator
+        )
 
         self._attr = {}
         self.sensor = sensor
@@ -33,28 +39,35 @@ class CarTracker(FordPassEntity, TrackerEntity):
 
     @property
     def latitude(self):
+        """Return latitude from Vehicle GPS"""
         return float(self.coordinator.data[self.sensor]["latitude"])
 
     @property
     def longitude(self):
+        """Return longitude from Vehicle GPS"""
         return float(self.coordinator.data[self.sensor]["longitude"])
 
     @property
     def source_type(self):
+        """Set source type to GPS"""
         return SOURCE_TYPE_GPS
 
     @property
     def name(self):
+        """Return device tracker entity name"""
         return "fordpass_tracker"
 
     @property
     def device_id(self):
+        """Return device tracker id"""
         return self.device_id
 
     @property
     def extra_state_attributes(self):
+        """No extra attributes to return"""
         return None
 
     @property
     def icon(self):
+        """Return device tracker icon"""
         return "mdi:radar"

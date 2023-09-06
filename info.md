@@ -1,4 +1,9 @@
 ## **Changelog**
+### Version 1.50
+- Complete refactor of all code to make it more compliant
+- Added new config flow to allow for choosing vehicles on setup instead of using VIN 
+### Version 1.49
+- Added German & Italian translations (@@lollo0296)
 ### Version 1.48
 - Add translations for service strings
 - Fix error on odometer missing config
