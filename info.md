@@ -1,4 +1,6 @@
 ## **Changelog**
+### Version 1.52
+- Update for discontinued API endpoints (Update, lock, remote start)
 ### Version 1.51
 - Fix for incorrect tire pressure conversion
 - Handling of blank nickName when configuring car in config flow
