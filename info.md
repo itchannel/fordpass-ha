@@ -1,4 +1,8 @@
 ## **Changelog**
+### Version 1.51
+- Fix for incorrect tire pressure conversion
+- Handling of blank nickName when configuring car in config flow
+- Fix for incorrect URL reference in vehicles API
 ### Version 1.50
 - Complete refactor of all code to make it more compliant
 - Added new config flow to allow for choosing vehicles on setup instead of using VIN 

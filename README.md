@@ -12,6 +12,9 @@
 - https://github.com/JacobWasFramed - Updated unit conversions
 - https://github.com/heehoo59 - French Translation
 
+## Account Warning (Sep 2023)
+A number of users have encountered their accounts being banned for containing "+" symbols in their email. It appears Ford thinks this is a disposable email. So if you have a + in your email I recommend changing it.
+
 ## 1.50 Change
 As of 1.50 VIN number is no longer required for setup. Integration should display a list of vehicles associated with your Fordpass account
 

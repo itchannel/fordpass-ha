@@ -116,7 +116,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         for vehicle in self.vehicles:
             _LOGGER.debug(vehicle)
             if vehicle["VIN"] not in configured:
-                avaliable_vehicles[vehicle["VIN"]] = vehicle["nickName"] + f" ({vehicle['VIN']})"
+                if "nickName" in vehicle:
+                    avaliable_vehicles[vehicle["VIN"]] = vehicle["nickName"] + f" ({vehicle['VIN']})"
+                else:
+                    avaliable_vehicles[vehicle["VIN"]] = f" ({vehicle['VIN']})"
 
         if not avaliable_vehicles:
             _LOGGER.debug("No Vehicles?")
