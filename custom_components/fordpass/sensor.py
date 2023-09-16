@@ -225,11 +225,11 @@ class CarSensor(
                         sval = 0.1450377377
                         rval = 1
                         decimal = 0
-                    if self.fordoptions[CONF_PRESSURE_UNIT] == "BAR":
+                    elif self.fordoptions[CONF_PRESSURE_UNIT] == "BAR":
                         sval = 0.01
                         rval = 0.0689475729
                         decimal = 2
-                    if self.fordoptions[CONF_PRESSURE_UNIT] == "kPa":
+                    elif self.fordoptions[CONF_PRESSURE_UNIT] == "kPa":
                         sval = 1
                         rval = 6.8947572932
                         decimal = 0
