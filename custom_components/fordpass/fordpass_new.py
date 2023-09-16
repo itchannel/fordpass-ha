@@ -306,7 +306,7 @@ class Vehicle:
                 "Application-Id": self.region,
             }
             response = session.get(
-                f"{BASE_URL}/vehicles/v4/{self.vin}/status",
+                f"{BASE_URL}/vehicles/v5/{self.vin}/status",
                 params=params,
                 headers=headers,
             )
