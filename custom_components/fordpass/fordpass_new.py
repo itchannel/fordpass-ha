@@ -394,7 +394,7 @@ class Vehicle:
         Issue a start command to the engine
         """
         return self.__request_and_poll(
-            "PUT", f"{BASE_URL}/vehicles/v2/{self.vin}/engine/start"
+            "PUT", f"{BASE_URL}/vehicles/v5/{self.vin}/engine/start"
         )
 
     def stop(self):
@@ -402,7 +402,7 @@ class Vehicle:
         Issue a stop command to the engine
         """
         return self.__request_and_poll(
-            "DELETE", f"{BASE_URL}/vehicles/v2/{self.vin}/engine/start"
+            "DELETE", f"{BASE_URL}/vehicles/v5/{self.vin}/engine/start"
         )
 
     def lock(self):
@@ -410,7 +410,7 @@ class Vehicle:
         Issue a lock command to the doors
         """
         return self.__request_and_poll(
-            "PUT", f"{BASE_URL}/vehicles/v2/{self.vin}/doors/lock"
+            "PUT", f"{BASE_URL}/vehicles/v5/{self.vin}/doors/lock"
         )
 
     def unlock(self):
@@ -418,7 +418,7 @@ class Vehicle:
         Issue an unlock command to the doors
         """
         return self.__request_and_poll(
-            "DELETE", f"{BASE_URL}/vehicles/v2/{self.vin}/doors/lock"
+            "DELETE", f"{BASE_URL}/vehicles/v5/{self.vin}/doors/lock"
         )
 
     def enable_guard(self):
@@ -452,7 +452,7 @@ class Vehicle:
         else:
             vinnum = self.vin
         status = self.__make_request(
-            "PUT", f"{BASE_URL}/vehicles/v2/{vinnum}/status", None, None
+            "PUT", f"{BASE_URL}/vehicles/v5/{vinnum}/status", None, None
         )
         return status.json()["status"]
 
