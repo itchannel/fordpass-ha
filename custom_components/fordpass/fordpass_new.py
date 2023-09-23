@@ -456,6 +456,36 @@ class Vehicle:
         )
         return status.json()["status"]
 
+    def charge_log(self):
+        """Get Charge logs from account"""
+        self.__acquire_token()
+
+        if self.region2 == "Australia":
+            countryheader = "AUS"
+        elif self.region2 == "North America & Canada":
+            countryheader = "USA"
+        elif self.region2 == "UK&Europe":
+            countryheader = "GBR"
+        else:
+            countryheader = "USA"
+        headers = {
+            **apiHeaders,
+            "Auth-Token": self.token,
+            "Application-Id": self.region,
+            "Countrycode": countryheader,
+            "Locale": "EN-US"
+        }
+
+        response = session.get(
+            f"{GUARD_URL}/electrification/experiences/v1/devices/{self.vin}/energy-transfer-logs/",
+            headers=headers)
+        if response.status_code == 200:
+            result = response.json()
+            return result["energyTransferLogs"]
+
+        response.raise_for_status()
+        return None
+
     def __make_request(self, method, url, data, params):
         """
         Make a request to the given URL, passing data/params as needed
