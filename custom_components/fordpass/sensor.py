@@ -149,6 +149,12 @@ class CarSensor(
                 if self.coordinator.data["messages"] is None:
                     return None
                 return len(self.coordinator.data["messages"])
+            if self.sensor == "chargeStatus":
+                if self.coordinator.data["chargeStatus"] is not None and self.coordinator.data["chargeStatus"]["power"] is not None:
+                    power_wh = self.coordinator.data["chargeStatus"]["power"]
+                    power_kwh = power_wh / 1000
+                    return round(power_kwh, 1)
+                return "Not Supported"
             if self.sensor == "dieselSystemStatus":
                 if self.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"] is not None:
                     return self.coordinator.data["dieselSystemStatus"]["filterRegenerationStatus"]
@@ -197,6 +203,8 @@ class CarSensor(
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                     return "mi"
                 return "km"
+            if self.sensor == "chargeStatus":
+                return "kWh"
             if self.sensor == "exhaustFluidLevel":
                 return "%"
             return None
@@ -344,6 +352,32 @@ class CarSensor(
                     ]["value"]
 
                 return elecs
+            if self.sensor == "chargeStatus":
+                if self.coordinator.data["chargeStatus"] is None:
+                    return None
+                cs = {}
+                if self.coordinator.data[self.sensor]["chargerType"] is not None:
+                    cs["chargerType"] = self.coordinator.data[self.sensor]["chargerType"]
+                if self.coordinator.data[self.sensor]["currentTargetSoc"] is not None:
+                    cs["currentTargetSoc"] = self.coordinator.data[self.sensor]["currentTargetSoc"]
+                if (
+                    self.coordinator.data[self.sensor]["plugDetails"] is not None and 
+                    self.coordinator.data[self.sensor]["plugDetails"]["plugInTime"] is not None
+                    ):
+                    cs["Plug In Time"] = self.coordinator.data[self.sensor]["plugDetails"]["plugInTime"]
+                if (
+                    self.coordinator.data[self.sensor]["plugDetails"] is not None and 
+                    self.coordinator.data[self.sensor]["plugDetails"]["totalPluggedInTime"] is not None
+                    ):
+                    cs["Total Plugged In Time"] = self.coordinator.data[self.sensor]["plugDetails"]["totalPluggedInTime"]
+
+                if self.coordinator.data[self.sensor]["power"] is not None:
+                    power_wh = self.coordinator.data["chargeStatus"]["power"]
+                    power_kwh = power_wh / 1000
+                    cs["Power Level kWh"] = round(power_kwh, 1)
+                if self.coordinator.data[self.sensor]["energyConsumed"] is not None:
+                    cs["Energy Consumed"] = self.coordinator.data[self.sensor]["energyConsumed"]
+                return cs
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.coordinator.data:
                     return None

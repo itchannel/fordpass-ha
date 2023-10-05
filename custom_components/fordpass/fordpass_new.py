@@ -477,6 +477,27 @@ class Vehicle:
         response.raise_for_status()
         return None
 
+    def charge_status(self):
+        """Get Charge status from account"""
+        self.__acquire_token()
+
+        headers = {
+            **apiHeaders,
+            "Auth-Token": self.token,
+            "Application-Id": self.region
+        }
+
+        response = session.get(
+            f"{GUARD_URL}/electrification/experiences/v1/devices/{self.vin}/energy-transfer-status/",
+            headers=headers)
+        
+        if response.status_code == 200:
+            result = response.json()
+            return result
+
+        response.raise_for_status()
+        return None
+    
     def __make_request(self, method, url, data, params):
         """
         Make a request to the given URL, passing data/params as needed
