@@ -1,10 +1,19 @@
 import json
 import requests
 
-fp_username = "" #FordPass Username
-fp_password = "" #FordPass password
-fp_vin = "" #FordPass VIN for vehicle to get data from
-fp_token = "Hass_fordpass_token.txt" #Name of the file for the user_fordpass_token.txt from the fordpass-ha integration
+# Place this script in the /config/custom_components/fordpass folder on your HomeAssistant
+# Add the details below
+# run from a terminal: python3 autonomicData.py
+# It will create autonomicData.json in the same folder
+
+#FordPass Username
+fp_username = "" 
+#FordPass password
+fp_password = "" 
+#FordPass VIN for vehicle to get data from
+fp_vin = "" 
+#Name of the file for the user_fordpass_token.txt from the fordpass-ha integration
+fp_token = "Hass_fordpass_token.txt" 
 
 
 def get_autonomic_token(ford_access_token):
@@ -74,7 +83,7 @@ autonomic_token = get_autonomic_token(ford_access_token)
 vehicle_status = get_vehicle_status(fp_vin, autonomic_token["access_token"])
 
 # Write the updated JSON data to the file
-with open('new_data.json', 'w') as file:
+with open('autonomicData.json', 'w') as file:
     json.dump(vehicle_status, file, indent=4)
 print("done")
 
