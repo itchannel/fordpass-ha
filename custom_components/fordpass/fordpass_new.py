@@ -32,7 +32,7 @@ region_lookup = {
     "North America & Canada": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592",
 }
 
-newApi = True
+NEW_API = True
 
 BASE_URL = "https://usapi.cv.ford.com/api"
 GUARD_URL = "https://api.mps.ford.com/api"
@@ -197,8 +197,7 @@ class Vehicle:
         # Code to get Auto token
         if self.getAutoToken():
             return True
-        else:
-            return False
+        return False
 
     def refresh_token_func(self, token):
         """Refresh token if still valid"""
@@ -324,7 +323,7 @@ class Vehicle:
             "Application-Id": self.region,
         }
 
-        if newApi:
+        if NEW_API:
             headers = {
                 **apiHeaders,
                 "authorization": f"Bearer {self.auto_token}",
@@ -419,7 +418,7 @@ class Vehicle:
 
             _LOGGER.debug(result)
             return result
-        _LOGGER.debug(response.text)
+        # _LOGGER.debug(response.text)
         response.raise_for_status()
         return None
 
