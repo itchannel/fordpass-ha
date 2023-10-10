@@ -20,15 +20,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         _LOGGER.debug("Ford model doesn't support remote locking")
 
 
-
 class Lock(FordPassEntity, LockEntity):
     """Defines the vehicle's lock."""
-
     def __init__(self, coordinator):
         """Initialize."""
         self._device_id="fordpass_doorlock"
         self.coordinator = coordinator
-
         self.data = coordinator.data["metrics"]
 
         # Required for HA 2022.7

@@ -32,9 +32,13 @@ region_lookup = {
     "North America & Canada": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592",
 }
 
+newApi = True
+
 BASE_URL = "https://usapi.cv.ford.com/api"
 GUARD_URL = "https://api.mps.ford.com/api"
 SSO_URL = "https://sso.ci.ford.com"
+autonomicUrl = "https://api.autonomic.ai/v1"
+autonomicAccountUrl = "https://accounts.autonomic.ai/v1"
 
 session = requests.Session()
 
@@ -55,6 +59,7 @@ class Vehicle:
         self.expires = None
         self.expires_at = None
         self.refresh_token = None
+        self.auto_token = None
         retry = Retry(connect=3, backoff_factor=0.5)
         adapter = HTTPAdapter(max_retries=retry)
         session.mount("http://", adapter)
@@ -189,7 +194,12 @@ class Vehicle:
             session.cookies.clear()
             return True
         response.raise_for_status()
-        return False
+        # Code to get Auto token
+        if self.getAutoToken():
+            return True
+        else:
+            return False
+
 
     def refresh_token_func(self, token):
         """Refresh token if still valid"""
@@ -271,6 +281,38 @@ class Vehicle:
         if os.path.isfile(self.token_location):
             os.remove(self.token_location)
 
+    def getAutoToken(self):
+        """Get token from new autonomic API"""
+        _LOGGER.debug("Getting Auto Token")
+        headers={
+            "accept": "*/*",
+            "content-type": "application/x-www-form-urlencoded"
+        }
+
+        data = {
+            "subject_token": self.token,
+            "subject_issuer": "fordpass",
+            "client_id": "fordpass-prod",
+            "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+            "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+
+        }
+
+
+        r = session.post(
+            f"{autonomicAccountUrl}/auth/oidc/token",
+            data=data,
+            headers=headers
+        )
+
+        if r.status_code == 200:
+            result = r.json()
+            _LOGGER.debug(r.status_code)
+            _LOGGER.debug(r.text)
+            self.auto_token = result["access_token"]
+            return True
+    
+
     def status(self):
         """Get Vehicle status from API"""
 
@@ -284,37 +326,50 @@ class Vehicle:
             "Application-Id": self.region,
         }
 
-        response = session.get(
-            f"{BASE_URL}/vehicles/v5/{self.vin}/status", params=params, headers=headers
-        )
-        if response.status_code == 200:
-            result = response.json()
-            if result["status"] == 402:
-                response.raise_for_status()
-            return result["vehiclestatus"]
-        if response.status_code == 401:
-            _LOGGER.debug("401 with status request: start token refresh")
-            data = {}
-            data["access_token"] = self.token
-            data["refresh_token"] = self.refresh_token
-            data["expiry_date"] = self.expires_at
-            self.refresh_token_func(data)
-            self.__acquire_token()
+        if newApi:
             headers = {
                 **apiHeaders,
-                "auth-token": self.token,
+                "authorization": f"Bearer {self.auto_token2}",
                 "Application-Id": self.region,
-            }
+        }
+            r = session.get(
+                f"{autonomicUrl}/telemetry/sources/fordpass/vehicles/{self.vin}", params=params, headers=headers
+            )
+            if r.status_code == 200:
+                #_LOGGER.debug(r.text)
+                result = r.json()
+                return result
+        else:
             response = session.get(
-                f"{BASE_URL}/vehicles/v5/{self.vin}/status",
-                params=params,
-                headers=headers,
+                f"{BASE_URL}/vehicles/v5/{self.vin}/status", params=params, headers=headers
             )
             if response.status_code == 200:
                 result = response.json()
-            return result["vehiclestatus"]
-        response.raise_for_status()
-        return None
+                if result["status"] == 402:
+                    response.raise_for_status()
+                return result["vehiclestatus"]
+            if response.status_code == 401:
+                _LOGGER.debug("401 with status request: start token refresh")
+                data = {}
+                data["access_token"] = self.token
+                data["refresh_token"] = self.refresh_token
+                data["expiry_date"] = self.expires_at
+                self.refresh_token_func(data)
+                self.__acquire_token()
+                headers = {
+                    **apiHeaders,
+                    "auth-token": self.token,
+                    "Application-Id": self.region,
+                }
+                response = session.get(
+                    f"{BASE_URL}/vehicles/v5/{self.vin}/status",
+                    params=params,
+                    headers=headers,
+                )
+                if response.status_code == 200:
+                    result = response.json()
+                return result["vehiclestatus"]
+            response.raise_for_status()
 
     def messages(self):
         """Get Vehicle messages from API"""
@@ -393,33 +448,25 @@ class Vehicle:
         """
         Issue a start command to the engine
         """
-        return self.__request_and_poll(
-            "PUT", f"{BASE_URL}/vehicles/v5/{self.vin}/engine/start"
-        )
+        return self.__requestAndPollCommand("remoteStart")
 
     def stop(self):
         """
         Issue a stop command to the engine
         """
-        return self.__request_and_poll(
-            "DELETE", f"{BASE_URL}/vehicles/v5/{self.vin}/engine/start"
-        )
+        return self.__requestAndPollCommand("cancelRemoteStart")
 
     def lock(self):
         """
         Issue a lock command to the doors
         """
-        return self.__request_and_poll(
-            "PUT", f"{BASE_URL}/vehicles/v5/{self.vin}/doors/lock"
-        )
+        return self.__requestAndPollCommand("unlock")
 
     def unlock(self):
         """
         Issue an unlock command to the doors
         """
-        return self.__request_and_poll(
-            "DELETE", f"{BASE_URL}/vehicles/v5/{self.vin}/doors/lock"
-        )
+        return self.__requestAndPollCommand("unlock")
 
     def enable_guard(self):
         """
@@ -486,7 +533,37 @@ class Vehicle:
             return True
         _LOGGER.debug("Command failed")
         return False
+    
+    def __requestAndPollCommand(self, command, vin=None):
+        """Send command to the new Command endpoint"""
+        headers = {
+            **apiHeaders,
+            "Application-Id": self.region,
+            "authorization": f"Bearer {self.auto_token2}"
+            }
+        
+        data = {
+            "properties": {},
+            "tags": {},
+            "type": command,
+            "wakeUp": True
+        }
+        if vin is None:
+            r = session.post(
+                f"{autonomicUrl}command/vehicles/{self.vin}/commands",
+                data=json.dumps(data),
+                headers = headers
+            )
+        else:
+            r = session.post(
+                f"{autonomicUrl}command/vehicles/{vin}/commands",
+                data=json.dumps(data),
+                headers = headers
+            )
 
+        _LOGGER.debug("Testing command")
+        _LOGGER.debug(r.status_code)
+        _LOGGER.debug(r.text)
     def __request_and_poll(self, method, url):
         """Poll API until status code is reached, locking + remote start"""
         self.__acquire_token()
