@@ -195,7 +195,7 @@ class Vehicle:
             return True
         response.raise_for_status()
         # Code to get Auto token
-        if self.getAutoToken():
+        if self.get_auto_token():
             return True
         return False
 
@@ -279,7 +279,7 @@ class Vehicle:
         if os.path.isfile(self.token_location):
             os.remove(self.token_location)
 
-    def getAutoToken(self):
+    def get_auto_token(self):
         """Get token from new autonomic API"""
         _LOGGER.debug("Getting Auto Token")
         headers = {
