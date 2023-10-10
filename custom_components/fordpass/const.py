@@ -73,6 +73,6 @@ WINDOW_POSITIONS = {
 }
 
 SWITCHES = {
-        "ignition": {"icon": "hass:power"},
-        # "guardmode": {"icon": "mdi:shield-key"}
-    }
+    "ignition": {"icon": "hass:power"},
+    # "guardmode": {"icon": "mdi:shield-key"}
+}

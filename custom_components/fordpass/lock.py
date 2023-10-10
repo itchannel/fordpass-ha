@@ -24,7 +24,7 @@ class Lock(FordPassEntity, LockEntity):
     """Defines the vehicle's lock."""
     def __init__(self, coordinator):
         """Initialize."""
-        self._device_id="fordpass_doorlock"
+        self._device_id = "fordpass_doorlock"
         self.coordinator = coordinator
         self.data = coordinator.data["metrics"]
 
@@ -69,7 +69,7 @@ class Lock(FordPassEntity, LockEntity):
     def icon(self):
         """Return MDI Icon"""
         return "mdi:car-door-lock"
-    
+
     @property
     def name(self):
         """Return Name"""

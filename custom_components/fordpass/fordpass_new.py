@@ -561,7 +561,7 @@ class Vehicle:
         _LOGGER.debug("Testing command")
         _LOGGER.debug(r.status_code)
         _LOGGER.debug(r.text)
-        
+
     def __request_and_poll(self, method, url):
         """Poll API until status code is reached, locking + remote start"""
         self.__acquire_token()
