@@ -200,7 +200,6 @@ class Vehicle:
         else:
             return False
 
-
     def refresh_token_func(self, token):
         """Refresh token if still valid"""
         data = {"refresh_token": token["refresh_token"]}
@@ -284,7 +283,7 @@ class Vehicle:
     def getAutoToken(self):
         """Get token from new autonomic API"""
         _LOGGER.debug("Getting Auto Token")
-        headers={
+        headers = {
             "accept": "*/*",
             "content-type": "application/x-www-form-urlencoded"
         }
@@ -298,7 +297,6 @@ class Vehicle:
 
         }
 
-
         r = session.post(
             f"{AUTONOMIC_ACCOUNT_URL}/auth/oidc/token",
             data=data,
@@ -311,7 +309,7 @@ class Vehicle:
             _LOGGER.debug(r.text)
             self.auto_token = result["access_token"]
             return True
-    
+
 
     def status(self):
         """Get Vehicle status from API"""
@@ -334,7 +332,7 @@ class Vehicle:
         }
             r = session.get(
                 f"{AUTONOMIC_URL}/telemetry/sources/fordpass/vehicles/{self.vin}", params=params, headers=headers
-            )
+                )
             if r.status_code == 200:
                 #_LOGGER.debug(r.text)
                 result = r.json()
