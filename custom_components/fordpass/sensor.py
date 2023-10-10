@@ -28,7 +28,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             if "zoneLighting" in sensor.coordinator.data:
                 sensors.append(sensor)
         elif key == "elVeh":
-            if sensor.coordinator.data["elVehDTE"] is not None:
+            if "xevBatteryCapacity" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
         elif key == "dieselSystemStatus":
             if sensor.coordinator.data.get("dieselSystemStatus", {}):
@@ -87,9 +87,9 @@ class CarSensor(
                 else:
                     return None
             if self.sensor == "battery":
-                return self.data["batteryStateOfCharge"]["value"]
+                return round(self.data["batteryStateOfCharge"]["value"])
             if self.sensor == "oil":
-                return self.data["oilLifeRemaining"]["value"]
+                return round(self.data["oilLifeRemaining"]["value"])
             if self.sensor == "tirePressure":
                 return self.data["tirePressureSystemStatus"][0]["value"]
             if self.sensor == "gps":
@@ -129,14 +129,14 @@ class CarSensor(
                     )
                 )
             if self.sensor == "elVeh":
-                if self.data["elVehDTE"] is not None:
+                if "xevBatteryRange" in self.data:
                     if self.fordoptions[CONF_DISTANCE_UNIT] is not None:
                         if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                             return round(
-                                float(self.data["elVehDTE"]["value"]) / 1.60934
+                                float(self.data["xevBatteryRange"]["value"]) / 1.60934
                             )
-                        return float(self.data["elVehDTE"]["value"])
-                    return float(self.data["elVehDTE"]["value"])
+                        return float(self.data["xevBatteryRange"]["value"])
+                    return float(self.data["xevBatteryRange"]["value"])
                 return "Unsupported"
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.data:
@@ -175,9 +175,9 @@ class CarSensor(
             if self.sensor == "fuel":
                 return "%"
             if self.sensor == "battery":
-                return None
+                return "%"
             if self.sensor == "oil":
-                return None
+                return "%"
             if self.sensor == "tirePressure":
                 return None
             if self.sensor == "gps":
@@ -282,67 +282,46 @@ class CarSensor(
             if self.sensor == "lastRefresh":
                 return None
             if self.sensor == "elVeh":
-                if self.data["elVehDTE"] is None:
+                if self.data["xevBatteryCapacity"] is None:
                     return None
                 elecs = {}
                 if (
-                    self.data["elVehDTE"] is not None and self.data["elVehDTE"]["value"] is not None
+                    self.data["xevBatteryCapacity"] is not None and self.data["xevBatteryCapacity"]["value"] is not None
                 ):
-                    elecs["elVehDTE"] = self.data["elVehDTE"]["value"]
+                    elecs["xevBatteryCapacity"] = self.data["xevBatteryCapacity"]["value"]
                 if (
-                    self.data["plugStatus"] is not None and self.data["plugStatus"]["value"] is not None
+                    self.data["xevPlugChargerStatus"] is not None and self.data["xevPlugChargerStatus"]["value"] is not None
                 ):
-                    elecs["Plug Status"] = self.data["plugStatus"][
+                    elecs["Plug Status"] = self.data["xevPlugChargerStatus"][
                         "value"
                     ]
 
                 if (
-                    self.data["chargingStatus"] is not None and self.data["chargingStatus"]["value"] is not None
+                    self.data["xevBatteryChargeDisplayStatus"] is not None and self.data["xevBatteryChargeDisplayStatus"]["value"] is not None
                 ):
                     elecs["Charging Status"] = self.data[
-                        "chargingStatus"
+                        "xevBatteryChargeDisplayStatus"
                     ]["value"]
 
                 if (
-                    self.data["chargeStartTime"] is not None and self.data["chargeStartTime"]["value"] is not None
-                ):
-                    elecs["Charge Start Time"] = self.data[
-                        "chargeStartTime"
-                    ]["value"]
-
-                if (
-                    self.data["chargeEndTime"] is not None and self.data["chargeEndTime"]["value"] is not None
-                ):
-                    elecs["Charge End Time"] = self.data[
-                        "chargeEndTime"
-                    ]["value"]
-
-                if (
-                    self.data["batteryFillLevel"] is not None and self.data["batteryFillLevel"]["value"] is not None
-                ):
-                    elecs["Battery Fill Level"] = int(self.data[
-                        "batteryFillLevel"
-                    ]["value"])
-
-                if (
-                    self.data["chargerPowertype"] is not None and self.data["chargerPowertype"]["value"] is not None
+                    self.data["xevChargeStationPowerType"] is not None and self.data["xevChargeStationPowerType"]["value"] is not None
                 ):
                     elecs["Charger Power Type"] = self.data[
-                        "chargerPowertype"
+                        "xevChargeStationPowerType"
                     ]["value"]
 
                 if (
-                    self.data["batteryChargeStatus"] is not None and self.data["batteryChargeStatus"]["value"] is not None
+                    self.data["xevChargeStationCommunicationStatus"] is not None and self.data["xevChargeStationCommunicationStatus"]["value"] is not None
                 ):
                     elecs["Battery Charge Status"] = self.data[
-                        "batteryChargeStatus"
+                        "xevChargeStationCommunicationStatus"
                     ]["value"]
 
                 if (
-                    self.data["batteryPerfStatus"] is not None and self.data["batteryPerfStatus"]["value"] is not None
+                    self.data["xevBatteryPerformanceStatus"] is not None and self.data["xevBatteryPerformanceStatus"]["value"] is not None
                 ):
                     elecs["Battery Performance Status"] = self.data[
-                        "batteryPerfStatus"
+                        "xevBatteryPerformanceStatus"
                     ]["value"]
 
                 return elecs
