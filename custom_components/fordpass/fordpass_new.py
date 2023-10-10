@@ -37,8 +37,8 @@ newApi = True
 BASE_URL = "https://usapi.cv.ford.com/api"
 GUARD_URL = "https://api.mps.ford.com/api"
 SSO_URL = "https://sso.ci.ford.com"
-autonomicUrl = "https://api.autonomic.ai/v1"
-autonomicAccountUrl = "https://accounts.autonomic.ai/v1"
+AUTONOMIC_URL = "https://api.autonomic.ai/v1"
+AUTONOMIC_ACCOUNT_URL = "https://accounts.autonomic.ai/v1"
 
 session = requests.Session()
 
@@ -300,7 +300,7 @@ class Vehicle:
 
 
         r = session.post(
-            f"{autonomicAccountUrl}/auth/oidc/token",
+            f"{AUTONOMIC_ACCOUNT_URL}/auth/oidc/token",
             data=data,
             headers=headers
         )
@@ -333,7 +333,7 @@ class Vehicle:
                 "Application-Id": self.region,
         }
             r = session.get(
-                f"{autonomicUrl}/telemetry/sources/fordpass/vehicles/{self.vin}", params=params, headers=headers
+                f"{AUTONOMIC_URL}/telemetry/sources/fordpass/vehicles/{self.vin}", params=params, headers=headers
             )
             if r.status_code == 200:
                 #_LOGGER.debug(r.text)
@@ -539,7 +539,7 @@ class Vehicle:
         headers = {
             **apiHeaders,
             "Application-Id": self.region,
-            "authorization": f"Bearer {self.auto_token2}"
+            "authorization": f"Bearer {self.auto_token}"
             }
         
         data = {
@@ -550,13 +550,13 @@ class Vehicle:
         }
         if vin is None:
             r = session.post(
-                f"{autonomicUrl}command/vehicles/{self.vin}/commands",
+                f"{AUTONOMIC_URL}command/vehicles/{self.vin}/commands",
                 data=json.dumps(data),
                 headers = headers
             )
         else:
             r = session.post(
-                f"{autonomicUrl}command/vehicles/{vin}/commands",
+                f"{AUTONOMIC_URL}command/vehicles/{vin}/commands",
                 data=json.dumps(data),
                 headers = headers
             )
