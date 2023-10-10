@@ -149,9 +149,9 @@ class CarSensor(
                     ]
                 return "Unsupported"
             if self.sensor == "remoteStartStatus":
-                if self.data["remoteStartStatus"] is None:
+                if self.data["remoteStartCountdownTimer"] is None:
                     return None
-                if self.data["remoteStartStatus"]["value"] == 1:
+                if self.data["remoteStartCountdownTimer"]["value"] > 0:
                     return "Active"
                 return "Inactive"
             if self.sensor == "messages":
@@ -367,9 +367,9 @@ class CarSensor(
                     return zone
                 return None
             if self.sensor == "remoteStartStatus":
-                if self.data["remoteStart"] is None:
+                if self.data["remoteStartCountdownTimer"] is None:
                     return None
-                return self.data["remoteStart"].items()
+                return { "Countdown": self.data["remoteStartCountdownTimer"]["value"] }
             if self.sensor == "messages":
                 if self.coordinator.data["messages"] is None:
                     return None
