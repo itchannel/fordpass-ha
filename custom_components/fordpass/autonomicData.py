@@ -1,16 +1,22 @@
 import json
 import requests
+import sys
+import os
+from datetime import datetime
+
 
 # Place this script in the /config/custom_components/fordpass folder on your HomeAssistant
 # Add the details below
-# run from a terminal: python3 autonomicData.py
-# It will create autonomicData.json in the same folder
+# run from a terminal in the /config/custom_components/fordpass folder: python3 autonomicData.py
+# It will create username_status_timestamp.json in the same folder
+# Script will automatically redact your VIN, VehicleID, and Geolocation details (lat, long)
 
+#GitHub username to append to the filename
+gitHub_username = ""
 #FordPass VIN for vehicle to get data from
 fp_vin = "" 
 #Name of the file for the user_fordpass_token.txt from the fordpass-ha integration
-fp_token = "Hass_fordpass_token.txt" 
-
+fp_token = "_fordpass_token.txt"
 
 def get_autonomic_token(ford_access_token):
     url = "https://accounts.autonomic.ai/v1/auth/oidc/token"
@@ -50,6 +56,7 @@ def get_vehicle_status(vin, access_token):
         "Content-Type": "application/json",
         "accept": "*/*"
     }
+    redactionItems = ["lat", "lon", "vehicleId", "vin"]
 
     try:
         response = requests.post(url, headers=headers, json={})
@@ -57,6 +64,9 @@ def get_vehicle_status(vin, access_token):
 
         # Parse the JSON response
         vehicle_status_data = response.json()
+
+        # Redact sensitive information
+        redact_json(vehicle_status_data, redactionItems)
         return vehicle_status_data
 
     except requests.exceptions.HTTPError as errh:
@@ -68,18 +78,44 @@ def get_vehicle_status(vin, access_token):
     except requests.exceptions.RequestException as err:
         print(f"Something went wrong: {err}")
 
-# Get FordPass token
-with open(fp_token, 'r') as file:
-    fp_token_data = json.load(file)
+def redact_json(data, redaction):
+    if isinstance(data, dict):
+        for key in list(data.keys()):
+            if key in redaction:
+                data[key] = 'REDACTED'
+            else:
+                redact_json(data[key], redaction)
+    elif isinstance(data, list):
+        for item in data:
+            redact_json(item, redaction)
 
-ford_access_token = fp_token_data['access_token']
+if __name__ == "__main__":
+    if gitHub_username == "":
+        gitHub_username = 'my'
+    if fp_vin == "":
+        print("Please enter your VIN into the python script")
+        sys.exit()
+    if fp_token == "":
+        print("Please enter your FordPass token text file name into the python script")
+        sys.exit()
+    elif os.path.isfile(fp_token) == False:
+        print(f"Error finding FordPass token text file: {fp_token}")
+        sys.exit()
 
-# Exchange Fordpass token for Autonomic Token
-autonomic_token = get_autonomic_token(ford_access_token)
-vehicle_status = get_vehicle_status(fp_vin, autonomic_token["access_token"])
+    # Get FordPass token
+    with open(fp_token, 'r') as file:
+        fp_token_data = json.load(file)
 
-# Write the updated JSON data to the file
-with open('autonomicData.json', 'w') as file:
-    json.dump(vehicle_status, file, indent=4)
-print("done")
+    ford_access_token = fp_token_data['access_token']
 
+    # Exchange Fordpass token for Autonomic Token
+    autonomic_token = get_autonomic_token(ford_access_token)
+    vehicle_status = get_vehicle_status(fp_vin, autonomic_token["access_token"])
+
+    current_datetime = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    fileName = f'/root/config/custom_components/fordpass/{gitHub_username}_status_{current_datetime}.json'
+
+    # Write the updated JSON data to the file
+    with open(fileName, 'w') as file:
+        json.dump(vehicle_status, file, indent=4)
+    print("done")
