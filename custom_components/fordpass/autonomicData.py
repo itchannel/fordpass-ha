@@ -40,12 +40,18 @@ def get_autonomic_token(ford_access_token):
 
     except requests.exceptions.HTTPError as errh:
         print(f"HTTP Error: {errh}")
+        print(f"Trying refresh token")
+        get_autonomic_token(ford_refresh_token)
     except requests.exceptions.ConnectionError as errc:
         print(f"Error Connecting: {errc}")
+        sys.exit()
     except requests.exceptions.Timeout as errt:
         print(f"Timeout Error: {errt}")
+        sys.exit()
     except requests.exceptions.RequestException as err:
         print(f"Something went wrong: {err}")
+        sys.exit()
+
 
 def get_vehicle_status(vin, access_token):
     BASE_URL = "https://api.autonomic.ai/"
@@ -90,6 +96,7 @@ def redact_json(data, redaction):
             redact_json(item, redaction)
 
 if __name__ == "__main__":
+    workingDir = "/config/custom_components/fordpass"
     if gitHub_username == "":
         gitHub_username = 'my'
     if fp_vin == "":
@@ -98,22 +105,23 @@ if __name__ == "__main__":
     if fp_token == "":
         print("Please enter your FordPass token text file name into the python script")
         sys.exit()
-    elif os.path.isfile(fp_token) == False:
-        print(f"Error finding FordPass token text file: {fp_token}")
+    elif os.path.isfile(os.path.join(workingDir, fp_token)) == False:
+        print(f"Error finding FordPass token text file: {os.path.join(workingDir, fp_token)}")
         sys.exit()
 
+    fp_token = os.path.join(workingDir, fp_token)
     # Get FordPass token
     with open(fp_token, 'r') as file:
         fp_token_data = json.load(file)
 
     ford_access_token = fp_token_data['access_token']
-
+    ford_refresh_token = fp_token_data['refresh_token']
     # Exchange Fordpass token for Autonomic Token
     autonomic_token = get_autonomic_token(ford_access_token)
     vehicle_status = get_vehicle_status(fp_vin, autonomic_token["access_token"])
 
     current_datetime = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    fileName = f'/root/config/custom_components/fordpass/{gitHub_username}_status_{current_datetime}.json'
+    fileName = os.path.join(workingDir, f"{gitHub_username}_status_{current_datetime}.json")
 
     # Write the updated JSON data to the file
     with open(fileName, 'w') as file:
