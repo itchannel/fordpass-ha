@@ -50,7 +50,7 @@ SENSORS = {
     #    "icon": "mdi:one-up",
     #   "name": "Firmware Update In Progress",
     # },
-    # "remoteStartStatus": {"icon": "mdi:remote"},
+    "remoteStartStatus": {"icon": "mdi:remote"},
     # "zoneLighting": {"icon": "mdi:spotlight-beam"},
     "messages": {"icon": "mdi:message-text"},
     # "dieselSystemStatus": {"icon": "mdi:smoking-pipe"},
