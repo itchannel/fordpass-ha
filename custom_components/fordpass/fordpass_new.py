@@ -550,7 +550,7 @@ class Vehicle:
                 data=json.dumps(data),
                 headers=headers
             )
-            
+
         else:
             r = session.post(
                 f"{AUTONOMIC_URL}/command/vehicles/{vin}/commands",
@@ -562,7 +562,6 @@ class Vehicle:
         _LOGGER.debug(r.text)
         if r.status_code == 201:
             return True
-        
         return False
 
     def __request_and_poll(self, method, url):

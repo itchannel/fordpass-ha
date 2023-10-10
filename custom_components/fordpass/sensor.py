@@ -125,7 +125,7 @@ class CarSensor(
             if self.sensor == "lastRefresh":
                 return dt.as_local(
                     datetime.strptime(
-                        self.coordinator.data["updateTime"] , "%Y-%m-%dT%H:%M:%S.%fz"
+                        self.coordinator.data["updateTime"], "%Y-%m-%dT%H:%M:%S.%fz"
                     )
                 )
             if self.sensor == "elVeh":
@@ -249,9 +249,9 @@ class CarSensor(
                         decimal = 0
                     tirepress = {}
                     for value in self.data["tirePressure"]:
-                            #if "recommended" in key:
-                            #    tirepress[key] = round(float(value["value"]) * rval, decimal)
-                            #else:
+                            # if "recommended" in key:
+                            # tirepress[key] = round(float(value["value"]) * rval, decimal)
+                            # else:
                         tirepress[value["vehicleWheel"]] = round(float(value["value"]) * sval, decimal)
                     return tirepress
                 return None
