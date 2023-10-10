@@ -548,13 +548,13 @@ class Vehicle:
         }
         if vin is None:
             r = session.post(
-                f"{AUTONOMIC_URL}command/vehicles/{self.vin}/commands",
+                f"{AUTONOMIC_URL}/command/vehicles/{self.vin}/commands",
                 data=json.dumps(data),
                 headers=headers
             )
         else:
             r = session.post(
-                f"{AUTONOMIC_URL}command/vehicles/{vin}/commands",
+                f"{AUTONOMIC_URL}/command/vehicles/{vin}/commands",
                 data=json.dumps(data),
                 headers=headers
             )
