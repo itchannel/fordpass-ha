@@ -6,10 +6,6 @@ import requests
 # run from a terminal: python3 autonomicData.py
 # It will create autonomicData.json in the same folder
 
-#FordPass Username
-fp_username = "" 
-#FordPass password
-fp_password = "" 
 #FordPass VIN for vehicle to get data from
 fp_vin = "" 
 #Name of the file for the user_fordpass_token.txt from the fordpass-ha integration
