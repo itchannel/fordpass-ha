@@ -310,7 +310,6 @@ class Vehicle:
             self.auto_token = result["access_token"]
             return True
 
-
     def status(self):
         """Get Vehicle status from API"""
 
@@ -329,12 +328,12 @@ class Vehicle:
                 **apiHeaders,
                 "authorization": f"Bearer {self.auto_token2}",
                 "Application-Id": self.region,
-        }
+            }
             r = session.get(
                 f"{AUTONOMIC_URL}/telemetry/sources/fordpass/vehicles/{self.vin}", params=params, headers=headers
-                )
+            )
             if r.status_code == 200:
-                #_LOGGER.debug(r.text)
+                # _LOGGER.debug(r.text)
                 result = r.json()
                 return result
         else:
@@ -531,15 +530,15 @@ class Vehicle:
             return True
         _LOGGER.debug("Command failed")
         return False
-    
+
     def __requestAndPollCommand(self, command, vin=None):
         """Send command to the new Command endpoint"""
         headers = {
             **apiHeaders,
             "Application-Id": self.region,
             "authorization": f"Bearer {self.auto_token}"
-            }
-        
+        }
+
         data = {
             "properties": {},
             "tags": {},
@@ -550,18 +549,19 @@ class Vehicle:
             r = session.post(
                 f"{AUTONOMIC_URL}command/vehicles/{self.vin}/commands",
                 data=json.dumps(data),
-                headers = headers
+                headers=headers
             )
         else:
             r = session.post(
                 f"{AUTONOMIC_URL}command/vehicles/{vin}/commands",
                 data=json.dumps(data),
-                headers = headers
+                headers=headers
             )
 
         _LOGGER.debug("Testing command")
         _LOGGER.debug(r.status_code)
         _LOGGER.debug(r.text)
+        
     def __request_and_poll(self, method, url):
         """Poll API until status code is reached, locking + remote start"""
         self.__acquire_token()
