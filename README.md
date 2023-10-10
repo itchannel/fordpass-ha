@@ -12,6 +12,9 @@
 - https://github.com/JacobWasFramed - Updated unit conversions
 - https://github.com/heehoo59 - French Translation
 
+## As of 10/10/2023 Ford has switched to a new API!
+This has caused the integration to stop working, I have started work on integrating the new API and there is a Beta but there is a lot of changes so it will take time to get it back and 100% operational again. 
+
 ## Account Warning (Sep 2023)
 A number of users have encountered their accounts being banned for containing "+" symbols in their email. It appears Ford thinks this is a disposable email. So if you have a + in your email I recommend changing it.
 
