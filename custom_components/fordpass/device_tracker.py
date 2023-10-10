@@ -34,10 +34,12 @@ class CarTracker(FordPassEntity, TrackerEntity):
 
     @property
     def latitude(self):
+        """Return latitude"""
         return float(self.data["position"]["value"]["location"]["lat"])
 
     @property
     def longitude(self):
+        """Return longtitude"""
         return float(self.data["position"]["value"]["location"]["lon"])
 
     @property

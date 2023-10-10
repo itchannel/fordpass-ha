@@ -309,6 +309,7 @@ class Vehicle:
             _LOGGER.debug(r.text)
             self.auto_token = result["access_token"]
             return True
+        return False
 
     def status(self):
         """Get Vehicle status from API"""
@@ -326,7 +327,7 @@ class Vehicle:
         if newApi:
             headers = {
                 **apiHeaders,
-                "authorization": f"Bearer {self.auto_token2}",
+                "authorization": f"Bearer {self.auto_token}",
                 "Application-Id": self.region,
             }
             r = session.get(
@@ -445,25 +446,25 @@ class Vehicle:
         """
         Issue a start command to the engine
         """
-        return self.__requestAndPollCommand("remoteStart")
+        return self.__request_and_poll_command("remoteStart")
 
     def stop(self):
         """
         Issue a stop command to the engine
         """
-        return self.__requestAndPollCommand("cancelRemoteStart")
+        return self.__request_and_poll_command("cancelRemoteStart")
 
     def lock(self):
         """
         Issue a lock command to the doors
         """
-        return self.__requestAndPollCommand("unlock")
+        return self.__request_and_poll_command("unlock")
 
     def unlock(self):
         """
         Issue an unlock command to the doors
         """
-        return self.__requestAndPollCommand("unlock")
+        return self.__request_and_poll_command("unlock")
 
     def enable_guard(self):
         """
@@ -531,7 +532,7 @@ class Vehicle:
         _LOGGER.debug("Command failed")
         return False
 
-    def __requestAndPollCommand(self, command, vin=None):
+    def __request_and_poll_command(self, command, vin=None):
         """Send command to the new Command endpoint"""
         headers = {
             **apiHeaders,
