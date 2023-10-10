@@ -249,6 +249,7 @@ class Vehicle:
             self.auth()
         else:
             _LOGGER.debug("Token is valid, continuing")
+            self.get_auto_token()
 
     def write_token(self, token):
         """Save token to file for reuse"""
