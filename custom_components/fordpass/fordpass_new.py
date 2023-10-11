@@ -458,7 +458,7 @@ class Vehicle:
         """
         Issue a lock command to the doors
         """
-        return self.__request_and_poll_command("unlock")
+        return self.__request_and_poll_command("lock")
 
     def unlock(self):
         """
