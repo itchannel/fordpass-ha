@@ -399,7 +399,6 @@ class CarSensor(
                     cs["Time To Full Charge"] = self.data["xevBatteryTimeToFullCharge"]["value"]
 
                 return cs
-            
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.data:
                     return None
