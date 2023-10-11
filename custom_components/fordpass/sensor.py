@@ -32,7 +32,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 sensors.append(sensor)
         elif key == "elVehCharging":
             if "xevBatteryChargeEvent" in sensor.coordinator.data["events"]:
-                sensors.append(sensor)
+                sensors.append(sensor)        
         elif key == "dieselSystemStatus":
             if sensor.coordinator.data.get("dieselSystemStatus", {}):
                 if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus"):
@@ -142,6 +142,14 @@ class CarSensor(
                         return float(self.data["xevBatteryRange"]["value"])
                     return float(self.data["xevBatteryRange"]["value"])
                 return "Unsupported"
+            if self.sensor == "elVehCharging":
+                if "xevBatteryChargeDisplayStatus" in self.data:
+                    return self.data["xevBatteryChargeDisplayStatus"]["value"]
+                return "Unsupported"
+            if self.sensor == "elVehCharging":
+                if "xevBatteryRange" in self.data:
+                    float(self.data["xevBatteryRange"]["value"]) / 1.60934
+                return "Unsupported"      
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.data:
                     return "Unsupported"
@@ -170,6 +178,8 @@ class CarSensor(
                 if "value" in self.data["dieselSystemStatus"]["exhaustFluidLevel"]:
                     return self.data["dieselSystemStatus"]["exhaustFluidLevel"]["value"]
                 return "Not Supported"
+            if self.sensor == "speed":
+                return self.data[self.sensor]["value"]
             return None
         if ftype == "measurement":
             if self.sensor == "odometer":
@@ -210,6 +220,10 @@ class CarSensor(
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                     return "mi"
                 return "km"
+            if self.sensor == "speed":
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                    return "mph"
+                return "km/h"
             if self.sensor == "exhaustFluidLevel":
                 return "%"
             return None
@@ -217,13 +231,18 @@ class CarSensor(
             if self.sensor == "odometer":
                 return self.data[self.sensor].items()
             if self.sensor == "fuel":
-                if self.data["fuelRange"] is None:
-                    return None
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    self.data["fuelRange"]["value"] = round(
-                        float(self.data["fuelRange"]["value"]) / 1.60934
-                    )
-                return {"fuelRange": self.data["fuelRange"]["value"]}
+                if "fuelRange" in self.data:
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                        self.data["fuelRange"]["value"] = round(
+                            float(self.data["fuelRange"]["value"]) / 1.60934
+                        )
+                    return {"fuelRange": self.data["fuelRange"]["value"]}
+                elif "xevBatteryRange" in self.data:
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                        self.data["xevBatteryRange"]["value"] = round(
+                            float(self.data["xevBatteryRange"]["value"]) / 1.60934
+                        )
+                    return {"batteryRange": self.data["xevBatteryRange"]["value"]}
             if self.sensor == "battery":
                 return {
                     "Battery Voltage": self.data["batteryVoltage"]["value"]
@@ -286,13 +305,13 @@ class CarSensor(
             if self.sensor == "lastRefresh":
                 return None
             if self.sensor == "elVeh":
-                if self.data["xevBatteryStateOfCharge"] is None:
+                if self.data["xevBatteryCapacity"] is None:
                     return None
                 elecs = {}
                 if (
-                    self.data["xevBatteryStateOfCharge"] is not None and self.data["xevBatteryStateOfCharge"]["value"] is not None
+                    self.data["xevBatteryCapacity"] is not None and self.data["xevBatteryCapacity"]["value"] is not None
                 ):
-                    elecs["Battery State of Charge"] = self.data["xevBatteryStateOfCharge"]["value"]
+                    elecs["xevBatteryCapacity"] = self.data["xevBatteryCapacity"]["value"]
                 if (
                     self.data["xevPlugChargerStatus"] is not None and self.data["xevPlugChargerStatus"]["value"] is not None
                 ):
@@ -328,6 +347,12 @@ class CarSensor(
                         "xevBatteryPerformanceStatus"
                     ]["value"]
 
+                if (
+                    self.data["xevBatteryStateOfCharge"] is not None and self.data["xevBatteryStateOfCharge"]["value"] is not None
+                ):
+                    elecs["Battery Charge"] = self.data[
+                        "xevBatteryStateOfCharge"
+                    ]["value"]
                 return elecs
             
             if self.sensor == "elVehCharging":
@@ -339,10 +364,10 @@ class CarSensor(
                 if (
                     self.events["xevBatteryChargeEvent"]["metrics"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryStateOfCharge"]["value"] is not None
                 ):
-                    cs["Charging Percentage"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryStateOfCharge"]["value"]
+                    cs["Charging State of Charge"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryStateOfCharge"]["value"]
                 if (self.events["xevBatteryChargeEvent"]["metrics"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["value"] is not None
                 ):
-                    cs["Battery Charge Status"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["value"]
+                    cs["Charging Status"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["value"]
                 if (
                     self.events["xevBatteryChargeEvent"]["metrics"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["xevChargerPowerType"] is not None
                 ):
@@ -364,7 +389,7 @@ class CarSensor(
                 if (
                     self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerCurrentOutput"]["value"] is not None
                 ):
-                    cs["Charging kW"] =  chVolt * chAmps
+                    cs["Charging kW"] =  (chVolt * chAmps) / 1000
                 return cs
             
             if self.sensor == "zoneLighting":
@@ -424,6 +449,8 @@ class CarSensor(
                 return self.data["dieselSystemStatus"]
             if self.sensor == "exhaustFluidLevel":
                 return self.data["dieselSystemStatus"]
+            if self.sensor == "speed":
+                return None
             return None
         return None
 
