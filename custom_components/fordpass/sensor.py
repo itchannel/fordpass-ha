@@ -362,7 +362,7 @@ class CarSensor(
                     cs["Charging Voltage"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"]
                     chVolt = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"]
                 if (
-                    chAmps is not None and chVolt is not None
+                    self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerCurrentOutput"]["value"] is not None
                 ):
                     cs["Charging kW"] =  chVolt * chAmps
                 return cs
