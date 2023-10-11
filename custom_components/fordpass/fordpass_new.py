@@ -520,10 +520,8 @@ class Vehicle:
             vinnum = vin
         else:
             vinnum = self.vin
-        status = self.__make_request(
-            "PUT", f"{BASE_URL}/vehicles/v5/{vinnum}/status", None, None
-        )
-        return status.json()["status"]
+        status = self.__requestAndPollCommand("statusRefresh", vinnum)
+        return status
 
     def __make_request(self, method, url, data, params):
         """
@@ -572,13 +570,13 @@ class Vehicle:
         }
         if vin is None:
             r = session.post(
-                f"{AUTONOMIC_URL}command/vehicles/{self.vin}/commands",
+                f"{AUTONOMIC_URL}/command/vehicles/{self.vin}/commands",
                 data=json.dumps(data),
                 headers=headers
             )
         else:
             r = session.post(
-                f"{AUTONOMIC_URL}command/vehicles/{vin}/commands",
+                f"{AUTONOMIC_URL}/command/vehicles/{self.vin}/commands",
                 data=json.dumps(data),
                 headers=headers
             )
@@ -586,6 +584,9 @@ class Vehicle:
         _LOGGER.debug("Testing command")
         _LOGGER.debug(r.status_code)
         _LOGGER.debug(r.text)
+        if r.status_code == 201:
+            return True
+        return False
 
     def __request_and_poll(self, method, url):
         """Poll API until status code is reached, locking + remote start"""
