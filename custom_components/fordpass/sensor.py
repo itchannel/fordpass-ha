@@ -10,7 +10,7 @@ from homeassistant.components.sensor import (
     SensorStateClass
 )
 
-from ..fordpass-ha import FordPassEntity
+from . import FordPassEntity
 from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR, DISTANCE_CONVERSION_DISABLED
 
 
@@ -285,13 +285,13 @@ class CarSensor(
             if self.sensor == "lastRefresh":
                 return None
             if self.sensor == "elVeh":
-                if self.data["xevBatteryCapacity"] is None:
+                if self.data["xevBatteryStateOfCharge"] is None:
                     return None
                 elecs = {}
                 if (
-                    self.data["xevBatteryCapacity"] is not None and self.data["xevBatteryCapacity"]["value"] is not None
+                    self.data["xevBatteryStateOfCharge"] is not None and self.data["xevBatteryStateOfCharge"]["value"] is not None
                 ):
-                    elecs["Battery State Of Charge"] = self.data["xevBatteryStateOfCharge"]["value"]
+                    elecs["Battery State of Charge"] = self.data["xevBatteryStateOfCharge"]["value"]
                 if (
                     self.data["xevPlugChargerStatus"] is not None and self.data["xevPlugChargerStatus"]["value"] is not None
                 ):
@@ -328,7 +328,7 @@ class CarSensor(
                     ]["value"]
 
                 return elecs
-
+            
             if self.sensor == "elVehCharging":
                 if self.data["xevBatteryChargeEvent"] is None:
                     return None
