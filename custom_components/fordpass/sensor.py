@@ -219,7 +219,7 @@ class CarSensor(
             if self.sensor == "odometer":
                 return self.data[self.sensor].items()
             if self.sensor == "fuel":
-                if "FuelRange" in self.data:
+                if "fuelRange" in self.data:
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                         self.data["fuelRange"]["value"] = round(
                             float(self.data["fuelRange"]["value"]) / 1.60934
