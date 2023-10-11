@@ -2,6 +2,7 @@ import json
 import requests
 import sys
 import os
+import re
 from datetime import datetime
 
 
@@ -62,7 +63,7 @@ def get_vehicle_status(vin, access_token):
         "Content-Type": "application/json",
         "accept": "*/*"
     }
-    redactionItems = ["lat", "lon", "vehicleId", "vin"]
+    redactionItems = ["lat", "lon", "vehicleId", "vin", "latitude", "longitude"]
 
     try:
         response = requests.post(url, headers=headers, json={})
@@ -85,16 +86,28 @@ def get_vehicle_status(vin, access_token):
         print(f"Something went wrong: {err}")
 
 def redact_json(data, redaction):
+    # Regular expression to match GPS coordinates
+    gps_pattern = r'"gpsDegree":\s*-?\d+\.\d+,\s*"gpsFraction":\s*-?\d+\.\d+,\s*"gpsSign":\s*-?\d+\.\d+'
+
     if isinstance(data, dict):
         for key in list(data.keys()):
             if key in redaction:
                 data[key] = 'REDACTED'
             else:
-                redact_json(data[key], redaction)
+                if isinstance(data[key], str):
+                    # Redact GPS coordinates in string values
+                    data[key] = re.sub(gps_pattern, '"gpsDegree": "REDACTED", "gpsFraction": "REDACTED", "gpsSign": "REDACTED"', data[key])
+                else:
+                    redact_json(data[key], redaction)
+            # Special handling for 'stringArrayValue'
+            if key == 'stringArrayValue':
+                for i in range(len(data[key])):
+                    data[key][i] = re.sub(gps_pattern, '"gpsDegree": "REDACTED", "gpsFraction": "REDACTED", "gpsSign": "REDACTED"', data[key][i])
     elif isinstance(data, list):
         for item in data:
             redact_json(item, redaction)
-
+       
+            
 if __name__ == "__main__":
     workingDir = "/config/custom_components/fordpass"
     if gitHub_username == "":
