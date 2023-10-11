@@ -215,9 +215,6 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
                 data["vehicles"] = await self._hass.async_add_executor_job(
                     self.vehicle.vehicles
                 )
-                data["chargeStatus"] = await self._hass.async_add_executor_job(
-                    self.vehicle.charge_status
-                )                
                 _LOGGER.debug(data)
                 # If data has now been fetched but was previously unavailable, log and reset
                 if not self._available:
