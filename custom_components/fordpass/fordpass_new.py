@@ -60,6 +60,7 @@ class Vehicle:
         self.expires_at = None
         self.refresh_token = None
         self.auto_token = None
+        self.auto_expires_at = None
         retry = Retry(connect=3, backoff_factor=0.5)
         adapter = HTTPAdapter(max_retries=retry)
         session.mount("http://", adapter)
@@ -188,15 +189,19 @@ class Vehicle:
             self.token = result["access_token"]
             self.refresh_token = result["refresh_token"]
             self.expires_at = time.time() + result["expires_in"]
+            auto_token = self.get_auto_token()
+            self.auto_token = auto_token["access_token"]
+            self.auto_expires_at = time.time() + result["expires_in"]
             if self.save_token:
                 result["expiry_date"] = time.time() + result["expires_in"]
+                result["auto_token"] = auto_token["access_token"]
+                result["auto_refresh"] = auto_token["refresh_token"]
+                result["auto_expiry"] = time.time() + auto_token["expires_in"]
+
                 self.write_token(result)
             session.cookies.clear()
             return True
         response.raise_for_status()
-        # Code to get Auto token
-        if self.get_auto_token():
-            return True
         return False
 
     def refresh_token_func(self, token):
@@ -221,9 +226,12 @@ class Vehicle:
             _LOGGER.debug("401 response stage 2: refresh stage 1 token")
             self.auth()
 
+
+
     def __acquire_token(self):
         # Fetch and refresh token as needed
         # If file exists read in token file and check it's valid
+        _LOGGER.debug("Fetching token")
         if self.save_token:
             if os.path.isfile(self.token_location):
                 data = self.read_token()
@@ -232,24 +240,39 @@ class Vehicle:
                 data["access_token"] = self.token
                 data["refresh_token"] = self.refresh_token
                 data["expiry_date"] = self.expires_at
+                data["auto_token"] = self.auto_token
+                data["auto_expiry"] = self.auto_expires_at
         else:
             data = {}
             data["access_token"] = self.token
             data["refresh_token"] = self.refresh_token
             data["expiry_date"] = self.expires_at
+            data["auto_token"] = self.auto_token
+            data["auto_expiry"] = self.auto_expires_at
         self.token = data["access_token"]
         self.expires_at = data["expiry_date"]
+        _LOGGER.debug(self.auto_token)
+        _LOGGER.debug(self.auto_expires_at)
+        if self.auto_token is None or self.auto_expires_at is None:
+            self.auth()
+            pass
+        self.auto_token = data["auto_token"]
+        self.auto_expires_at = data["auto_expiry"]
         if self.expires_at:
             if time.time() >= self.expires_at:
                 _LOGGER.debug("No token, or has expired, requesting new token")
                 self.refresh_token_func(data)
                 # self.auth()
+        if self.auto_expires_at:
+            if time.time() >= self.auto_expires_at:
+                _LOGGER.debug("Autonomic token expired")
+                self.auth()
         if self.token is None:
+            _LOGGER.debug("Fetching token4")
             # No existing token exists so refreshing library
             self.auth()
         else:
             _LOGGER.debug("Token is valid, continuing")
-            self.get_auto_token()
 
     def write_token(self, token):
         """Save token to file for reuse"""
@@ -308,7 +331,7 @@ class Vehicle:
             _LOGGER.debug(r.status_code)
             _LOGGER.debug(r.text)
             self.auto_token = result["access_token"]
-            return True
+            return result
         return False
 
     def status(self):
@@ -323,6 +346,7 @@ class Vehicle:
             "auth-token": self.token,
             "Application-Id": self.region,
         }
+        _LOGGER.debug(self.auto_token)
 
         if NEW_API:
             headers = {
@@ -334,7 +358,7 @@ class Vehicle:
                 f"{AUTONOMIC_URL}/telemetry/sources/fordpass/vehicles/{self.vin}", params=params, headers=headers
             )
             if r.status_code == 200:
-                # _LOGGER.debug(r.text)
+                _LOGGER.debug(r.text)
                 result = r.json()
                 return result
         else:
@@ -419,7 +443,7 @@ class Vehicle:
 
             _LOGGER.debug(result)
             return result
-        # _LOGGER.debug(response.text)
+        _LOGGER.debug(response.text)
         response.raise_for_status()
         return None
 
@@ -458,7 +482,7 @@ class Vehicle:
         """
         Issue a lock command to the doors
         """
-        return self.__request_and_poll_command("unlock")
+        return self.__request_and_poll_command("lock")
 
     def unlock(self):
         """
@@ -496,7 +520,7 @@ class Vehicle:
             vinnum = vin
         else:
             vinnum = self.vin
-        status = self.__requestAndPollCommand("statusRefresh", vinnum)
+        status = self.__request_and_poll_command("statusRefresh", vinnum)
         return status
 
     def __make_request(self, method, url, data, params):
@@ -550,13 +574,13 @@ class Vehicle:
                 data=json.dumps(data),
                 headers=headers
             )
-
         else:
             r = session.post(
-                f"{AUTONOMIC_URL}/command/vehicles/{vin}/commands",
+                f"{AUTONOMIC_URL}/command/vehicles/{self.vin}/commands",
                 data=json.dumps(data),
                 headers=headers
             )
+
         _LOGGER.debug("Testing command")
         _LOGGER.debug(r.status_code)
         _LOGGER.debug(r.text)

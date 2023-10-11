@@ -42,8 +42,7 @@ SENSORS = {
     "windowPosition": {"icon": "mdi:car-door"},
     "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp"},
     "elVeh": {"icon": "mdi:ev-station"},
-    "elVehCharging": {"icon": "mdi:ev-station"},
-
+    "speed": {"icon": "mdi:speedometer"},
     # "deepSleepInProgress": {
     #     "icon": "mdi:power-sleep",
     #    "name": "Deep Sleep Mode Active",
