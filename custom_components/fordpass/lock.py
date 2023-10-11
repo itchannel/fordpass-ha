@@ -33,7 +33,7 @@ class Lock(FordPassEntity, LockEntity):
 
     async def async_lock(self, **kwargs):
         """Locks the vehicle."""
-        self._attr_is_locking = True
+        # self._attr_is_locking = True
         self.async_write_ha_state()
         _LOGGER.debug("Locking %s", self.coordinator.vin)
         status = await self.coordinator.hass.async_add_executor_job(
@@ -42,20 +42,20 @@ class Lock(FordPassEntity, LockEntity):
         _LOGGER.debug(status)
         await self.coordinator.async_request_refresh()
         _LOGGER.debug("Locking here")
-        self._attr_is_locking = False
+        # self._attr_is_locking = False
         self.async_write_ha_state()
 
     async def async_unlock(self, **kwargs):
         """Unlocks the vehicle."""
         _LOGGER.debug("Unlocking %s", self.coordinator.vin)
-        self._attr_is_unlocking = True
+        # self._attr_is_unlocking = True
         self.async_write_ha_state()
         status = await self.coordinator.hass.async_add_executor_job(
             self.coordinator.vehicle.unlock
         )
         _LOGGER.debug(status)
         await self.coordinator.async_request_refresh()
-        self._attr_is_unlocking = False
+        # self._attr_is_unlocking = False
         self.async_write_ha_state()
 
     @property
