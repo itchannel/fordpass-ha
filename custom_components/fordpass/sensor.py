@@ -329,6 +329,12 @@ class CarSensor(
                         "xevBatteryPerformanceStatus"
                     ]["value"]
 
+                if (
+                    self.data["xevBatteryStateOfCharge"] is not None and self.data["xevBatteryStateOfCharge"]["value"] is not None
+                ):
+                    elecs["Battery Charge"] = self.data[
+                        "xevBatteryStateOfCharge"
+                    ]["value"]
                 return elecs
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.data:
