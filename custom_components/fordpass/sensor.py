@@ -335,46 +335,35 @@ class CarSensor(
                     return None
                 cs = {}
 
-                if (
-                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
+                if (self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["metrics"] is not None
                 ):
-                    cs["Battery Charge Status"] = self.events[
-                        "xevBatteryChargeEvent"
-                    ]["value"]["xevBatteryChargeDisplayStatus"]["value"]
+                    cs["Battery Charge Status"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["value"]
 
                 if (
-                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["metrics"] is not None
                 ):
-                    cs["Charging Percentage"] = self.events[
-                        "xevBatteryChargeEvent"
-                        ]["value"]["xevBatteryStateOfCharge"]["value"]
+                    cs["Charging Type"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["xevChargerPowerType"]
                     
                 if (
-                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["metrics"] is not None
                 ):
-                    cs["Charging Type"] = self.events[
-                        "xevBatteryChargeEvent"
-                        ]["value"]["xevBatteryChargeDisplayStatus"]["xevChargerPowerType"]
+                    cs["Charging Percentage"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryStateOfCharge"]["value"]
                     
                 if (
-                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["metrics"] is not None
                 ):
-                    cs["Charging Voltage"] = self.events[
-                        "xevBatteryChargeEvent"
-                        ]["value"]["xevBatteryChargerVoltageOutput"]["value"]
+                    cs["Charging Voltage"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"]
 
                 if (
-                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["metrics"] is not None
                 ):
-                    cs["Charging Amperage"] = self.events[
-                        "xevBatteryChargeEvent"
-                        ]["value"]["xevBatteryChargerCurrentOutput"]["value"]
+                    cs["Charging Amperage"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerCurrentOutput"]["value"]
 
                 if (
-                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["metrics"] is not None
                 ):
-                    chAmps = self.events["xevBatteryChargeEvent"]["value"]["xevBatteryChargerCurrentOutput"]["value"]
-                    chVolt = self.events["xevBatteryChargeEvent"]["value"]["xevBatteryChargerVoltageOutput"]["value"]
+                    chAmps = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerCurrentOutput"]["value"]
+                    chVolt = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"]
                     cs["Charging kW"] =  chVolt * chAmps
 
                 return cs
