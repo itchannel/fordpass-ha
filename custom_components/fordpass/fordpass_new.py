@@ -520,7 +520,7 @@ class Vehicle:
             vinnum = vin
         else:
             vinnum = self.vin
-        status = self.__requestAndPollCommand("statusRefresh", vinnum)
+        status = self.__request_and_poll_command("statusRefresh", vinnum)
         return status
 
     def __make_request(self, method, url, data, params):
