@@ -127,11 +127,25 @@ class CarSensor(
                     return status
                 return "Unsupported"
             if self.sensor == "lastRefresh":
-                return dt.as_local(
-                    datetime.strptime(
-                        self.coordinator.data["updateTime"], "%Y-%m-%dT%H:%M:%S.%fz"
+                try:
+                    return dt.as_local(
+                        datetime.strptime(
+                            self.coordinator.data["updateTime"], "%Y-%m-%dT%H:%M:%S.%fz"
+                        )
                     )
-                )
+                except:
+                    _LOGGER.debug("%f conversion failed")
+                try:
+                    return dt.as_local(
+                        datetime.strptime(
+                            self.coordinator.data["updateTime"], "%Y-%m-%dT%H:%M:%Sz"
+                        )
+                    )
+                except:
+                    _LOGGER.debug("%s conversion failed")
+                    refresh = ""
+                
+                return refresh
             if self.sensor == "elVeh":
                 if "xevBatteryRange" in self.data:
                     if self.fordoptions[CONF_DISTANCE_UNIT] is not None:
