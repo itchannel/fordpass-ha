@@ -303,7 +303,7 @@ class CarSensor(
             if self.sensor == "lastRefresh":
                 return None
             if self.sensor == "elVeh":
-                if self.data["xevBatteryCapacity"] is None:
+                if "xevBatteryCapacity" not in self.data:
                     return None
                 elecs = {}
                 if (
@@ -354,7 +354,7 @@ class CarSensor(
                 return elecs
             ## SquidBytes: Added elVehCharging
             if self.sensor == "elVehCharging":
-                if self.data["xevPlugChargerStatus"] is None:
+                if "xevPlugChargerStatus" not in self.data:
                     return None
 
                 cs = {}
