@@ -213,13 +213,18 @@ class CarSensor(
             if self.sensor == "odometer":
                 return self.data[self.sensor].items()
             if self.sensor == "fuel":
-                if self.data["fuelRange"] is None:
-                    return None
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    self.data["fuelRange"]["value"] = round(
-                        float(self.data["fuelRange"]["value"]) / 1.60934
-                    )
-                return {"fuelRange": self.data["fuelRange"]["value"]}
+                if "FuelRange" in self.data:
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                        self.data["fuelRange"]["value"] = round(
+                            float(self.data["fuelRange"]["value"]) / 1.60934
+                        )
+                    return {"fuelRange": self.data["fuelRange"]["value"]}
+                elif "xevBatteryRange" in self.data:
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                        self.data["xevBatteryRange"]["value"] = round(
+                            float(self.data["xevBatteryRange"]["value"]) / 1.60934
+                        )
+                    return {"batteryRange": self.data["xevBatteryRange"]["value"]}
             if self.sensor == "battery":
                 return {
                     "Battery Voltage": self.data["batteryVoltage"]["value"]
