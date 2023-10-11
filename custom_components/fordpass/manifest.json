@@ -1,17 +1,17 @@
 {
-  "domain": "fordpass",
-  "name": "FordPass",
-  "codeowners": ["@itchannel"],
-  "config_flow": true,
-  "dependencies": [],
-  "documentation": "https://github.com/itchannel/fordpass-ha",
-  "homekit": {},
-  "integration_type": "device",
-  "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/itchannel/fordpass-ha/issues",
-  "loggers": ["custom_components.fordpass"],
-  "requirements": [],
-  "ssdp": [],
-  "version": "0.1.53",
-  "zeroconf": []
-}
+    "domain": "fordpass",
+    "name": "FordPass",
+    "codeowners": ["@itchannel"],
+    "config_flow": true,
+    "dependencies": [],
+    "documentation": "https://github.com/itchannel/fordpass-ha",
+    "homekit": {},
+    "integration_type": "device",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/itchannel/fordpass-ha/issues",
+    "loggers": ["custom_components.fordpass"],
+    "requirements": [],
+    "ssdp": [],
+    "version": "0.1.53",
+    "zeroconf": []
+  }
