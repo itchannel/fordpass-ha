@@ -63,6 +63,7 @@ class CarSensor(
         self._attr = {}
         self.coordinator = coordinator
         self.data = coordinator.data["metrics"]
+        self.events = coordinator.data["events"]
         self._device_id = "fordpass_" + sensor
         # Required for HA 2022.7
         self.coordinator_context = object()
@@ -330,53 +331,53 @@ class CarSensor(
                 return elecs
             
             if self.sensor == "elVehCharging":
-                if self.data["xevBatteryChargeEvent"] is None:
+                if self.events["xevBatteryChargeEvent"] is None:
                     return None
-                elecs = {}
+                cs = {}
 
                 if (
-                    self.data["xevBatteryChargeEvent"] is not None and self.data["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
                 ):
-                    elecs["Battery Charge Status"] = self.data[
+                    cs["Battery Charge Status"] = self.events[
                         "xevBatteryChargeEvent"
                     ]["value"]["xevBatteryChargeDisplayStatus"]["value"]
 
                 if (
-                    self.data["xevBatteryChargeEvent"] is not None and self.data["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
                 ):
-                    elecs["Charging Percentage"] = self.data[
+                    cs["Charging Percentage"] = self.events[
                         "xevBatteryChargeEvent"
                         ]["value"]["xevBatteryStateOfCharge"]["value"]
                     
                 if (
-                    self.data["xevBatteryChargeEvent"] is not None and self.data["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
                 ):
-                    elecs["Charging Type"] = self.data[
+                    cs["Charging Type"] = self.events[
                         "xevBatteryChargeEvent"
                         ]["value"]["xevBatteryChargeDisplayStatus"]["xevChargerPowerType"]
                     
                 if (
-                    self.data["xevBatteryChargeEvent"] is not None and self.data["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
                 ):
-                    elecs["Charging Voltage"] = self.data[
+                    cs["Charging Voltage"] = self.events[
                         "xevBatteryChargeEvent"
                         ]["value"]["xevBatteryChargerVoltageOutput"]["value"]
 
                 if (
-                    self.data["xevBatteryChargeEvent"] is not None and self.data["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
                 ):
-                    elecs["Charging Amperage"] = self.data[
+                    cs["Charging Amperage"] = self.events[
                         "xevBatteryChargeEvent"
                         ]["value"]["xevBatteryChargerCurrentOutput"]["value"]
 
                 if (
-                    self.data["xevBatteryChargeEvent"] is not None and self.data["xevBatteryChargeEvent"]["value"] is not None
+                    self.events["xevBatteryChargeEvent"] is not None and self.events["xevBatteryChargeEvent"]["value"] is not None
                 ):
-                    chAmps = self.data["xevBatteryChargeEvent"]["value"]["xevBatteryChargerCurrentOutput"]["value"]
-                    chVolt = self.data["xevBatteryChargeEvent"]["value"]["xevBatteryChargerVoltageOutput"]["value"]
-                    elecs["Charging kW"] =  chVolt * chAmps
+                    chAmps = self.events["xevBatteryChargeEvent"]["value"]["xevBatteryChargerCurrentOutput"]["value"]
+                    chVolt = self.events["xevBatteryChargeEvent"]["value"]["xevBatteryChargerVoltageOutput"]["value"]
+                    cs["Charging kW"] =  chVolt * chAmps
 
-                return elecs
+                return cs
             
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.data:
