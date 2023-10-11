@@ -30,9 +30,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif key == "elVeh":
             if "xevBatteryCapacity" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
-        elif key == "elVehCharging":
-            if "xevBatteryChargeEvent" in sensor.coordinator.data["events"]:
-                sensors.append(sensor)        
         elif key == "dieselSystemStatus":
             if sensor.coordinator.data.get("dieselSystemStatus", {}):
                 if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus"):
@@ -63,7 +60,6 @@ class CarSensor(
         self._attr = {}
         self.coordinator = coordinator
         self.data = coordinator.data["metrics"]
-        self.events = coordinator.data["events"]
         self._device_id = "fordpass_" + sensor
         # Required for HA 2022.7
         self.coordinator_context = object()
@@ -142,14 +138,6 @@ class CarSensor(
                         return float(self.data["xevBatteryRange"]["value"])
                     return float(self.data["xevBatteryRange"]["value"])
                 return "Unsupported"
-            if self.sensor == "elVehCharging":
-                if "xevBatteryChargeDisplayStatus" in self.data:
-                    return self.data["xevBatteryChargeDisplayStatus"]["value"]
-                return "Unsupported"
-            if self.sensor == "elVehCharging":
-                if "xevBatteryRange" in self.data:
-                    float(self.data["xevBatteryRange"]["value"]) / 1.60934
-                return "Unsupported"      
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.data:
                     return "Unsupported"
@@ -354,44 +342,6 @@ class CarSensor(
                         "xevBatteryStateOfCharge"
                     ]["value"]
                 return elecs
-            
-            if self.sensor == "elVehCharging":
-                if self.events["xevBatteryChargeEvent"] is None:
-                    return None
-
-                cs = {}
-
-                if (
-                    self.events["xevBatteryChargeEvent"]["metrics"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryStateOfCharge"]["value"] is not None
-                ):
-                    cs["Charging State of Charge"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryStateOfCharge"]["value"]
-                if (self.events["xevBatteryChargeEvent"]["metrics"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["value"] is not None
-                ):
-                    cs["Charging Status"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["value"]
-                if (
-                    self.events["xevBatteryChargeEvent"]["metrics"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["xevChargerPowerType"] is not None
-                ):
-                    cs["Charging Type"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargeDisplayStatus"]["xevChargerPowerType"]
-                if (
-                    self.events["xevBatteryChargeEvent"]["metrics"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"] is not None
-                ):
-                    cs["Charging Voltage"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"]
-                if (
-                    self.events["xevBatteryChargeEvent"]["metrics"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerCurrentOutput"]["value"] is not None
-                ):
-                    cs["Charging Amperage"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerCurrentOutput"]["value"]
-                    chAmps = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerCurrentOutput"]["value"]
-                if (
-                    self.events["xevBatteryChargeEvent"]["metrics"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"] is not None
-                ):
-                    cs["Charging Voltage"] = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"]
-                    chVolt = self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"]
-                if (
-                    self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerVoltageOutput"]["value"] is not None and self.events["xevBatteryChargeEvent"]["metrics"]["xevBatteryChargerCurrentOutput"]["value"] is not None
-                ):
-                    cs["Charging kW"] =  (chVolt * chAmps) / 1000
-                return cs
-            
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.data:
                     return None
