@@ -166,6 +166,8 @@ class CarSensor(
                 if "value" in self.data["dieselSystemStatus"]["exhaustFluidLevel"]:
                     return self.data["dieselSystemStatus"]["exhaustFluidLevel"]["value"]
                 return "Not Supported"
+            if self.sensor == "speed":
+                return self.data[self.sensor]["value"]
             return None
         if ftype == "measurement":
             if self.sensor == "odometer":
@@ -206,6 +208,10 @@ class CarSensor(
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                     return "mi"
                 return "km"
+            if self.sensor == "speed":
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                    return "mph"
+                return "km/h"
             if self.sensor == "exhaustFluidLevel":
                 return "%"
             return None
@@ -393,6 +399,8 @@ class CarSensor(
                 return self.data["dieselSystemStatus"]
             if self.sensor == "exhaustFluidLevel":
                 return self.data["dieselSystemStatus"]
+            if self.sensor == "speed":
+                return None
             return None
         return None
 
