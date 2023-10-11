@@ -80,7 +80,7 @@ class CarSensor(
                             float(self.data[self.sensor]["value"]) / 1.60934
                         )
                     return self.data[self.sensor]["value"]
-                return self.data[self.sensor]["value"]
+                return self.data["odometer"]["value"]
             if self.sensor == "fuel":
                 if "fuelLevel" in self.data:
                     if self.data["fuelLevel"] is None:
