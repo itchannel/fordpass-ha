@@ -146,7 +146,7 @@ class CarSensor(
             if self.sensor == "elVehCharging":
                 if "xevBatteryChargeDisplayStatus" in self.data:
                     ## Default sensor type is the status of charge (might be better to have the kW as the value, but for now I'll do this)
-                    return float(self.data["xevBatteryChargeDisplayStatus"]["value"])
+                    return self.data["xevBatteryChargeDisplayStatus"]["value"]
                 return "Unsupported"                
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.data:
