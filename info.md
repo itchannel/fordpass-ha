@@ -1,10 +1,13 @@
 ## **Changelog**
 ### Version 1.53
-*Warning this version is only a BETA and has a lot broken due to the massive API changes from Ford use at your own risk or wait a week!*
 - Updated vehicle endpoint to use new Autonomics API
 - Added secondary Autonomic token
 - Remapped commands to use new "command" API endpoint
 - Remapped existing sensors to new json variables (Some are missinge)
+- Added charge status sensor (Thanks @SquidBytes)
+- Added new speed sensor (Will be adding more attributes to this like pedal position and torque settings soon)
+
+*Please report any bugs as a separate issue so I can keep track easier*
 
 There is a LOT more coming soon as the new API exposes an excessive amount of information including speed, pedal position, crash sensors and way more. 
 ### Version 1.52
