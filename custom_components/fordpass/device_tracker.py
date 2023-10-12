@@ -35,12 +35,12 @@ class CarTracker(FordPassEntity, TrackerEntity):
     @property
     def latitude(self):
         """Return latitude"""
-        return float(self.data["position"]["value"]["location"]["lat"])
+        return float(self.coordinator.data["metrics"]["position"]["value"]["location"]["lat"])
 
     @property
     def longitude(self):
         """Return longtitude"""
-        return float(self.data["position"]["value"]["location"]["lon"])
+        return float(self.coordinator.data["metrics"]["position"]["value"]["location"]["lon"])
 
     @property
     def source_type(self):

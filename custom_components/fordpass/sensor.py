@@ -70,6 +70,7 @@ class CarSensor(
 
     def get_value(self, ftype):
         """Get sensor value and attributes from coordinator data"""
+        self.data = self.coordinator.data["metrics"]
         if ftype == "state":
             if self.sensor == "odometer":
                 if self.fordoptions[CONF_DISTANCE_UNIT] is not None:
@@ -95,7 +96,9 @@ class CarSensor(
             if self.sensor == "oil":
                 return round(self.data["oilLifeRemaining"]["value"])
             if self.sensor == "tirePressure":
-                return self.data["tirePressureSystemStatus"][0]["value"]
+                if "tirePressureSystemStatus" in self.data:
+                    return self.data["tirePressureSystemStatus"][0]["value"]
+                return "Not Supported"
             if self.sensor == "gps":
                 if self.data["position"] is None:
                     return "Unsupported"
@@ -261,7 +264,7 @@ class CarSensor(
             if self.sensor == "oil":
                 return self.data["oilLifeRemaining"].items()
             if self.sensor == "tirePressure":
-                if self.data["tirePressure"] is not None:
+                if "tirePressure" in self.data :
                     _LOGGER.debug(self.fordoptions[CONF_PRESSURE_UNIT])
                     if self.fordoptions[CONF_PRESSURE_UNIT] == "PSI":
                         _LOGGER.debug("PSIIIII")

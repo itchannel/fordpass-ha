@@ -61,9 +61,9 @@ class Lock(FordPassEntity, LockEntity):
     @property
     def is_locked(self):
         """Determine if the lock is locked."""
-        if self.data is None or self.data["doorLockStatus"] is None:
+        if self.coordinator.data["metrics"] is None or self.coordinator.data["metrics"]["doorLockStatus"] is None:
             return None
-        return self.data["doorLockStatus"][0]["value"] == "LOCKED"
+        return self.coordinator.data["metrics"]["doorLockStatus"][0]["value"] == "LOCKED"
 
     @property
     def icon(self):

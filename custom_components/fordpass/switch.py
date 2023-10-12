@@ -83,10 +83,10 @@ class Switch(FordPassEntity, SwitchEntity):
         """Check status of switch"""
         if self.switch == "ignition":
             if (
-                self.data is None or self.data["ignitionStatus"] is None
+                self.coordinator.data["metrics"] is None or self.coordinator.data["metrics"]["ignitionStatus"] is None
             ):
                 return None
-            if self.data["ignitionStatus"]["value"] == "OFF":
+            if self.coordinator.data["metrics"]["ignitionStatus"]["value"] == "OFF":
                 return False
         if self.switch == "guardmode":
             # Need to find the correct response for enabled vs disabled so this may be spotty at the moment
