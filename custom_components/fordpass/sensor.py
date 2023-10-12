@@ -307,7 +307,11 @@ class CarSensor(
             if self.sensor == "doorStatus":
                 doors = {}
                 for value in self.data[self.sensor]:
-                    doors[value["vehicleDoor"]] = value["value"]
+                    _LOGGER.debug(value)
+                    if "vehicleSide" in value:
+                        doors[f"{value['vehicleSide']} : {value['vehicleDoor']}"] = value['value']
+                    else:
+                        doors[value["vehicleDoor"]] = value['value']
                 return doors
             if self.sensor == "windowPosition":
                 if "windowStatus" not in self.data:
