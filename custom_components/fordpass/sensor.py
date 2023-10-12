@@ -322,7 +322,7 @@ class CarSensor(
                         else:
                             doors[value['vehicleDoor']] = value['value']
                     elif value['vehicleDoor'] == "INNER_TAILGATE":
-                        if "xevBatteryRange" in self.data:
+                        if "xevBatteryCapacity" in self.data:
                             value['vehicleDoor'] = "FRUNK" 
                             doors[value['vehicleDoor']] = value['value']
                     else:
