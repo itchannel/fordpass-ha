@@ -44,6 +44,7 @@ SENSORS = {
     "elVeh": {"icon": "mdi:ev-station"},
     "elVehCharging": {"icon": "mdi:ev-station"},
     "speed": {"icon": "mdi:speedometer"},
+    "indicators": {"icon": "mdi:engine-outline"},
     # "deepSleepInProgress": {
     #     "icon": "mdi:power-sleep",
     #    "name": "Deep Sleep Mode Active",
@@ -55,8 +56,8 @@ SENSORS = {
     "remoteStartStatus": {"icon": "mdi:remote"},
     # "zoneLighting": {"icon": "mdi:spotlight-beam"},
     "messages": {"icon": "mdi:message-text"},
-    # "dieselSystemStatus": {"icon": "mdi:smoking-pipe"},
-    # "exhaustFluidLevel": {"icon": "mdi:barrel"}
+    "dieselSystemStatus": {"icon": "mdi:smoking-pipe"},
+    "exhaustFluidLevel": {"icon": "mdi:barrel"}
 }
 
 SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}

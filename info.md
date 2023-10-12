@@ -1,4 +1,8 @@
 ## **Changelog**
+### Version 1.54
+- Fixed lock/unlock status (Waits 90seconds before checking command has completed)
+- Added back diesel sensors
+- Added indicator/warning sensor (Shows any faults on the vehicle)
 ### Version 1.53
 - Updated vehicle endpoint to use new Autonomics API
 - Added secondary Autonomic token

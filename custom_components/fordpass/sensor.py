@@ -35,13 +35,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             if "xevBatteryChargeEvent" in sensor.coordinator.data["events"]:
                 sensors.append(sensor)                        
         elif key == "dieselSystemStatus":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}):
-                if sensor.coordinator.data.get("dieselSystemStatus", {}).get("filterRegenerationStatus"):
-                    sensors.append(sensor)
+            if "dieselExhaustFilterStatus" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
         elif key == "exhaustFluidLevel":
-            if sensor.coordinator.data.get("dieselSystemStatus", {}):
-                if sensor.coordinator.data.get("dieselSystemStatus", {}).get("exhaustFluidLevel"):
-                    sensors.append(sensor)
+            if "dieselExhaustFluidLevel" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
         else:
             sensors.append(sensor)
     async_add_entities(sensors, True)
@@ -185,15 +183,22 @@ class CarSensor(
                     return None
                 return len(self.coordinator.data["messages"])
             if self.sensor == "dieselSystemStatus":
-                if self.data["dieselSystemStatus"]["filterRegenerationStatus"] is not None:
-                    return self.data["dieselSystemStatus"]["filterRegenerationStatus"]
+                if "dieselExhaustFilterStatus" in self.data:
+                    return self.data["dieselExhaustFilterStatus"]["value"]
                 return "Not Supported"
             if self.sensor == "exhaustFluidLevel":
-                if "value" in self.data["dieselSystemStatus"]["exhaustFluidLevel"]:
-                    return self.data["dieselSystemStatus"]["exhaustFluidLevel"]["value"]
+                if "dieselExhaustFluidLevel" in self.data:
+                    return self.data["dieselExhaustFluidLevel"]["value"]
                 return "Not Supported"
             if self.sensor == "speed":
                 return self.data[self.sensor]["value"]
+            if self.sensor == "indicators":
+                alerts = 0
+                for indicator in self.data["indicators"]:
+                    if "value" in indicator:
+                        if indicator["value"] == True:
+                            alert +=1
+                return alerts
             return None
         if ftype == "measurement":
             if self.sensor == "odometer":
@@ -473,11 +478,28 @@ class CarSensor(
                     messages[value["messageSubject"]] = value["createdDate"]
                 return messages
             if self.sensor == "dieselSystemStatus":
-                return self.data["dieselSystemStatus"]
+                    if "dieselExhaustOverTemp" in self.data["indicators"]:
+                        return {
+                            "Diesel Exhaust Over Temp": self.data["indicators"]["dieselExhaustOverTemp"]["value"]
+                        }
+                    return None
             if self.sensor == "exhaustFluidLevel":
-                return self.data["dieselSystemStatus"]
+                exhaustdata = {}
+                if "dieselExhaustFluidLevelRangeRemaining" in self.data:
+                    exhaustdata["Exhaust Fluid Range"] = self.data["dieselExhaustFluidLevelRangeRemaining"]["value"]
+                if "dieselExhaustFluidLow" in self.data["indicators"]:
+                    exhaustdata["Exhaust Fluid Low"] = self.data["indicators"]["dieselExhaustFluidLow"]["value"]
+                if "dieselExhaustFluidSystemFault" in self.data["indicators"]:
+                    exhaustdata["Exhaust Fluid System Fault"] = self.data["indicators"]["dieselExhaustFluidSystemFault"]["value"]
+                return exhaustdata
             if self.sensor == "speed":
                 return None
+            if self.sensor == "indicators":
+                alerts = {}
+                for key, value in self.data["indicators"].items():
+                    if "value" in value:
+                        alerts[key] = value["value"]
+                return alerts
             return None
         return None
 

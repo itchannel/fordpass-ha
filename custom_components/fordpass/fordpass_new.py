@@ -585,6 +585,7 @@ class Vehicle:
         _LOGGER.debug(r.status_code)
         _LOGGER.debug(r.text)
         if r.status_code == 201:
+            time.sleep(90)
             return True
         return False
 
