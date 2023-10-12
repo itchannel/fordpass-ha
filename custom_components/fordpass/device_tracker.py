@@ -15,7 +15,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
 
     # Added a check to see if the car supports GPS
-    if entry.data["gps"] is not None:
+    if entry.data["metrics"]["position"] is not None:
         async_add_entities([CarTracker(entry, "gps")], True)
     else:
         _LOGGER.debug("Vehicle does not support GPS")
@@ -24,28 +24,23 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class CarTracker(FordPassEntity, TrackerEntity):
     def __init__(self, coordinator, sensor):
 
-        super().__init__(
-            device_id="fordpass_" + sensor,
-            name="fordpass_" + sensor,
-            coordinator=coordinator
-        )
-
         self._attr = {}
         self.sensor = sensor
         self.coordinator = coordinator
+        self.data = coordinator.data["metrics"]
         self._device_id = "fordpass_tracker"
         # Required for HA 2022.7
         self.coordinator_context = object()
 
     @property
     def latitude(self):
-        """Return latitude from Vehicle GPS"""
-        return float(self.coordinator.data[self.sensor]["latitude"])
+        """Return latitude"""
+        return float(self.coordinator.data["metrics"]["position"]["value"]["location"]["lat"])
 
     @property
     def longitude(self):
-        """Return longitude from Vehicle GPS"""
-        return float(self.coordinator.data[self.sensor]["longitude"])
+        """Return longtitude"""
+        return float(self.coordinator.data["metrics"]["position"]["value"]["location"]["lon"])
 
     @property
     def source_type(self):

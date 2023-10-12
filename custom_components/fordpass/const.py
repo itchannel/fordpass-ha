@@ -42,19 +42,21 @@ SENSORS = {
     "windowPosition": {"icon": "mdi:car-door"},
     "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp"},
     "elVeh": {"icon": "mdi:ev-station"},
-    "deepSleepInProgress": {
-        "icon": "mdi:power-sleep",
-        "name": "Deep Sleep Mode Active",
-    },
-    "firmwareUpgInProgress": {
-        "icon": "mdi:one-up",
-        "name": "Firmware Update In Progress",
-    },
+    "elVehCharging": {"icon": "mdi:ev-station"},
+    "speed": {"icon": "mdi:speedometer"},
+    # "deepSleepInProgress": {
+    #     "icon": "mdi:power-sleep",
+    #    "name": "Deep Sleep Mode Active",
+    # },
+    # "firmwareUpgInProgress": {
+    #    "icon": "mdi:one-up",
+    #   "name": "Firmware Update In Progress",
+    # },
     "remoteStartStatus": {"icon": "mdi:remote"},
-    "zoneLighting": {"icon": "mdi:spotlight-beam"},
+    # "zoneLighting": {"icon": "mdi:spotlight-beam"},
     "messages": {"icon": "mdi:message-text"},
-    "dieselSystemStatus": {"icon": "mdi:smoking-pipe"},
-    "exhaustFluidLevel": {"icon": "mdi:barrel"}
+    # "dieselSystemStatus": {"icon": "mdi:smoking-pipe"},
+    # "exhaustFluidLevel": {"icon": "mdi:barrel"}
 }
 
 SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
@@ -72,4 +74,7 @@ WINDOW_POSITIONS = {
     },
 }
 
-SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
+SWITCHES = {
+    "ignition": {"icon": "hass:power"},
+    # "guardmode": {"icon": "mdi:shield-key"}
+}

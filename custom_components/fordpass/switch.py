@@ -15,17 +15,17 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     # switches = [Switch(entry)]
     # async_add_entities(switches, False)
-    for key in SWITCHES:
-        switch = Switch(entry, key, config_entry.options)
+    for key, value in SWITCHES.items():
+        sw = Switch(entry, key, config_entry.options)
         # Only add guard entity if supported by the car
         if key == "guardmode":
-            if "guardstatus" in switch.coordinator.data:
-                if switch.coordinator.data["guardstatus"]["returnCode"] == 200:
-                    async_add_entities([switch], False)
+            if "guardstatus" in sw.coordinator.data:
+                if sw.coordinator.data["guardstatus"]["returnCode"] == 200:
+                    async_add_entities([sw], False)
                 else:
                     _LOGGER.debug("Guard mode not supported on this vehicle")
         else:
-            async_add_entities([switch], False)
+            async_add_entities([sw], False)
 
 
 class Switch(FordPassEntity, SwitchEntity):
@@ -33,15 +33,10 @@ class Switch(FordPassEntity, SwitchEntity):
 
     def __init__(self, coordinator, switch, options):
         """Initialize"""
-        super().__init__(
-            device_id="fordpass_doorlock",
-            name="fordpass_doorlock",
-            coordinator=coordinator,
-        )
-
         self._device_id = "fordpass_" + switch
         self.switch = switch
         self.coordinator = coordinator
+        self.data = coordinator.data["metrics"]
         # Required for HA 2022.7
         self.coordinator_context = object()
 
@@ -88,10 +83,11 @@ class Switch(FordPassEntity, SwitchEntity):
         """Check status of switch"""
         if self.switch == "ignition":
             if (
-                self.coordinator.data is None or self.coordinator.data["remoteStartStatus"] is None
+                self.coordinator.data["metrics"] is None or self.coordinator.data["metrics"]["ignitionStatus"] is None
             ):
                 return None
-            return self.coordinator.data["remoteStartStatus"]["value"]
+            if self.coordinator.data["metrics"]["ignitionStatus"]["value"] == "OFF":
+                return False
         if self.switch == "guardmode":
             # Need to find the correct response for enabled vs disabled so this may be spotty at the moment
             guardstatus = self.coordinator.data["guardstatus"]
