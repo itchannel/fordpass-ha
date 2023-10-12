@@ -32,7 +32,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 sensors.append(sensor)
         ## SquidBytes: Added elVehCharging
         elif key == "elVehCharging":
-            if "xevBatteryChargeEvent" in sensor.coordinator.data["events"]:
+            if "xevBatteryChargeDisplayStatus" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)                        
         elif key == "dieselSystemStatus":
             if "dieselExhaustFilterStatus" in sensor.coordinator.data["metrics"]:
