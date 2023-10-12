@@ -317,7 +317,10 @@ class CarSensor(
                 for value in self.data[self.sensor]:
                     _LOGGER.debug(value)
                     if "vehicleSide" in value:
-                        doors[f"{value['vehicleSide']} : {value['vehicleDoor']}"] = value['value']
+                        if value['vehicleDoor'] == "UNSPECIFIED_FRONT":
+                            doors[f"{value['vehicleSide']} : {value['vehicleOccupantRole']}"] = value['value']
+                        else:
+                            doors[f"{value['vehicleSide']} : {value['vehicleDoor']}"] = value['value']
                     else:
                         doors[value["vehicleDoor"]] = value['value']
                 return doors
