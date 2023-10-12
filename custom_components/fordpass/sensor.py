@@ -192,6 +192,13 @@ class CarSensor(
                 return "Not Supported"
             if self.sensor == "speed":
                 return self.data[self.sensor]["value"]
+            if self.sensor == "indicators":
+                alerts = 0
+                for indicator in self.data["indicators"]:
+                    if "value" in indicator:
+                        if indicator["value"] == True:
+                            alert +=1
+                return alerts
             return None
         if ftype == "measurement":
             if self.sensor == "odometer":
@@ -487,6 +494,12 @@ class CarSensor(
                 return exhaustdata
             if self.sensor == "speed":
                 return None
+            if self.sensor == "indicators":
+                alerts = {}
+                for key, value in self.data["indicators"].items():
+                    if "value" in value:
+                        alerts[key] = value["value"]
+                return alerts
             return None
         return None
 

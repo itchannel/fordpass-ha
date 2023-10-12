@@ -44,6 +44,7 @@ SENSORS = {
     "elVeh": {"icon": "mdi:ev-station"},
     "elVehCharging": {"icon": "mdi:ev-station"},
     "speed": {"icon": "mdi:speedometer"},
+    "indicators": {"icon": "mdi:engine-outline"},
     # "deepSleepInProgress": {
     #     "icon": "mdi:power-sleep",
     #    "name": "Deep Sleep Mode Active",
