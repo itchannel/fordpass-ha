@@ -197,10 +197,10 @@ class CarSensor(
                 return self.data[self.sensor]["value"]
             if self.sensor == "indicators":
                 alerts = 0
-                for indicator in self.data["indicators"]:
+                for key, indicator in self.data["indicators"].items():
                     if "value" in indicator:
                         if indicator["value"] == True:
-                            alert +=1
+                            alerts +=1
                 return alerts
             return None
         if ftype == "measurement":
