@@ -40,6 +40,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif key == "exhaustFluidLevel":
             if "dieselExhaustFluidLevel" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
+        elif key == "indicators":
+            if "indicators" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
         else:
             sensors.append(sensor)
     async_add_entities(sensors, True)
