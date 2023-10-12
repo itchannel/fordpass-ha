@@ -318,12 +318,17 @@ class CarSensor(
                     _LOGGER.debug(value)
                     if "vehicleSide" in value:
                         if value['vehicleDoor'] == "UNSPECIFIED_FRONT":
-                            doors[f"{value['vehicleSide']} : {value['vehicleOccupantRole']}"] = value['value']
+                            doors[value['vehicleSide']] = value['value']
                         else:
-                            doors[f"{value['vehicleSide']} : {value['vehicleDoor']}"] = value['value']
+                            doors[value['vehicleDoor']] = value['value']
+                    elif value['vehicleDoor'] == "INNER_TAILGATE":
+                        if "xevBatteryRange" in self.data:
+                            value['vehicleDoor'] = "FRUNK" 
+                            doors[value['vehicleDoor']] = value['value']
                     else:
                         doors[value["vehicleDoor"]] = value['value']
                 return doors
+
             if self.sensor == "windowPosition":
                 if "windowStatus" not in self.data:
                     return None
