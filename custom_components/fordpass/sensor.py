@@ -441,6 +441,7 @@ class CarSensor(
                     battAmps = elecs["Battery Amperage"]
                 if (
                     "xevBatteryIoCurrent" in self.data and self.data["xevBatteryIoCurrent"] is not None and self.data["xevBatteryIoCurrent"]["value"] is not None
+                    and "xevBatteryVoltage" in self.data and self.data["xevBatteryVoltage"] is not None and self.data["xevBatteryVoltage"]["value"] is not None
                 ):
                     elecs["Battery kW"] =  round((battVolt * battAmps) / 1000, 2)
                     
@@ -455,7 +456,8 @@ class CarSensor(
                     elecs["Motor Amperage"] = float(self.data["xevTractionMotorCurrent"]["value"])
                     motorAmps = elecs["Motor Amperage"]
                 if (
-                    "xevTractionMotorVoltage" in self.data and self.data["xevTractionMotorVoltage"] is not None and self.data["xevTractionMotorVoltage"]["value"] is not None 
+                    "xevTractionMotorVoltage" in self.data and self.data["xevTractionMotorVoltage"] is not None and self.data["xevTractionMotorVoltage"]["value"] is not None
+                    and "xevTractionMotorCurrent" in self.data and self.data["xevTractionMotorCurrent"] is not None and self.data["xevTractionMotorCurrent"]["value"] is not None
                 ):
                     elecs["Motor kW"] =  round((motorVolt * motorAmps) / 1000, 2)
                         
@@ -516,6 +518,7 @@ class CarSensor(
                     chAmps = cs["Charging Amperage"]
                 if (
                     self.data["xevBatteryChargerCurrentOutput"]["value"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
+                    and "xevBatteryChargerVoltageOutput" in self.data and self.data["xevBatteryChargerVoltageOutput"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
                 ):
                     cs["Charging kW"] =  round((chVolt * chAmps) / 1000, 2)
             
@@ -615,10 +618,10 @@ class CarSensor(
                 if "tripFuelEconomy" in self.data:
                     if "xevBatteryVoltage" not in self.data:
                         # Do not display tripFuelEconomy if EV
+                        if "xevBatteryRange" in self.data:
+                        # DO display for Hybrid
+                            attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
                         attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
-                if "xevBatteryVoltage" in self.data:
-                    # Do not display tripFuelEconomy if EV
-                    attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
                         
                 return attribs
             if self.sensor == "indicators":
