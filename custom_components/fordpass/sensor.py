@@ -43,6 +43,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif key == "indicators":
             if "indicators" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
+        elif key == "coolantTemp":
+            if "engineCoolantTemp" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
+        elif key == "outsideTemp":
+            if "outsideTemperature" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
+        elif key == "engineOilTemp":
+            if "engineOilTemp" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
         else:
             sensors.append(sensor)
     async_add_entities(sensors, True)
@@ -202,6 +211,12 @@ class CarSensor(
                         if indicator["value"] == True:
                             alerts +=1
                 return alerts
+            if self.sensor == "coolantTemp":
+                return self.data["engineCoolantTemp"]["value"]
+            if self.sensor == "outsideTemp":
+                return self.data["outsideTemperature"]["value"]
+            if self.sensor == "engineOilTemp":
+                return self.data["engineOilTemp"]["value"]
             return None
         if ftype == "measurement":
             if self.sensor == "odometer":
@@ -214,6 +229,8 @@ class CarSensor(
                 return "%"
             if self.sensor == "oil":
                 return "%"
+            if self.sensor == "coolantTemp":
+                return "°C"
             if self.sensor == "tirePressure":
                 return None
             if self.sensor == "gps":
@@ -327,6 +344,8 @@ class CarSensor(
                             doors[value['vehicleDoor']] = value['value']
                     else:
                         doors[value["vehicleDoor"]] = value['value']
+                if "hoodStatus" in self.data:
+                    doors["Hood"] = self.data["hoodStatus"]["value"]
                 return doors
 
             if self.sensor == "windowPosition":
@@ -515,7 +534,22 @@ class CarSensor(
                     exhaustdata["Exhaust Fluid System Fault"] = self.data["indicators"]["dieselExhaustFluidSystemFault"]["value"]
                 return exhaustdata
             if self.sensor == "speed":
-                return None
+                attribs = {}
+                if "acceleratorPedalPosition" in self.data:
+                    attribs["acceleratorPedalPosition"] = self.data["acceleratorPedalPosition"]["value"]
+                if "brakePedalStatus" in self.data:
+                    attribs["brakePedalStatus"] = self.data["brakePedalStatus"]["value"]
+                if "brakeTorque" in self.data:
+                    attribs["brakeTorque"] = self.data["brakeTorque"]["value"]
+                if "engineSpeed" in self.data:
+                    attribs["engineSpeed"] = self.data["engineSpeed"]["value"]
+                if "gearLeverPosition" in self.data:
+                    attribs["gearLeverPosition"] = self.data["gearLeverPosition"]["value"]
+                if "parkingBrakeStatus" in self.data:
+                    attribs["parkingBrakeStatus"] = self.data["parkingBrakeStatus"]["value"]
+                if "torqueAtTransmission" in self.data:
+                    attribs["torqueAtTransmission"] = self.data["torqueAtTransmission"]["value"]
+                return attribs
             if self.sensor == "indicators":
                 alerts = {}
                 for key, value in self.data["indicators"].items():
@@ -574,4 +608,6 @@ class CarSensor(
                 return SensorDeviceClass.DISTANCE
             if SENSORS[self.sensor]["device_class"] == "timestamp":
                 return SensorDeviceClass.TIMESTAMP
+            if SENSORS[self.sensor]["device_class"] == "temperature":
+                return SensorDeviceClass.TEMPERATURE
         return None
