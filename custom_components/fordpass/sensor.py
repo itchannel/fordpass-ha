@@ -553,6 +553,27 @@ class CarSensor(
                     attribs["parkingBrakeStatus"] = self.data["parkingBrakeStatus"]["value"]
                 if "torqueAtTransmission" in self.data:
                     attribs["torqueAtTransmission"] = self.data["torqueAtTransmission"]["value"]
+                if "ambientTemp" in self.data:
+                    attribs["ambientTemp"] = self.data["ambientTemp"]["value"]
+                if "tripFuelEconomy" in self.data:
+                    if "xevBatteryVoltage" in self.data:
+                        # Do not display tripFuelEconomy if EV
+                        # tripXevBatteryChargeRegenerated should be a previous FordPass feature called "Driving Score". % based on how much regen vs brake you do
+                        attribs["Driving Score"] = self.data["tripXevBatteryChargeRegenerated"]["value"]
+                        if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                            attribs["Range Regenerated"] = round(float(self.data["tripXevBatteryRangeRegenerated"]["value"]) / 1.60934)
+                        else:
+                            attribs["Range Regenerated"] = self.data["tripXevBatteryRangeRegenerated"]["value"]
+                    else:
+                        # Hybrid does not seem to have xevBatteryVoltage, but does have RangeRegen and "Driving Score" keys
+                        if "tripXevBatteryChargeRegenerated" in self.data:
+                            attribs["Driving Score"] = self.data["tripXevBatteryChargeRegenerated"]["value"]
+                            if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                                attribs["Range Regenerated"] = round(float(self.data["tripXevBatteryRangeRegenerated"]["value"]) / 1.60934)
+                            else:
+                                attribs["Range Regenerated"] = self.data["tripXevBatteryRangeRegenerated"]["value"]
+                        # ICE vehicles, and Hybrid get tripFuelEconomy
+                        attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
                 return attribs
             if self.sensor == "indicators":
                 alerts = {}
