@@ -1,4 +1,11 @@
 ## **Changelog**
+### Version 1.56
+- Fix for error when missing GPS data from vehicle
+- Fix for electric vehicle error
+- Better formatting of door statuses
+- Fix for missing diesel stats
+### Version 1.55
+- Skipped due to git issue
 ### Version 1.54
 - Fixed lock/unlock status (Waits 90seconds before checking command has completed)
 - Added back diesel sensors

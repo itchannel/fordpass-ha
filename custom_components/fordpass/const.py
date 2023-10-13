@@ -35,7 +35,7 @@ SENSORS = {
     "battery": {"icon": "mdi:car-battery"},
     "oil": {"icon": "mdi:oil"},
     "tirePressure": {"icon": "mdi:car-tire-alert"},
-    "gps": {"icon": "mdi:radar"},
+    # "gps": {"icon": "mdi:radar"},
     "alarm": {"icon": "mdi:bell"},
     "ignitionStatus": {"icon": "hass:power"},
     "doorStatus": {"icon": "mdi:car-door"},
