@@ -420,6 +420,7 @@ class CarSensor(
                             )
                     else:
                         elecs["Maximum Battery Range"] = self.data["xevBatteryMaximumRange"]["value"]
+                return elecs
                     
             ## SquidBytes: Added elVehCharging
             if self.sensor == "elVehCharging":

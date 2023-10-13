@@ -563,6 +563,7 @@ class Vehicle:
 
     def __request_and_poll_command(self, command, vin=None):
         """Send command to the new Command endpoint"""
+        self.__acquire_token()
         headers = {
             **apiHeaders,
             "Application-Id": self.region,
