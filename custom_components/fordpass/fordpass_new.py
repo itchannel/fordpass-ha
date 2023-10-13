@@ -598,7 +598,7 @@ class Vehicle:
             command_id = response["id"]
             current_status = response["currentStatus"]
             i = 1
-            while i < 9:
+            while i < 14:
                 # Check status every 10 seconds for 90 seconds until command completes or time expires
                 status = self.status()
                 _LOGGER.debug("STATUS")

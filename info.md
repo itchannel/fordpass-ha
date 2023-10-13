@@ -1,4 +1,8 @@
 ## **Changelog**
+### Version 1.57
+- Rewrote command function to actively poll until success or failure is returned
+- Fixed bug where elveh attributes wasn't showing
+- Fixed bug where command wouldn't check token expiry first
 ### Version 1.56
 - Fix for error when missing GPS data from vehicle
 - Fix for electric vehicle error
