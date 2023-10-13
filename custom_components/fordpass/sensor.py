@@ -234,6 +234,8 @@ class CarSensor(
                 return "%"
             if self.sensor == "coolantTemp":
                 return "°C"
+            if self.sensor == "outsideTemp":
+                return "°C"            
             if self.sensor == "tirePressure":
                 return None
             if self.sensor == "gps":
@@ -272,6 +274,9 @@ class CarSensor(
         if ftype == "attribute":
             if self.sensor == "odometer":
                 return self.data[self.sensor].items()
+            if self.sensor == "outsideTemp":
+                if "ambientTemp" in self.data:
+                    return self.data["ambientTemp"]["value"]                
             if self.sensor == "fuel":
                 if "fuelRange" in self.data:
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
@@ -407,6 +412,20 @@ class CarSensor(
                     ]["value"]
 
                 if (
+                    # tripXevBatteryChargeRegenerated should be a previous FordPass feature called "Driving Score". A % based on how much regen vs brake you use
+                    "tripXevBatteryChargeRegenerated" in self.data and self.data["tripXevBatteryChargeRegenerated"] is not None and self.data["tripXevBatteryChargeRegenerated"]["value"] is not None
+                ):
+                    elecs["Driving Score"] = self.data["tripXevBatteryChargeRegenerated"]["value"]
+
+                if (
+                    "tripXevBatteryRangeRegenerated" in self.data and self.data["tripXevBatteryRangeRegenerated"] is not None and self.data["tripXevBatteryRangeRegenerated"]["value"] is not None
+                ):
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                        elecs["Range Regenerated"] = round(float(self.data["tripXevBatteryRangeRegenerated"]["value"]) / 1.60934)
+                    else:
+                        elecs["Range Regenerated"] = self.data["tripXevBatteryRangeRegenerated"]["value"]
+
+                if (
                     "xevBatteryCapacity" in self.data and self.data["xevBatteryCapacity"] is not None and self.data["xevBatteryCapacity"]["value"] is not None
                 ):
                     elecs["Maximum Battery Capacity"] = self.data["xevBatteryCapacity"]["value"]
@@ -421,7 +440,7 @@ class CarSensor(
                     else:
                         elecs["Maximum Battery Range"] = self.data["xevBatteryMaximumRange"]["value"]
                 return elecs
-                    
+
             ## SquidBytes: Added elVehCharging
             if self.sensor == "elVehCharging":
                 if "xevPlugChargerStatus" not in self.data:
@@ -553,26 +572,9 @@ class CarSensor(
                     attribs["parkingBrakeStatus"] = self.data["parkingBrakeStatus"]["value"]
                 if "torqueAtTransmission" in self.data:
                     attribs["torqueAtTransmission"] = self.data["torqueAtTransmission"]["value"]
-                if "ambientTemp" in self.data:
-                    attribs["ambientTemp"] = self.data["ambientTemp"]["value"]
                 if "tripFuelEconomy" in self.data:
-                    if "xevBatteryVoltage" in self.data:
+                    if "xevBatteryVoltage" not in self.data:
                         # Do not display tripFuelEconomy if EV
-                        # tripXevBatteryChargeRegenerated should be a previous FordPass feature called "Driving Score". % based on how much regen vs brake you do
-                        attribs["Driving Score"] = self.data["tripXevBatteryChargeRegenerated"]["value"]
-                        if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                            attribs["Range Regenerated"] = round(float(self.data["tripXevBatteryRangeRegenerated"]["value"]) / 1.60934)
-                        else:
-                            attribs["Range Regenerated"] = self.data["tripXevBatteryRangeRegenerated"]["value"]
-                    else:
-                        # Hybrid does not seem to have xevBatteryVoltage, but does have RangeRegen and "Driving Score" keys
-                        if "tripXevBatteryChargeRegenerated" in self.data:
-                            attribs["Driving Score"] = self.data["tripXevBatteryChargeRegenerated"]["value"]
-                            if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                                attribs["Range Regenerated"] = round(float(self.data["tripXevBatteryRangeRegenerated"]["value"]) / 1.60934)
-                            else:
-                                attribs["Range Regenerated"] = self.data["tripXevBatteryRangeRegenerated"]["value"]
-                        # ICE vehicles, and Hybrid get tripFuelEconomy
                         attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
                 return attribs
             if self.sensor == "indicators":
