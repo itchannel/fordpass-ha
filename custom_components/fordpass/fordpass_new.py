@@ -563,6 +563,7 @@ class Vehicle:
 
     def __request_and_poll_command(self, command, vin=None):
         """Send command to the new Command endpoint"""
+        self.__acquire_token()
         headers = {
             **apiHeaders,
             "Application-Id": self.region,
@@ -592,8 +593,36 @@ class Vehicle:
         _LOGGER.debug(r.status_code)
         _LOGGER.debug(r.text)
         if r.status_code == 201:
-            time.sleep(90)
-            return True
+            # New code to hanble checking states table from vehicle data
+            response = r.json()
+            command_id = response["id"]
+            current_status = response["currentStatus"]
+            i = 1
+            while i < 14:
+                # Check status every 10 seconds for 90 seconds until command completes or time expires
+                status = self.status()
+                _LOGGER.debug("STATUS")
+                _LOGGER.debug(status)
+
+                if "states" in status:
+                    _LOGGER.debug("States located")
+                    if f"{command}Command" in status["states"]:
+                        _LOGGER.debug("Found command")
+                        _LOGGER.debug(status["states"][f"{command}Command"]["commandId"])
+                        if status["states"][f"{command}Command"]["commandId"] == command_id:
+                            _LOGGER.debug("Making progress")
+                            _LOGGER.debug(status["states"][f"{command}Command"])
+                            if status["states"][f"{command}Command"]["value"]["toState"] == "success":
+                                _LOGGER.debug("Command succeeded")
+                                return True
+                            if status["states"][f"{command}Command"]["value"]["toState"] == "expired":
+                                _LOGGER.debug("Command expired")
+                                return False
+                i += 1
+                _LOGGER.debug("Looping again")
+                time.sleep(10)
+            #time.sleep(90)
+            return False
         return False
 
     def __request_and_poll(self, method, url):
