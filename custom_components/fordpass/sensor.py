@@ -32,7 +32,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 sensors.append(sensor)
         ## SquidBytes: Added elVehCharging
         elif key == "elVehCharging":
-            if "xevBatteryChargeEvent" in sensor.coordinator.data["events"]:
+            if "xevBatteryChargeDisplayStatus" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)                        
         elif key == "dieselSystemStatus":
             if "dieselExhaustFilterStatus" in sensor.coordinator.data["metrics"]:
@@ -317,10 +317,18 @@ class CarSensor(
                 for value in self.data[self.sensor]:
                     _LOGGER.debug(value)
                     if "vehicleSide" in value:
-                        doors[f"{value['vehicleSide']} : {value['vehicleDoor']}"] = value['value']
+                        if value['vehicleDoor'] == "UNSPECIFIED_FRONT":
+                            doors[value['vehicleSide']] = value['value']
+                        else:
+                            doors[value['vehicleDoor']] = value['value']
+                    elif value['vehicleDoor'] == "INNER_TAILGATE":
+                        if "xevBatteryCapacity" in self.data:
+                            value['vehicleDoor'] = "FRUNK" 
+                            doors[value['vehicleDoor']] = value['value']
                     else:
                         doors[value["vehicleDoor"]] = value['value']
                 return doors
+
             if self.sensor == "windowPosition":
                 if "windowStatus" not in self.data:
                     return None
@@ -333,11 +341,7 @@ class CarSensor(
             if self.sensor == "elVeh":
                 if "xevBatteryRange" not in self.data:
                     return None
-                elecs = {}
-                if (
-                    "xevBatteryCapacity" in self.data and self.data["xevBatteryCapacity"] is not None and self.data["xevBatteryCapacity"]["value"] is not None
-                ):
-                    elecs["xevBatteryCapacity"] = self.data["xevBatteryCapacity"]["value"]
+                elecs = {}                    
                 if (
                     "xevPlugChargerStatus" in self.data and self.data["xevPlugChargerStatus"] is not None and self.data["xevPlugChargerStatus"]["value"] is not None
                 ):
@@ -379,7 +383,22 @@ class CarSensor(
                     elecs["Battery Charge"] = self.data[
                         "xevBatteryStateOfCharge"
                     ]["value"]
-                return elecs
+
+                if (
+                    "xevBatteryCapacity" in self.data and self.data["xevBatteryCapacity"] is not None and self.data["xevBatteryCapacity"]["value"] is not None
+                ):
+                    elecs["Maximum Battery Capacity"] = self.data["xevBatteryCapacity"]["value"]
+
+                if (
+                    "xevBatteryMaximumRange" in self.data and self.data["xevBatteryMaximumRange"] is not None and self.data["xevBatteryMaximumRange"]["value"] is not None
+                ):
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                        elecs["Maximum Battery Range"] = round(
+                                float(self.data["xevBatteryMaximumRange"]["value"]) / 1.60934
+                            )
+                    else:
+                        elecs["Maximum Battery Range"] = self.data["xevBatteryMaximumRange"]["value"]
+                    
             ## SquidBytes: Added elVehCharging
             if self.sensor == "elVehCharging":
                 if "xevPlugChargerStatus" not in self.data:
