@@ -259,8 +259,8 @@ class Vehicle:
         if self.auto_token is None or self.auto_expires_at is None:
             self.auth()
             pass
-        self.auto_token = data["auto_token"]
-        self.auto_expires_at = data["auto_expiry"]
+        # self.auto_token = data["auto_token"]
+        # self.auto_expires_at = data["auto_expiry"]
         if self.expires_at:
             if time.time() >= self.expires_at:
                 _LOGGER.debug("No token, or has expired, requesting new token")
