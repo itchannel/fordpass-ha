@@ -4,6 +4,9 @@
 - Fix for electric vehicle error
 - Better formatting of door statuses
 - Fix for missing diesel stats
+- Fix for initial integration error on startup
+- Added temperature sensors
+- Added extra attributes to speed sensor e.g. pedal positions and RPM
 ### Version 1.55
 - Skipped due to git issue
 ### Version 1.54
