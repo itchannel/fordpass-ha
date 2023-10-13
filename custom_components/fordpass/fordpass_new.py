@@ -235,6 +235,11 @@ class Vehicle:
         if self.save_token:
             if os.path.isfile(self.token_location):
                 data = self.read_token()
+                self.token = data["access_token"]
+                self.refresh_token = data["refresh_token"]
+                self.expires_at = data["expiry_date"]
+                self.auto_token = data["auto_token"]
+                self.auto_expires_at = data["auto_expiry"]
             else:
                 data = {}
                 data["access_token"] = self.token
@@ -249,15 +254,13 @@ class Vehicle:
             data["expiry_date"] = self.expires_at
             data["auto_token"] = self.auto_token
             data["auto_expiry"] = self.auto_expires_at
-        self.token = data["access_token"]
-        self.expires_at = data["expiry_date"]
         _LOGGER.debug(self.auto_token)
         _LOGGER.debug(self.auto_expires_at)
         if self.auto_token is None or self.auto_expires_at is None:
             self.auth()
             pass
-        self.auto_token = data["auto_token"]
-        self.auto_expires_at = data["auto_expiry"]
+        # self.auto_token = data["auto_token"]
+        # self.auto_expires_at = data["auto_expiry"]
         if self.expires_at:
             if time.time() >= self.expires_at:
                 _LOGGER.debug("No token, or has expired, requesting new token")
@@ -407,6 +410,8 @@ class Vehicle:
             return result["result"]["messages"]
             # _LOGGER.debug(result)
         _LOGGER.debug(response.text)
+        if response.status_code == 401:
+            self.auth()
         response.raise_for_status()
         return None
 
@@ -444,6 +449,8 @@ class Vehicle:
             _LOGGER.debug(result)
             return result
         _LOGGER.debug(response.text)
+        if response.status_code == 401:
+            self.auth()
         response.raise_for_status()
         return None
 

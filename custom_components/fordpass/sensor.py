@@ -32,7 +32,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 sensors.append(sensor)
         ## SquidBytes: Added elVehCharging
         elif key == "elVehCharging":
-            if "xevBatteryChargeEvent" in sensor.coordinator.data["events"]:
+            if "xevBatteryChargeDisplayStatus" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)                        
         elif key == "dieselSystemStatus":
             if "dieselExhaustFilterStatus" in sensor.coordinator.data["metrics"]:
@@ -42,6 +42,18 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 sensors.append(sensor)
         elif key == "indicators":
             if "indicators" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
+        elif key == "coolantTemp":
+            if "engineCoolantTemp" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
+        elif key == "outsideTemp":
+            if "outsideTemperature" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
+        elif key == "engineOilTemp":
+            if "engineOilTemp" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
+        elif key == "windowPosition":
+            if "windowStatus" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
         else:
             sensors.append(sensor)
@@ -101,9 +113,9 @@ class CarSensor(
                     return self.data["tirePressureSystemStatus"][0]["value"]
                 return "Not Supported"
             if self.sensor == "gps":
-                if self.data["position"] is None:
-                    return "Unsupported"
-                return self.data["position"]["value"]
+                if "position" in self.data :
+                    return self.data["position"]["value"]
+                return "Unsupported"
             if self.sensor == "alarm":
                 return self.data["alarmStatus"]["value"]
             if self.sensor == "ignitionStatus":
@@ -197,11 +209,17 @@ class CarSensor(
                 return self.data[self.sensor]["value"]
             if self.sensor == "indicators":
                 alerts = 0
-                for indicator in self.data["indicators"]:
+                for key, indicator in self.data["indicators"].items():
                     if "value" in indicator:
                         if indicator["value"] == True:
-                            alert +=1
+                            alerts +=1
                 return alerts
+            if self.sensor == "coolantTemp":
+                return self.data["engineCoolantTemp"]["value"]
+            if self.sensor == "outsideTemp":
+                return self.data["outsideTemperature"]["value"]
+            if self.sensor == "engineOilTemp":
+                return self.data["engineOilTemp"]["value"]
             return None
         if ftype == "measurement":
             if self.sensor == "odometer":
@@ -214,6 +232,8 @@ class CarSensor(
                 return "%"
             if self.sensor == "oil":
                 return "%"
+            if self.sensor == "coolantTemp":
+                return "°C"
             if self.sensor == "tirePressure":
                 return None
             if self.sensor == "gps":
@@ -301,9 +321,9 @@ class CarSensor(
                     return tirepress
                 return None
             if self.sensor == "gps":
-                if self.data["position"] is None:
-                    return None
-                return self.data["position"].items()
+                if "position" in self.data:
+                    return self.data["position"].items()
+                return None
             if self.sensor == "alarm":
                 return self.data["alarmStatus"].items()
             if self.sensor == "ignitionStatus":
@@ -317,10 +337,20 @@ class CarSensor(
                 for value in self.data[self.sensor]:
                     _LOGGER.debug(value)
                     if "vehicleSide" in value:
-                        doors[f"{value['vehicleSide']} : {value['vehicleDoor']}"] = value['value']
+                        if value['vehicleDoor'] == "UNSPECIFIED_FRONT":
+                            doors[value['vehicleSide']] = value['value']
+                        else:
+                            doors[value['vehicleDoor']] = value['value']
+                    elif value['vehicleDoor'] == "INNER_TAILGATE":
+                        if "xevBatteryCapacity" in self.data:
+                            value['vehicleDoor'] = "FRUNK" 
+                            doors[value['vehicleDoor']] = value['value']
                     else:
                         doors[value["vehicleDoor"]] = value['value']
+                if "hoodStatus" in self.data:
+                    doors["Hood"] = self.data["hoodStatus"]["value"]
                 return doors
+
             if self.sensor == "windowPosition":
                 if "windowStatus" not in self.data:
                     return None
@@ -333,11 +363,7 @@ class CarSensor(
             if self.sensor == "elVeh":
                 if "xevBatteryRange" not in self.data:
                     return None
-                elecs = {}
-                if (
-                    "xevBatteryCapacity" in self.data and self.data["xevBatteryCapacity"] is not None and self.data["xevBatteryCapacity"]["value"] is not None
-                ):
-                    elecs["xevBatteryCapacity"] = self.data["xevBatteryCapacity"]["value"]
+                elecs = {}                    
                 if (
                     "xevPlugChargerStatus" in self.data and self.data["xevPlugChargerStatus"] is not None and self.data["xevPlugChargerStatus"]["value"] is not None
                 ):
@@ -379,7 +405,22 @@ class CarSensor(
                     elecs["Battery Charge"] = self.data[
                         "xevBatteryStateOfCharge"
                     ]["value"]
-                return elecs
+
+                if (
+                    "xevBatteryCapacity" in self.data and self.data["xevBatteryCapacity"] is not None and self.data["xevBatteryCapacity"]["value"] is not None
+                ):
+                    elecs["Maximum Battery Capacity"] = self.data["xevBatteryCapacity"]["value"]
+
+                if (
+                    "xevBatteryMaximumRange" in self.data and self.data["xevBatteryMaximumRange"] is not None and self.data["xevBatteryMaximumRange"]["value"] is not None
+                ):
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                        elecs["Maximum Battery Range"] = round(
+                                float(self.data["xevBatteryMaximumRange"]["value"]) / 1.60934
+                            )
+                    else:
+                        elecs["Maximum Battery Range"] = self.data["xevBatteryMaximumRange"]["value"]
+                    
             ## SquidBytes: Added elVehCharging
             if self.sensor == "elVehCharging":
                 if "xevPlugChargerStatus" not in self.data:
@@ -481,7 +522,7 @@ class CarSensor(
                     messages[value["messageSubject"]] = value["createdDate"]
                 return messages
             if self.sensor == "dieselSystemStatus":
-                    if "dieselExhaustOverTemp" in self.data["indicators"]:
+                    if "indicators" in self.data and "dieselExhaustOverTemp" in self.data["indicators"]:
                         return {
                             "Diesel Exhaust Over Temp": self.data["indicators"]["dieselExhaustOverTemp"]["value"]
                         }
@@ -490,13 +531,28 @@ class CarSensor(
                 exhaustdata = {}
                 if "dieselExhaustFluidLevelRangeRemaining" in self.data:
                     exhaustdata["Exhaust Fluid Range"] = self.data["dieselExhaustFluidLevelRangeRemaining"]["value"]
-                if "dieselExhaustFluidLow" in self.data["indicators"]:
+                if "indicators" in self.data and "dieselExhaustFluidLow" in self.data["indicators"]:
                     exhaustdata["Exhaust Fluid Low"] = self.data["indicators"]["dieselExhaustFluidLow"]["value"]
-                if "dieselExhaustFluidSystemFault" in self.data["indicators"]:
+                if "indicators" in self.data and "dieselExhaustFluidSystemFault" in self.data["indicators"]:
                     exhaustdata["Exhaust Fluid System Fault"] = self.data["indicators"]["dieselExhaustFluidSystemFault"]["value"]
                 return exhaustdata
             if self.sensor == "speed":
-                return None
+                attribs = {}
+                if "acceleratorPedalPosition" in self.data:
+                    attribs["acceleratorPedalPosition"] = self.data["acceleratorPedalPosition"]["value"]
+                if "brakePedalStatus" in self.data:
+                    attribs["brakePedalStatus"] = self.data["brakePedalStatus"]["value"]
+                if "brakeTorque" in self.data:
+                    attribs["brakeTorque"] = self.data["brakeTorque"]["value"]
+                if "engineSpeed" in self.data:
+                    attribs["engineSpeed"] = self.data["engineSpeed"]["value"]
+                if "gearLeverPosition" in self.data:
+                    attribs["gearLeverPosition"] = self.data["gearLeverPosition"]["value"]
+                if "parkingBrakeStatus" in self.data:
+                    attribs["parkingBrakeStatus"] = self.data["parkingBrakeStatus"]["value"]
+                if "torqueAtTransmission" in self.data:
+                    attribs["torqueAtTransmission"] = self.data["torqueAtTransmission"]["value"]
+                return attribs
             if self.sensor == "indicators":
                 alerts = {}
                 for key, value in self.data["indicators"].items():
@@ -555,4 +611,6 @@ class CarSensor(
                 return SensorDeviceClass.DISTANCE
             if SENSORS[self.sensor]["device_class"] == "timestamp":
                 return SensorDeviceClass.TIMESTAMP
+            if SENSORS[self.sensor]["device_class"] == "temperature":
+                return SensorDeviceClass.TEMPERATURE
         return None

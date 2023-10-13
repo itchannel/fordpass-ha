@@ -35,7 +35,7 @@ SENSORS = {
     "battery": {"icon": "mdi:car-battery"},
     "oil": {"icon": "mdi:oil"},
     "tirePressure": {"icon": "mdi:car-tire-alert"},
-    "gps": {"icon": "mdi:radar"},
+    # "gps": {"icon": "mdi:radar"},
     "alarm": {"icon": "mdi:bell"},
     "ignitionStatus": {"icon": "hass:power"},
     "doorStatus": {"icon": "mdi:car-door"},
@@ -45,6 +45,9 @@ SENSORS = {
     "elVehCharging": {"icon": "mdi:ev-station"},
     "speed": {"icon": "mdi:speedometer"},
     "indicators": {"icon": "mdi:engine-outline"},
+    "coolantTemp" : {"icon": "mdi:coolant-temperature", "state_class": "measurement", "device_class": "temperature"},
+    "outsideTemp" : {"icon": "mdi:thermometer", "state_class": "measurement", "device_class": "temperature"},
+    "engineOilTemp" : {"icon": "mdi:oil-temperature", "state_class": "measurement", "device_class": "temperature"},
     # "deepSleepInProgress": {
     #     "icon": "mdi:power-sleep",
     #    "name": "Deep Sleep Mode Active",

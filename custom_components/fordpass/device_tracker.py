@@ -15,7 +15,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
 
     # Added a check to see if the car supports GPS
-    if entry.data["metrics"]["position"] is not None:
+    if "position" in entry.data["metrics"] and entry.data["metrics"]["position"] is not None:
         async_add_entities([CarTracker(entry, "gps")], True)
     else:
         _LOGGER.debug("Vehicle does not support GPS")
@@ -59,8 +59,14 @@ class CarTracker(FordPassEntity, TrackerEntity):
 
     @property
     def extra_state_attributes(self):
-        """No extra attributes to return"""
-        return None
+        atts = {}
+        if "alt" in self.coordinator.data["metrics"]["position"]["value"]["location"]:
+            atts["Altitude"] = self.coordinator.data["metrics"]["position"]["value"]["location"]["alt"]
+        if "gpsCoordinateMethod" in self.coordinator.data["metrics"]["position"]["value"]:
+            atts["gpsCoordinateMethod"] = self.coordinator.data["metrics"]["position"]["value"]["gpsCoordinateMethod"]
+        if "gpsDimension" in self.coordinator.data["metrics"]["position"]["value"]:
+            atts["gpsDimension"] = self.coordinator.data["metrics"]["position"]["value"]["gpsDimension"]
+        return atts
 
     @property
     def icon(self):
