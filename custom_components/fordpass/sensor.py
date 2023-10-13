@@ -52,6 +52,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif key == "engineOilTemp":
             if "engineOilTemp" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
+        elif key == "windowPosition":
+            if "windowStatus" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
         else:
             sensors.append(sensor)
     async_add_entities(sensors, True)
