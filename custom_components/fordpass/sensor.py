@@ -384,20 +384,6 @@ class CarSensor(
                     ]["value"]
 
                 if (
-                    "xevChargeStationPowerType" in self.data and self.data["xevChargeStationPowerType"] is not None and self.data["xevChargeStationPowerType"]["value"] is not None
-                ):
-                    elecs["Charger Power Type"] = self.data[
-                        "xevChargeStationPowerType"
-                    ]["value"]
-
-                if (
-                    "xevChargeStationCommunicationStatus" in self.data and self.data["xevChargeStationCommunicationStatus"] is not None and self.data["xevChargeStationCommunicationStatus"]["value"] is not None
-                ):
-                    elecs["Battery Charge Status"] = self.data[
-                        "xevChargeStationCommunicationStatus"
-                    ]["value"]
-
-                if (
                     "xevBatteryPerformanceStatus" in self.data and self.data["xevBatteryPerformanceStatus"] is not None and self.data["xevBatteryPerformanceStatus"]["value"] is not None
                 ):
                     elecs["Battery Performance Status"] = self.data[
@@ -409,6 +395,13 @@ class CarSensor(
                 ):
                     elecs["Battery Charge"] = self.data[
                         "xevBatteryStateOfCharge"
+                    ]["value"]
+
+                if (
+                    "xevBatteryActualStateOfCharge" in self.data and self.data["xevBatteryActualStateOfCharge"] is not None and self.data["xevBatteryActualStateOfCharge"]["value"] is not None
+                ):
+                    elecs["Battery Actual Charge"] = self.data[
+                        "xevBatteryActualStateOfCharge"
                     ]["value"]
 
                 if (
@@ -439,6 +432,35 @@ class CarSensor(
                             )
                     else:
                         elecs["Maximum Battery Range"] = self.data["xevBatteryMaximumRange"]["value"]
+                if (
+                    "xevBatteryVoltage" in self.data and self.data["xevBatteryVoltage"] is not None and self.data["xevBatteryVoltage"]["value"] is not None
+                ):
+                    elecs["Battery Voltage"] = float(self.data["xevBatteryVoltage"]["value"])
+                    battVolt = elecs["Charging Voltage"]
+                if (
+                    "xevBatteryIoCurrent" in self.data and self.data["xevBatteryIoCurrent"] is not None and self.data["xevBatteryIoCurrent"]["value"] is not None
+                ):
+                    elecs["Battery Amperage"] = float(self.data["xevBatteryIoCurrent"]["value"])
+                    battAmps = elecs["Battery Amperage"]
+                if (
+                    self.data["xevBatteryIoCurrent"]["value"] is not None and self.data["xevBatteryVoltage"]["value"] is not None
+                ):
+                    elecs["Battery kW"] =  round((battVolt * battAmps) / 1000, 2)
+                if (
+                    "xevTractionMotorVoltage" in self.data and self.data["xevTractionMotorVoltage"] is not None and self.data["xevTractionMotorVoltage"]["value"] is not None
+                ):
+                    elecs["Motor Voltage"] = float(self.data["xevTractionMotorVoltage"]["value"])
+                    motorVolt = elecs["Motor Voltage"]
+                if (
+                    "xevTractionMotorCurrent" in self.data and self.data["xevTractionMotorCurrent"] is not None and self.data["xevTractionMotorCurrent"]["value"] is not None
+                ):
+                    elecs["Motor Amperage"] = float(self.data["xevTractionMotorCurrent"]["value"])
+                    motorAmps = elecs["Motor Amperage"]
+                if (
+                    self.data["xevTractionMotorCurrent"]["value"] is not None and self.data["xevTractionMotorVoltage"]["value"] is not None
+                ):
+                    elecs["Motor kW"] =  round((motorVolt * motorAmps) / 1000, 2)
+                        
                 return elecs
 
             ## SquidBytes: Added elVehCharging
@@ -464,6 +486,15 @@ class CarSensor(
                 ):
                     cs["Charge Station Status"] = self.data["xevChargeStationCommunicationStatus"]["value"]
                 if (
+                    "tripXevBatteryDistanceAccumulated" in self.data and self.data["tripXevBatteryDistanceAccumulated"] is not None and self.data["tripXevBatteryDistanceAccumulated"]["value"] is not None
+                ):
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                        cs["Distance Accumulated"] = round(
+                                float(self.data["tripXevBatteryDistanceAccumulated"]["value"]) / 1.60934
+                            )
+                    else:
+                        cs["Distance Accumulated"] = self.data["tripXevBatteryDistanceAccumulated"]["value"]
+                if (
                     "xevBatteryTemperature" in self.data and self.data["xevBatteryTemperature"] is not None and self.data["xevBatteryTemperature"]["value"] is not None
                 ):
                     cs["Battery Temperature"] = self.data["xevBatteryTemperature"]["value"]
@@ -478,7 +509,7 @@ class CarSensor(
                     cs["Charging Amperage"] = float(self.data["xevBatteryChargerCurrentOutput"]["value"])
                     chAmps = cs["Charging Amperage"]
                 if (
-                    "xevBatteryChargerCurrentOutput" in self.data and self.data["xevBatteryChargerCurrentOutput"]["value"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
+                    self.data["xevBatteryChargerCurrentOutput"]["value"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
                 ):
                     cs["Charging kW"] =  round((chVolt * chAmps) / 1000, 2)
             
@@ -565,7 +596,9 @@ class CarSensor(
                 if "brakeTorque" in self.data:
                     attribs["brakeTorque"] = self.data["brakeTorque"]["value"]
                 if "engineSpeed" in self.data:
-                    attribs["engineSpeed"] = self.data["engineSpeed"]["value"]
+                    # Do not display for EV
+                    if "xevBatteryVoltage" not in self.data:
+                        attribs["engineSpeed"] = self.data["engineSpeed"]["value"]
                 if "gearLeverPosition" in self.data:
                     attribs["gearLeverPosition"] = self.data["gearLeverPosition"]["value"]
                 if "parkingBrakeStatus" in self.data:
@@ -576,6 +609,10 @@ class CarSensor(
                     if "xevBatteryVoltage" not in self.data:
                         # Do not display tripFuelEconomy if EV
                         attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
+                if "xevBatteryVoltage" in self.data:
+                    # Do not display tripFuelEconomy if EV
+                    attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
+                        
                 return attribs
             if self.sensor == "indicators":
                 alerts = {}
