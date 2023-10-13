@@ -410,6 +410,8 @@ class Vehicle:
             return result["result"]["messages"]
             # _LOGGER.debug(result)
         _LOGGER.debug(response.text)
+        if response.status_code == 401:
+            self.auth()
         response.raise_for_status()
         return None
 
@@ -447,6 +449,8 @@ class Vehicle:
             _LOGGER.debug(result)
             return result
         _LOGGER.debug(response.text)
+        if response.status_code == 401:
+            self.auth()
         response.raise_for_status()
         return None
 
