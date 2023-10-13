@@ -7,6 +7,8 @@
 - Fix for initial integration error on startup
 - Added temperature sensors
 - Added extra attributes to speed sensor e.g. pedal positions and RPM
+- Removed GPS sensor (All stats are in device_tracker entity)
+- Added check if window position if supported, if not entity is not added
 ### Version 1.55
 - Skipped due to git issue
 ### Version 1.54
