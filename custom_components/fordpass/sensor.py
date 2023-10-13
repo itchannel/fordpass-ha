@@ -101,9 +101,9 @@ class CarSensor(
                     return self.data["tirePressureSystemStatus"][0]["value"]
                 return "Not Supported"
             if self.sensor == "gps":
-                if self.data["position"] is None:
-                    return "Unsupported"
-                return self.data["position"]["value"]
+                if "position" in self.data :
+                    return self.data["position"]["value"]
+                return "Unsupported"
             if self.sensor == "alarm":
                 return self.data["alarmStatus"]["value"]
             if self.sensor == "ignitionStatus":
@@ -301,9 +301,9 @@ class CarSensor(
                     return tirepress
                 return None
             if self.sensor == "gps":
-                if self.data["position"] is None:
-                    return None
-                return self.data["position"].items()
+                if "position" in self.data:
+                    return self.data["position"].items()
+                return None
             if self.sensor == "alarm":
                 return self.data["alarmStatus"].items()
             if self.sensor == "ignitionStatus":
@@ -500,7 +500,7 @@ class CarSensor(
                     messages[value["messageSubject"]] = value["createdDate"]
                 return messages
             if self.sensor == "dieselSystemStatus":
-                    if "dieselExhaustOverTemp" in self.data["indicators"]:
+                    if "indicators" in self.data and "dieselExhaustOverTemp" in self.data["indicators"]:
                         return {
                             "Diesel Exhaust Over Temp": self.data["indicators"]["dieselExhaustOverTemp"]["value"]
                         }
@@ -509,9 +509,9 @@ class CarSensor(
                 exhaustdata = {}
                 if "dieselExhaustFluidLevelRangeRemaining" in self.data:
                     exhaustdata["Exhaust Fluid Range"] = self.data["dieselExhaustFluidLevelRangeRemaining"]["value"]
-                if "dieselExhaustFluidLow" in self.data["indicators"]:
+                if "indicators" in self.data and "dieselExhaustFluidLow" in self.data["indicators"]:
                     exhaustdata["Exhaust Fluid Low"] = self.data["indicators"]["dieselExhaustFluidLow"]["value"]
-                if "dieselExhaustFluidSystemFault" in self.data["indicators"]:
+                if "indicators" in self.data and "dieselExhaustFluidSystemFault" in self.data["indicators"]:
                     exhaustdata["Exhaust Fluid System Fault"] = self.data["indicators"]["dieselExhaustFluidSystemFault"]["value"]
                 return exhaustdata
             if self.sensor == "speed":
