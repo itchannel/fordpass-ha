@@ -215,10 +215,16 @@ class CarSensor(
                             alerts +=1
                 return alerts
             if self.sensor == "coolantTemp":
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                    return round(float(self.data["engineCoolantTemp"]["value"] * 9/5) + 32)
                 return self.data["engineCoolantTemp"]["value"]
             if self.sensor == "outsideTemp":
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                    return round(float(self.data["outsideTemperature"]["value"] * 9/5) + 32)
                 return self.data["outsideTemperature"]["value"]
             if self.sensor == "engineOilTemp":
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                    return round(float(self.data["engineOilTemp"]["value"] * 9/5) + 32)
                 return self.data["engineOilTemp"]["value"]
             return None
         if ftype == "measurement":
@@ -233,9 +239,13 @@ class CarSensor(
             if self.sensor == "oil":
                 return "%"
             if self.sensor == "coolantTemp":
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                    return "°F"
                 return "°C"
             if self.sensor == "outsideTemp":
-                return "°C"            
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                    return "°F"
+                return "°C"
             if self.sensor == "tirePressure":
                 return None
             if self.sensor == "gps":
@@ -275,8 +285,10 @@ class CarSensor(
             if self.sensor == "odometer":
                 return self.data[self.sensor].items()
             if self.sensor == "outsideTemp":
-                if "ambientTemp" in self.data:
-                    return self.data["ambientTemp"]["value"]                
+                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                    return round(float(self.data["ambientTemp"]["value"] * 9/5) + 32)
+                return self.data["ambientTemp"]["value"]   
+
             if self.sensor == "fuel":
                 if "fuelRange" in self.data:
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
@@ -497,7 +509,10 @@ class CarSensor(
                 if (
                     "xevBatteryTemperature" in self.data and self.data["xevBatteryTemperature"] is not None and self.data["xevBatteryTemperature"]["value"] is not None
                 ):
-                    cs["Battery Temperature"] = self.data["xevBatteryTemperature"]["value"]
+                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                        cs["Battery Temperature"] = round(float(self.data["xevBatteryTemperature"]["value"] * 9/5) + 32)
+                    else: 
+                        cs["Battery Temperature"] = self.data["xevBatteryTemperature"]["value"]
                 if (
                     "xevBatteryChargerVoltageOutput" in self.data and self.data["xevBatteryChargerVoltageOutput"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
                 ):
@@ -596,8 +611,8 @@ class CarSensor(
                 if "brakeTorque" in self.data:
                     attribs["brakeTorque"] = self.data["brakeTorque"]["value"]
                 if "engineSpeed" in self.data:
-                    # Do not display for EV
                     if "xevBatteryVoltage" not in self.data:
+                        # Do not display for EV
                         attribs["engineSpeed"] = self.data["engineSpeed"]["value"]
                 if "gearLeverPosition" in self.data:
                     attribs["gearLeverPosition"] = self.data["gearLeverPosition"]["value"]
