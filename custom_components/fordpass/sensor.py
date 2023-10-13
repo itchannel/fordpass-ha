@@ -286,9 +286,8 @@ class CarSensor(
                 return self.data[self.sensor].items()
             if self.sensor == "outsideTemp":
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return round(float(self.data["ambientTemp"]["value"] * 9/5) + 32)
-                return self.data["ambientTemp"]["value"]   
-
+                    return {"Ambient Temp": round(float(self.data["ambientTemp"]["value"] * 9/5) + 32)}
+                return {"Ambient Temp": self.data["ambientTemp"]["value"]}
             if self.sensor == "fuel":
                 if "fuelRange" in self.data:
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
@@ -382,20 +381,6 @@ class CarSensor(
                     return None
                 elecs = {}                    
                 if (
-                    "xevPlugChargerStatus" in self.data and self.data["xevPlugChargerStatus"] is not None and self.data["xevPlugChargerStatus"]["value"] is not None
-                ):
-                    elecs["Plug Status"] = self.data["xevPlugChargerStatus"][
-                        "value"
-                    ]
-
-                if (
-                    "xevBatteryChargeDisplayStatus" in self.data and self.data["xevBatteryChargeDisplayStatus"] is not None and self.data["xevBatteryChargeDisplayStatus"]["value"] is not None
-                ):
-                    elecs["Charging Status"] = self.data[
-                        "xevBatteryChargeDisplayStatus"
-                    ]["value"]
-
-                if (
                     "xevBatteryPerformanceStatus" in self.data and self.data["xevBatteryPerformanceStatus"] is not None and self.data["xevBatteryPerformanceStatus"]["value"] is not None
                 ):
                     elecs["Battery Performance Status"] = self.data[
@@ -416,8 +401,8 @@ class CarSensor(
                         "xevBatteryActualStateOfCharge"
                     ]["value"]
 
+                # tripXevBatteryChargeRegenerated should be a previous FordPass feature called "Driving Score". A % based on how much regen vs brake you use
                 if (
-                    # tripXevBatteryChargeRegenerated should be a previous FordPass feature called "Driving Score". A % based on how much regen vs brake you use
                     "tripXevBatteryChargeRegenerated" in self.data and self.data["tripXevBatteryChargeRegenerated"] is not None and self.data["tripXevBatteryChargeRegenerated"]["value"] is not None
                 ):
                     elecs["Driving Score"] = self.data["tripXevBatteryChargeRegenerated"]["value"]
@@ -439,25 +424,26 @@ class CarSensor(
                     "xevBatteryMaximumRange" in self.data and self.data["xevBatteryMaximumRange"] is not None and self.data["xevBatteryMaximumRange"]["value"] is not None
                 ):
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        elecs["Maximum Battery Range"] = round(
-                                float(self.data["xevBatteryMaximumRange"]["value"]) / 1.60934
-                            )
+                        elecs["Maximum Battery Range"] = round(float(self.data["xevBatteryMaximumRange"]["value"]) / 1.60934)
                     else:
                         elecs["Maximum Battery Range"] = self.data["xevBatteryMaximumRange"]["value"]
+
                 if (
                     "xevBatteryVoltage" in self.data and self.data["xevBatteryVoltage"] is not None and self.data["xevBatteryVoltage"]["value"] is not None
                 ):
                     elecs["Battery Voltage"] = float(self.data["xevBatteryVoltage"]["value"])
-                    battVolt = elecs["Charging Voltage"]
+                    battVolt = elecs["Battery Voltage"]
+
                 if (
                     "xevBatteryIoCurrent" in self.data and self.data["xevBatteryIoCurrent"] is not None and self.data["xevBatteryIoCurrent"]["value"] is not None
                 ):
                     elecs["Battery Amperage"] = float(self.data["xevBatteryIoCurrent"]["value"])
                     battAmps = elecs["Battery Amperage"]
                 if (
-                    self.data["xevBatteryIoCurrent"]["value"] is not None and self.data["xevBatteryVoltage"]["value"] is not None
+                    "xevBatteryIoCurrent" in self.data and self.data["xevBatteryIoCurrent"] is not None and self.data["xevBatteryIoCurrent"]["value"] is not None
                 ):
                     elecs["Battery kW"] =  round((battVolt * battAmps) / 1000, 2)
+                    
                 if (
                     "xevTractionMotorVoltage" in self.data and self.data["xevTractionMotorVoltage"] is not None and self.data["xevTractionMotorVoltage"]["value"] is not None
                 ):
@@ -469,7 +455,7 @@ class CarSensor(
                     elecs["Motor Amperage"] = float(self.data["xevTractionMotorCurrent"]["value"])
                     motorAmps = elecs["Motor Amperage"]
                 if (
-                    self.data["xevTractionMotorCurrent"]["value"] is not None and self.data["xevTractionMotorVoltage"]["value"] is not None
+                    "xevTractionMotorVoltage" in self.data and self.data["xevTractionMotorVoltage"] is not None and self.data["xevTractionMotorVoltage"]["value"] is not None 
                 ):
                     elecs["Motor kW"] =  round((motorVolt * motorAmps) / 1000, 2)
                         
@@ -479,13 +465,18 @@ class CarSensor(
             if self.sensor == "elVehCharging":
                 if "xevPlugChargerStatus" not in self.data:
                     return None
-
                 cs = {}
+
+                if (
+                    "xevPlugChargerStatus" in self.data and self.data["xevPlugChargerStatus"] is not None and self.data["xevPlugChargerStatus"]["value"] is not None
+                ):
+                    cs["Plug Status"] = self.data["xevPlugChargerStatus"]["value"]
 
                 if (
                     "xevBatteryStateOfCharge" in self.data and self.data["xevBatteryStateOfCharge"] is not None and self.data["xevBatteryStateOfCharge"]["value"] is not None
                 ):
                     cs["Charging State of Charge"] = self.data["xevBatteryStateOfCharge"]["value"]
+                    
                 if ("xevBatteryChargeDisplayStatus" in self.data and self.data["xevBatteryChargeDisplayStatus"] is not None and self.data["xevBatteryChargeDisplayStatus"]["value"] is not None
                 ):
                     cs["Charging Status"] = self.data["xevBatteryChargeDisplayStatus"]["value"]
@@ -510,9 +501,9 @@ class CarSensor(
                     "xevBatteryTemperature" in self.data and self.data["xevBatteryTemperature"] is not None and self.data["xevBatteryTemperature"]["value"] is not None
                 ):
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        cs["Battery Temperature"] = round(float(self.data["xevBatteryTemperature"]["value"] * 9/5) + 32)
+                        cs["Battery Temperature °F"] = round(float(self.data["xevBatteryTemperature"]["value"] * 9/5) + 32)
                     else: 
-                        cs["Battery Temperature"] = self.data["xevBatteryTemperature"]["value"]
+                        cs["Battery Temperature °C"] = self.data["xevBatteryTemperature"]["value"]
                 if (
                     "xevBatteryChargerVoltageOutput" in self.data and self.data["xevBatteryChargerVoltageOutput"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
                 ):
@@ -534,6 +525,7 @@ class CarSensor(
                     cs["Time To Full Charge"] = self.data["xevBatteryTimeToFullCharge"]["value"]
 
                 return cs
+            
             if self.sensor == "zoneLighting":
                 if "zoneLighting" not in self.data:
                     return None
