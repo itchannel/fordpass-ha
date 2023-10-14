@@ -238,8 +238,13 @@ class Vehicle:
                 self.token = data["access_token"]
                 self.refresh_token = data["refresh_token"]
                 self.expires_at = data["expiry_date"]
-                self.auto_token = data["auto_token"]
-                self.auto_expires_at = data["auto_expiry"]
+                if "auto_token" in data and "auto_expiry" in data:
+                    _LOGGER.debug("AUTO token not set in file")
+                    self.auto_token = data["auto_token"]
+                    self.auto_expires_at = data["auto_expiry"]
+                else:
+                    self.auto_token = None
+                    self.auto_expires_at = None
             else:
                 data = {}
                 data["access_token"] = self.token
