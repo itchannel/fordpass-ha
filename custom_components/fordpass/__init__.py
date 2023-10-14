@@ -223,12 +223,15 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
 
                 return data
         except Exception as ex:
-            self._available = False  # Mark as unavailable
+            # self._available = False  # Mark as unavailable
             _LOGGER.warning(str(ex))
             _LOGGER.warning("Error communicating with FordPass for %s", self.vin)
-            raise UpdateFailed(
-                f"Error communicating with FordPass for {self.vin}"
-            ) from ex
+            _LOGGER.warning("Returning Stale data to prevent unavaliable status")
+            if self.data:
+                return self.data
+            # raise UpdateFailed(
+            #    f"Error communicating with FordPass for {self.vin}"
+            # ) from ex
 
 
 class FordPassEntity(CoordinatorEntity):
