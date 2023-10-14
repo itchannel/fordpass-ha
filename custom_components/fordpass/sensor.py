@@ -239,10 +239,10 @@ class CarSensor(
             if self.sensor == "oil":
                 return "%"
             if self.sensor == "coolantTemp":
-                return "°C”"
+                return "°C"
             if self.sensor == "outsideTemp":
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return "°F"
+                return "°C"
+            if self.sensor == "engineOilTemp":
                 return "°C"
             if self.sensor == "tirePressure":
                 return None
