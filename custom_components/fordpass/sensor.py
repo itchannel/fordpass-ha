@@ -239,9 +239,7 @@ class CarSensor(
             if self.sensor == "oil":
                 return "%"
             if self.sensor == "coolantTemp":
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return "°F"
-                return "°C"
+                return "°C”"
             if self.sensor == "outsideTemp":
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
                     return "°F"
@@ -638,10 +636,10 @@ class CarSensor(
         """Return Sensor Name"""
         return "fordpass_" + self.sensor
 
-    @property
-    def state(self):
-        """Return Sensor State"""
-        return self.get_value("state")
+    # @property
+    # def state(self):
+    #    """Return Sensor State"""
+    #    return self.get_value("state")
 
     @property
     def device_id(self):
@@ -657,6 +655,11 @@ class CarSensor(
     def native_unit_of_measurement(self):
         """Return sensor measurement"""
         return self.get_value("measurement")
+    
+    @property
+    def native_value(self):
+        """Return Native Value"""
+        return self.get_value("state")
 
     @property
     def icon(self):
