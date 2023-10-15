@@ -1,4 +1,10 @@
 ## **Changelog**
+### Version 1.58
+- Rewrote auth function to allow for more granular debugging
+- Changed odometer to use native conversions in HA (pick from sensor options)
+- No longer displays "unavaliable" if sensor goes offline, will instead show previous data and report an error in logs
+- More EV features
+
 ### Version 1.57
 - Rewrote command function to actively poll until success or failure is returned
 - Fixed bug where elveh attributes wasn't showing
