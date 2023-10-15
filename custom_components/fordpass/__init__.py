@@ -88,6 +88,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await hass.async_add_executor_job(
             refresh_status, hass, service_call, coordinator
         )
+        await coordinator.async_request_refresh()
 
     async def async_clear_tokens_service(service_call):
         await hass.async_add_executor_job(clear_tokens, hass, service_call, coordinator)
@@ -157,11 +158,11 @@ def refresh_status(hass, service, coordinator):
     _LOGGER.debug("Running Service")
     vin = service.data.get("vin", "")
     status = coordinator.vehicle.request_update(vin)
-    if status == 401:
-        _LOGGER.debug("Invalid VIN")
-    elif status == 200:
+    if status:
         _LOGGER.debug("Refresh Sent")
-        coordinator.async_request_refresh()
+        return True
+    else:
+        return False
 
 
 def clear_tokens(hass, service, coordinator):
