@@ -219,8 +219,7 @@ class CarSensor(
             return None
         if ftype == "measurement":
             if self.sensor == "odometer":
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return "km"
+                return "km"
             if self.sensor == "fuel":
                 return "%"
             if self.sensor == "battery":
