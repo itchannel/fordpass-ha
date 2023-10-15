@@ -211,16 +211,10 @@ class CarSensor(
                             alerts +=1
                 return alerts
             if self.sensor == "coolantTemp":
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return round(float(self.data["engineCoolantTemp"]["value"] * 9/5) + 32)
                 return self.data["engineCoolantTemp"]["value"]
             if self.sensor == "outsideTemp":
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return round(float(self.data["outsideTemperature"]["value"] * 9/5) + 32)
                 return self.data["outsideTemperature"]["value"]
             if self.sensor == "engineOilTemp":
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return round(float(self.data["engineOilTemp"]["value"] * 9/5) + 32)
                 return self.data["engineOilTemp"]["value"]
             return None
         if ftype == "measurement":
@@ -278,9 +272,8 @@ class CarSensor(
             if self.sensor == "odometer":
                 return self.data[self.sensor].items()
             if self.sensor == "outsideTemp":
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return {"Ambient Temp": round(float(self.data["ambientTemp"]["value"] * 9/5) + 32)}
-                return {"Ambient Temp": self.data["ambientTemp"]["value"]}
+                if "ambientTemp" in self.data:
+                    return {"Ambient Temp": self.data["ambientTemp"]["value"]}
             if self.sensor == "fuel":
                 if "fuelRange" in self.data:
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
@@ -349,10 +342,6 @@ class CarSensor(
                         if value['vehicleDoor'] == "UNSPECIFIED_FRONT":
                             doors[value['vehicleSide']] = value['value']
                         else:
-                            doors[value['vehicleDoor']] = value['value']
-                    elif value['vehicleDoor'] == "INNER_TAILGATE":
-                        if "xevBatteryCapacity" in self.data:
-                            value['vehicleDoor'] = "FRUNK" 
                             doors[value['vehicleDoor']] = value['value']
                     else:
                         doors[value["vehicleDoor"]] = value['value']
