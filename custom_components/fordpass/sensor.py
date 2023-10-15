@@ -123,6 +123,9 @@ class CarSensor(
                         continue
                     if value["value"] != "CLOSED":
                         return "Open"
+                if "hoodStatus" in self.data:
+                    if self.data["hoodStatus"]["value"] == "OPEN":
+                        return "Open"
                 return "Closed"
             if self.sensor == "windowPosition":
                 if "windowStatus" in self.data:
