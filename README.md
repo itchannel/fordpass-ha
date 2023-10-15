@@ -22,7 +22,7 @@ We want to keep you informed about the latest developments regarding the integra
 
 - **Ongoing Work:** We both want to continue enhancing the integration and ensuring its functionality. However, it's important to note that we have limited time to allocate to this effort.
 
-- **Future Updates:** We are continuing our efforts to adapt to new changes and persure further enhancments.
+- **Future Updates:** We are continuing our efforts to adapt to new changes and persue further enhancments.
 
 
 #### Please understand that there may be issues, or disruptions, to different sensors during this process.
@@ -30,6 +30,7 @@ We want to keep you informed about the latest developments regarding the integra
 If you have any questions or concerns, please either open a new issue or comment on an existing issue related to yours.
 
 Thank you,
+
 itchannel and SquidBytes
 
 ## Credit 
