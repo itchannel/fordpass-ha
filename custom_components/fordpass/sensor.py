@@ -350,10 +350,6 @@ class CarSensor(
                             doors[value['vehicleSide']] = value['value']
                         else:
                             doors[value['vehicleDoor']] = value['value']
-                    elif value['vehicleDoor'] == "INNER_TAILGATE":
-                        if "xevBatteryCapacity" in self.data:
-                            value['vehicleDoor'] = "FRUNK" 
-                            doors[value['vehicleDoor']] = value['value']
                     else:
                         doors[value["vehicleDoor"]] = value['value']
                 if "hoodStatus" in self.data:
