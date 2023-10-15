@@ -161,6 +161,7 @@ def refresh_status(hass, service, coordinator):
         _LOGGER.debug("Invalid VIN")
     elif status == 200:
         _LOGGER.debug("Refresh Sent")
+        coordinator.async_request_refresh()
 
 
 def clear_tokens(hass, service, coordinator):
@@ -228,10 +229,9 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.warning("Error communicating with FordPass for %s", self.vin)
             _LOGGER.warning("Returning Stale data to prevent unavaliable status")
             if self.data:
-                return self.data
-            # raise UpdateFailed(
-            #    f"Error communicating with FordPass for {self.vin}"
-            # ) from ex
+                if "metrics" in self.data:
+                    return self.data
+            raise UpdateFailed(    f"Error communicating with FordPass for {self.vin}" ) from ex
 
 
 class FordPassEntity(CoordinatorEntity):

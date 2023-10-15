@@ -86,15 +86,8 @@ class CarSensor(
         self.data = self.coordinator.data["metrics"]
         if ftype == "state":
             if self.sensor == "odometer":
-                if self.fordoptions[CONF_DISTANCE_UNIT] is not None:
-                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        if DISTANCE_CONVERSION_DISABLED in self.fordoptions and self.fordoptions[DISTANCE_CONVERSION_DISABLED] is True:
-                            return self.data[self.sensor]["value"]
-                        return round(
-                            float(self.data[self.sensor]["value"]) / 1.60934
-                        )
-                    return self.data[self.sensor]["value"]
-                return self.data["odometer"]["value"]
+                if self.sensor in self.data:
+                    return self.data["odometer"]["value"]
             if self.sensor == "fuel":
                 if "fuelLevel" in self.data:
                     if self.data["fuelLevel"] is None:
@@ -230,8 +223,7 @@ class CarSensor(
         if ftype == "measurement":
             if self.sensor == "odometer":
                 if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return "mi"
-                return "km"
+                    return "km"
             if self.sensor == "fuel":
                 return "%"
             if self.sensor == "battery":
