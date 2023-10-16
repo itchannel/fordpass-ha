@@ -498,7 +498,7 @@ class CarSensor(
                     cs["Charging Amperage"] = float(self.data["xevBatteryChargerCurrentOutput"]["value"])
                     chAmps = cs["Charging Amperage"]
                 if (
-                    self.data["xevBatteryChargerCurrentOutput"]["value"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
+                    "xevBatteryChargerCurrentOutput" in self.data and self.data["xevBatteryChargerCurrentOutput"]["value"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
                     and "xevBatteryChargerVoltageOutput" in self.data and self.data["xevBatteryChargerVoltageOutput"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
                 ):
                     cs["Charging kW"] =  round((chVolt * chAmps) / 1000, 2)
