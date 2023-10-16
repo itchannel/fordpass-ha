@@ -471,15 +471,15 @@ class CarSensor(
                     "xevChargeStationCommunicationStatus" in self.data and self.data["xevChargeStationCommunicationStatus"] is not None and self.data["xevChargeStationCommunicationStatus"]["value"] is not None
                 ):
                     cs["Charge Station Status"] = self.data["xevChargeStationCommunicationStatus"]["value"]
-                if (
-                    "tripXevBatteryDistanceAccumulated" in self.data and self.data["tripXevBatteryDistanceAccumulated"] is not None and self.data["tripXevBatteryDistanceAccumulated"]["value"] is not None
-                ):
-                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        cs["Distance Accumulated"] = round(
-                                float(self.data["tripXevBatteryDistanceAccumulated"]["value"]) / 1.60934
-                            )
-                    else:
-                        cs["Distance Accumulated"] = self.data["tripXevBatteryDistanceAccumulated"]["value"]
+                # if (
+                #     "tripXevBatteryDistanceAccumulated" in self.data and self.data["tripXevBatteryDistanceAccumulated"] is not None and self.data["tripXevBatteryDistanceAccumulated"]["value"] is not None
+                # ):
+                #     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                #         cs["Distance Accumulated"] = round(
+                #                 float(self.data["tripXevBatteryDistanceAccumulated"]["value"]) / 1.60934
+                #             )
+                #     else:
+                #         cs["Distance Accumulated"] = self.data["tripXevBatteryDistanceAccumulated"]["value"]
                 if (
                     "xevBatteryTemperature" in self.data and self.data["xevBatteryTemperature"] is not None and self.data["xevBatteryTemperature"]["value"] is not None
                 ):
