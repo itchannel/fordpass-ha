@@ -5,6 +5,11 @@
 - No longer displays "unavaliable" if sensor goes offline, will instead show previous data and report an error in logs
 - More EV features
 - Add hood status to door locks
+- Added tripFuelEconomy attribute under speed
+- Added "Driving Score" and Range Regeneration attributes to elVeh (Driving score was a previous feature in the FordPass app. Its basically a "score" based on the maximum brake regen gained from a trip)
+- Removed duplicate attributes from elVeh / elVehCharging
+- Returning Estimated End Time as a timestamp for elVehCharging (previously was Time To Complete)
+- Improved the elVehCharging display
 
 ### Version 1.57
 - Rewrote command function to actively poll until success or failure is returned
