@@ -31,7 +31,7 @@ VIC_MODEL = ""
 VERBOSE = True
 
 
-def get_autonomic_token(ford_access_token):
+def get_autonomic_token(ford_access_token, fpRefresh):
     """Get Autonomic API token from FordPass token"""
     url = "https://accounts.autonomic.ai/v1/auth/oidc/token"
     headers = {
@@ -157,7 +157,7 @@ if __name__ == "__main__":
         if VERBOSE:
             print("WARNING: json will contain sensitive information!")
     # Exchange Fordpass token for Autonomic Token
-    autonomic_token = get_autonomic_token(fpToken)
+    autonomic_token = get_autonomic_token(fpToken, fpRefresh)
     vehicle_status = get_vehicle_status(FP_VIN, autonomic_token["access_token"])
     current_datetime = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     if VIC_YEAR != "":
