@@ -4,7 +4,6 @@
     "step": {
       "user": {
         "data": {
-          "vin": "VIN",
           "username": "FordPass Username (Email)",
           "password": "FordPass Password",
           "region": "FordPass Region"
@@ -13,6 +12,13 @@
       "vehicle": {
         "title": "Select vehicle to add",
         "description": "Select the vehicle to add",
+        "data": {
+          "vin": "VIN"
+        }
+      },
+      "vin": {
+        "title": "Enter VIN",
+        "description": "Enter the VIN of the vehicle to add",
         "data": {
           "vin": "VIN"
         }

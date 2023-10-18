@@ -1,4 +1,6 @@
 ## **Changelog**
+### Version 1.59
+- Add support for manual VIN entry (Lincoln cars hopefuly)
 ### Version 1.58
 - Rewrote auth function to allow for more granular debugging
 - Changed odometer to use native conversions in HA (pick from sensor options)
