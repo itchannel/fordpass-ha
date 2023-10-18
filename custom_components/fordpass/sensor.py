@@ -1,4 +1,5 @@
 """All vehicle sensors from the accessible by the API"""
+
 import logging
 from datetime import datetime
 
@@ -55,6 +56,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif key == "windowPosition":
             if "windowStatus" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
+        elif key == "battery":
+            if "batteryStateOfCharge" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
         else:
             sensors.append(sensor)
     async_add_entities(sensors, True)
@@ -82,6 +86,7 @@ class CarSensor(
         self.coordinator_context = object()
 
     def get_value(self, ftype):
+        
         """Get sensor value and attributes from coordinator data"""
         self.data = self.coordinator.data["metrics"]
         if ftype == "state":
@@ -98,7 +103,9 @@ class CarSensor(
                 else:
                     return None
             if self.sensor == "battery":
-                return round(self.data["batteryStateOfCharge"]["value"])
+                if  "batteryStateOfCharge" in self.data:
+                    return round(self.data["batteryStateOfCharge"]["value"])
+                return None
             if self.sensor == "oil":
                 return round(self.data["oilLifeRemaining"]["value"])
             if self.sensor == "tirePressure":
