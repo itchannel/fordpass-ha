@@ -88,6 +88,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await hass.async_add_executor_job(
             refresh_status, hass, service_call, coordinator
         )
+        await coordinator.async_request_refresh()
 
     async def async_clear_tokens_service(service_call):
         await hass.async_add_executor_job(clear_tokens, hass, service_call, coordinator)
@@ -157,10 +158,10 @@ def refresh_status(hass, service, coordinator):
     _LOGGER.debug("Running Service")
     vin = service.data.get("vin", "")
     status = coordinator.vehicle.request_update(vin)
-    if status == 401:
-        _LOGGER.debug("Invalid VIN")
-    elif status == 200:
+    if status:
         _LOGGER.debug("Refresh Sent")
+        return True
+    return False
 
 
 def clear_tokens(hass, service, coordinator):
@@ -223,12 +224,14 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
 
                 return data
         except Exception as ex:
-            self._available = False  # Mark as unavailable
+            # self._available = False  # Mark as unavailable
             _LOGGER.warning(str(ex))
             _LOGGER.warning("Error communicating with FordPass for %s", self.vin)
-            raise UpdateFailed(
-                f"Error communicating with FordPass for {self.vin}"
-            ) from ex
+            _LOGGER.warning("Returning Stale data to prevent unavaliable status")
+            if self.data:
+                if "metrics" in self.data:
+                    return self.data
+            raise UpdateFailed(f"Error communicating with FordPass for {self.vin}") from ex
 
 
 class FordPassEntity(CoordinatorEntity):

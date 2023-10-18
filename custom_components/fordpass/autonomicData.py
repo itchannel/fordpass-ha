@@ -1,10 +1,12 @@
+"""Script for grabbing vehicle JSON data from Autonomic API"""
+from datetime import datetime
+import glob
 import json
-import requests
 import sys
 import os
 import re
-import glob
-from datetime import datetime
+import requests
+
 
 # Place this script in the /config/custom_components/fordpass folder on your HomeAssistant
 # Add the details below
@@ -14,24 +16,23 @@ from datetime import datetime
 # USER INPUT DATA
 
 # Required: Enter the VIN to query
-fp_vin = ""
+FP_VIN = ""
 
 # Automatically redact json? (True or False) False is only recommended if you would like to save your json for personal use
-redaction = True
-
-
+REDACTION = True
 
 # Optional: Enter your vehicle year (example: 2023)
-vicYear = ""
+VIC_YEAR = ""
 
 # Optional: Enter your vehicle model (example: Lightning)
-vicModel = ""
-
+VIC_MODEL = ""
 
 # You can turn off print statements if you want to use this script for other purposes (True or False)
-verbose = True
+VERBOSE = True
+
 
 def get_autonomic_token(ford_access_token):
+    """Get Autonomic API token from FordPass token"""
     url = "https://accounts.autonomic.ai/v1/auth/oidc/token"
     headers = {
         "accept": "*/*",
@@ -46,15 +47,16 @@ def get_autonomic_token(ford_access_token):
     }
 
     try:
-        response = requests.post(url, headers=headers, data=data)
+        response = requests.post(url, headers=headers, data=data, timeout=10)
         response.raise_for_status()
         autonomic_token_data = response.json()
         return autonomic_token_data
 
     except requests.exceptions.HTTPError as errh:
         print(f"HTTP Error: {errh}")
-        print(f"Trying refresh token")
-        get_autonomic_token(fpRefresh)
+        # print("Trying refresh token")
+        # get_autonomic_token(fp_refresh)
+        return None
     except requests.exceptions.ConnectionError as errc:
         print(f"Error Connecting: {errc}")
         sys.exit()
@@ -67,26 +69,27 @@ def get_autonomic_token(ford_access_token):
 
 
 def get_vehicle_status(vin, access_token):
-    BASE_URL = "https://api.autonomic.ai/"
+    """Get vehicle status from Autonomic API"""
+    base_url = "https://api.autonomic.ai/"
     endpoint = f"v1beta/telemetry/sources/fordpass/vehicles/{vin}:query"
-    url = f"{BASE_URL}{endpoint}"
+    url = f"{base_url}{endpoint}"
     headers = {
         "Authorization": f"Bearer {access_token}",  # Replace 'your_autonom_token' with the actual Autonomic API token
         "Content-Type": "application/json",
         "accept": "*/*"
     }
-    redactionItems = ["lat", "lon", "vehicleId", "vin", "latitude", "longitude"]
+    redaction_items = ["lat", "lon", "vehicleId", "vin", "latitude", "longitude"]
 
     try:
-        response = requests.post(url, headers=headers, json={})
+        response = requests.post(url, headers=headers, json={}, timeout=10)
         response.raise_for_status()  # Raise HTTPError for bad requests (4xx and 5xx status codes)
 
         # Parse the JSON response
         vehicle_status_data = response.json()
 
         # Redact sensitive information
-        if redaction:
-            redact_json(vehicle_status_data, redactionItems)
+        if REDACTION:
+            redact_json(vehicle_status_data, redaction_items)
         return vehicle_status_data
 
     except requests.exceptions.HTTPError as errh:
@@ -97,8 +100,11 @@ def get_vehicle_status(vin, access_token):
         print(f"Timeout Error: {errt}")
     except requests.exceptions.RequestException as err:
         print(f"Something went wrong: {err}")
+    return None
+
 
 def redact_json(data, redaction):
+    """Redact sensitive information from JSON data"""
     # Regular expression to match GPS coordinates
     gps_pattern = r'"gpsDegree":\s*-?\d+\.\d+,\s*"gpsFraction":\s*-?\d+\.\d+,\s*"gpsSign":\s*-?\d+\.\d+'
 
@@ -119,15 +125,16 @@ def redact_json(data, redaction):
     elif isinstance(data, list):
         for item in data:
             redact_json(item, redaction)
-            
+
+
 if __name__ == "__main__":
-    fordPassDir = "/config/custom_components/fordpass"
-    existingfordToken = os.path.join(fordPassDir, "*_fordpass_token.txt")
+    FORD_PASS_DIR = "/config/custom_components/fordpass"
+    existingfordToken = os.path.join(FORD_PASS_DIR, "*_fordpass_token.txt")
     userToken = glob.glob(existingfordToken)
-    
+
     if userToken:
         for userTokenMatch in userToken:
-            with open(userTokenMatch, 'r') as file:
+            with open(userTokenMatch, 'r', encoding="utf-8") as file:
                 fp_token_data = json.load(file)
             fpToken = fp_token_data['access_token']
             fpRefresh = fp_token_data['refresh_token']
@@ -135,37 +142,36 @@ if __name__ == "__main__":
         print(f"Error finding FordPass token text file: {existingfordToken}, {userToken}")
         sys.exit()
 
-    if fp_vin == "":
+    if FP_VIN == "":
         print("Please enter your VIN into the python script")
         sys.exit()
 
-    if verbose:
+    if VERBOSE:
         print("Starting")
-    if redaction:
-        redactionStatus = "_REDACTED"
-        if verbose:
+    if REDACTION:
+        REDACTION_STATUS = "_REDACTED"
+        if VERBOSE:
             print("Automatically redacting json")
     else:
-        redactionStatus = ""
-        if verbose:
+        REDACTION_STATUS = ""
+        if VERBOSE:
             print("WARNING: json will contain sensitive information!")
     # Exchange Fordpass token for Autonomic Token
     autonomic_token = get_autonomic_token(fpToken)
-    vehicle_status = get_vehicle_status(fp_vin, autonomic_token["access_token"])
+    vehicle_status = get_vehicle_status(FP_VIN, autonomic_token["access_token"])
     current_datetime = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-    if vicYear != "":
-        vicYear = vicYear.replace(" ", "_") + "-"
-    if vicModel != "":
-        vicModel = vicModel.replace(" ", "_")
+    if VIC_YEAR != "":
+        VIC_YEAR = VIC_YEAR.replace(" ", "_") + "-"
+    if VIC_MODEL != "":
+        VIC_MODEL = VIC_MODEL.replace(" ", "_")
     else:
-        vicModel = "my"
+        VIC_MODEL = "my"
 
-
-    fileName = os.path.join(fordPassDir, f"{vicYear}{vicModel}_status_{current_datetime}{redactionStatus}.json")
+    fileName = os.path.join(FORD_PASS_DIR, f"{VIC_YEAR}{VIC_MODEL}_status_{current_datetime}{REDACTION_STATUS}.json")
 
     # Write the redacted JSON data to the file
-    with open(fileName, 'w') as file:
+    with open(fileName, 'w', encoding="utf-8") as file:
         json.dump(vehicle_status, file, indent=4)
-    if verbose:
+    if VERBOSE:
         print(f"File saved: {fileName}")
         print("Note: json file will be deleted if fordpass-ha is updated")
