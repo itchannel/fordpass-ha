@@ -139,8 +139,7 @@ class Vehicle:
                 next_url = response.headers["Location"]
                 _LOGGER.debug("Step 2 Complete")
                 return next_url
-            else:
-                response.raise_for_status()
+            return None
         except Exception as ex:
             _LOGGER.debug("Step 2 Exception")
             _LOGGER.debug(ex)
@@ -172,8 +171,8 @@ class Vehicle:
                 grant_id = params["grant_id"]
                 _LOGGER.debug("Step 3 Complete")
                 return {"code": code, "grant_id": grant_id}
-            else:
-                response.raise_for_status()
+            response.raise_for_status()
+            return None
 
         except Exception as ex:
             _LOGGER.debug("Step 3 Exception")
@@ -217,8 +216,8 @@ class Vehicle:
                     access_token = result["access_token"]
                     _LOGGER.debug("Step 4 Complete")
                     return access_token
-            else:
-                response.raise_for_status()
+            response.raise_for_status()
+            return None
         except Exception as ex:
             _LOGGER.debug("Step 4 exception")
             _LOGGER.debug(ex)
@@ -258,6 +257,7 @@ class Vehicle:
                 _LOGGER.debug("Step 5 Complete")
                 return True
             response.raise_for_status()
+            return False
         except Exception as ex:
             _LOGGER.debug("Step 5 exception")
             _LOGGER.debug(ex)
@@ -309,7 +309,7 @@ class Vehicle:
                 self.auth()
             else:
                 raise Exception("Step 4 has reached error limit")
-    
+
         # Run Step 5 auth
         success = self.auth_step5(access_tokens)
 
@@ -322,6 +322,7 @@ class Vehicle:
         else:
             self.errors = 0
             return True
+        return False
 
     def refresh_token_func(self, token):
         """Refresh token if still valid"""
@@ -380,7 +381,6 @@ class Vehicle:
         _LOGGER.debug(self.auto_expires_at)
         if self.auto_token is None or self.auto_expires_at is None:
             self.auth()
-            pass
         # self.auto_token = data["auto_token"]
         # self.auto_expires_at = data["auto_expiry"]
         if self.expires_at:
@@ -513,6 +513,7 @@ class Vehicle:
                         return result
                     i += 1
             response.raise_for_status()
+        return {}
 
     def get_messages(self):
         """Make call to messages API"""
@@ -594,7 +595,7 @@ class Vehicle:
                     result = response.json()
                     return result
                 i += 1
-                  
+
         return None
 
     def guard_status(self):
@@ -688,22 +689,6 @@ class Vehicle:
             url, headers=headers, data=data, params=params
         )
 
-    def __poll_status(self, url, command_id):
-        """
-        Poll the given URL with the given command ID until the command is completed
-        """
-        status = self.__make_request("GET", f"{url}/{command_id}", None, None)
-        result = status.json()
-        if result["status"] == 552:
-            _LOGGER.debug("Command is pending")
-            time.sleep(5)
-            return self.__poll_status(url, command_id)  # retry after 5s
-        if result["status"] == 200:
-            _LOGGER.debug("Command completed succesfully")
-            return True
-        _LOGGER.debug("Command failed")
-        return False
-
     def __request_and_poll_command(self, command, vin=None):
         """Send command to the new Command endpoint"""
         self.__acquire_token()
@@ -765,17 +750,5 @@ class Vehicle:
                 _LOGGER.debug("Looping again")
                 time.sleep(10)
             # time.sleep(90)
-            return False
-        return False
-
-    def __request_and_poll(self, method, url):
-        """Poll API until status code is reached, locking + remote start"""
-        self.__acquire_token()
-        command = self.__make_request(method, url, None, None)
-
-        if command.status_code == 200:
-            result = command.json()
-            if "commandId" in result:
-                return self.__poll_status(url, result["commandId"])
             return False
         return False

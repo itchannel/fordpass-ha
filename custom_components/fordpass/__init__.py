@@ -161,8 +161,7 @@ def refresh_status(hass, service, coordinator):
     if status:
         _LOGGER.debug("Refresh Sent")
         return True
-    else:
-        return False
+    return False
 
 
 def clear_tokens(hass, service, coordinator):

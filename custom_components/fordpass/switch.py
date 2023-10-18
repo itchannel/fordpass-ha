@@ -15,7 +15,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     # switches = [Switch(entry)]
     # async_add_entities(switches, False)
-    for key, value in SWITCHES.items():
+    for key in SWITCHES:
         sw = Switch(entry, key, config_entry.options)
         # Only add guard entity if supported by the car
         if key == "guardmode":
@@ -84,9 +84,9 @@ class Switch(FordPassEntity, SwitchEntity):
         if self.switch == "ignition":
             # Return None if both ignitionStatus and remoteStartCountdownTimer are None
             if (
-                self.coordinator.data["metrics"] is None 
+                self.coordinator.data["metrics"] is None
                 or (
-                    self.coordinator.data["metrics"]["ignitionStatus"] is None 
+                    self.coordinator.data["metrics"]["ignitionStatus"] is None
                     and self.coordinator.data["metrics"]["remoteStartCountdownTimer"] is None
                 )
             ):
@@ -96,7 +96,7 @@ class Switch(FordPassEntity, SwitchEntity):
             if self.coordinator.data["metrics"]["ignitionStatus"] is not None:
                 if self.coordinator.data["metrics"]["ignitionStatus"]["value"] == "ON":
                     return True
-                
+
             # Then check if remoteStartCountdownTimer is greater than 0, which means a remote start is in progress
             if self.coordinator.data["metrics"]["remoteStartCountdownTimer"] is not None:
                 if self.coordinator.data["metrics"]["remoteStartCountdownTimer"]["value"] > 0:

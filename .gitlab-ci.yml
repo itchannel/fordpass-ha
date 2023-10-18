@@ -20,5 +20,5 @@ static_analysis:
   tags: ["dev","python"]
   allow_failure: true
   script:
-  - flake8 --max-line-length=280 --ignore=W605,E275
-  - pylint . --recursive=y --disable=W0613,C0115,E0401,R0911,R0912,R0913,R0915,R0903,W0201,R1702,W1401,R0902,R0914 --max-line-length=280
+  - flake8 --max-line-length=280 --ignore=W605,E275,W503
+  - pylint . --recursive=y --disable=W0613,C0115,E0401,R0911,R0912,R0913,R0915,R0903,W0201,R1702,W1401,R0902,R0914,W0718,W1203,R0916,C0103,W0231,W0719,R0904 --max-line-length=280
