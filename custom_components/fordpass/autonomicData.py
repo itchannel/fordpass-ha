@@ -31,7 +31,7 @@ VIC_MODEL = ""
 VERBOSE = True
 
 
-def get_autonomic_token(ford_access_token, fpRefresh):
+def get_autonomic_token(ford_access_token, fp_refresh):
     """Get Autonomic API token from FordPass token"""
     url = "https://accounts.autonomic.ai/v1/auth/oidc/token"
     headers = {
@@ -55,7 +55,7 @@ def get_autonomic_token(ford_access_token, fpRefresh):
     except requests.exceptions.HTTPError as errh:
         print(f"HTTP Error: {errh}")
         print("Trying refresh token")
-        get_autonomic_token(fpRefresh)
+        get_autonomic_token(fp_refresh)
         return None
     except requests.exceptions.ConnectionError as errc:
         print(f"Error Connecting: {errc}")
