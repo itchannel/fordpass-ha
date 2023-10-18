@@ -12,7 +12,7 @@ from homeassistant.components.sensor import (
 )
 
 from . import FordPassEntity
-from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR, DISTANCE_CONVERSION_DISABLED
+from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,10 +31,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif key == "elVeh":
             if "xevBatteryRange" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
-        ## SquidBytes: Added elVehCharging
+        # SquidBytes: Added elVehCharging
         elif key == "elVehCharging":
             if "xevBatteryChargeDisplayStatus" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)                        
+                sensors.append(sensor)
         elif key == "dieselSystemStatus":
             if "dieselExhaustFilterStatus" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
@@ -86,7 +86,6 @@ class CarSensor(
         self.coordinator_context = object()
 
     def get_value(self, ftype):
-        
         """Get sensor value and attributes from coordinator data"""
         self.data = self.coordinator.data["metrics"]
         if ftype == "state":

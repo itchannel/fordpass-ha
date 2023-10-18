@@ -111,7 +111,7 @@ class Vehicle:
             _LOGGER.debug("Step 1 Exception")
             _LOGGER.debug(ex)
             return None
-        
+
     def auth_step2(self, ibm_url):
         """Login using credentials"""
         _LOGGER.debug("Running Step2")
@@ -147,7 +147,7 @@ class Vehicle:
             if response.text is not None:
                 _LOGGER.debug(response.text)
             return None
-        
+
     def auth_step3(self, next_url):
         """Obtain code and grant_id"""
         _LOGGER.debug("Running Step3")
@@ -183,7 +183,7 @@ class Vehicle:
             if response.headers is not None:
                 _LOGGER.debug(response.headers)
             return None
-    
+
     def auth_step4(self, codes, code1):
         """Obtain access_token"""
         _LOGGER.debug("Running Step4")
@@ -284,7 +284,7 @@ class Vehicle:
         login_url = self.auth_step2(ibm_urls["ibm_url"])
 
         if login_url is None:
-            self.errors +=1
+            self.errors += 1
             if self.errors <= 10:
                 self.auth()
             else:
@@ -294,7 +294,7 @@ class Vehicle:
         codes = self.auth_step3(login_url)
 
         if codes is None:
-            self.errors +=1
+            self.errors += 1
             if self.errors <= 10:
                 self.auth()
             else:
@@ -304,19 +304,18 @@ class Vehicle:
         access_tokens = self.auth_step4(codes, ibm_urls["code1"])
 
         if access_tokens is None:
-            self.errors +=1
-            if self.errors <=10:
+            self.errors += 1
+            if self.errors <= 10:
                 self.auth()
             else:
                 raise Exception("Step 4 has reached error limit")
     
-
         # Run Step 5 auth
         success = self.auth_step5(access_tokens)
 
-        if success is False :
-            self.errors +=1
-            if self.errors <=10:
+        if success is False:
+            self.errors += 1
+            if self.errors <= 10:
                 self.auth()
             else:
                 raise Exception("Step 5 has reached error limit")
@@ -485,7 +484,6 @@ class Vehicle:
         _LOGGER.debug(r.status_code)
         return r
 
-
     def status(self):
         """Get Vehicle status from API"""
         _LOGGER.debug("Getting Vehicle Status")
@@ -516,7 +514,6 @@ class Vehicle:
                     i += 1
             response.raise_for_status()
 
-
     def get_messages(self):
         """Make call to messages API"""
         headers = {
@@ -544,7 +541,7 @@ class Vehicle:
                 result = response.json()
                 return result["result"]["messages"]
         return None
-    
+
     def get_vehicles(self):
         """Make call to vehicles API"""
         _LOGGER.debug("Getting Vehicles")
@@ -579,7 +576,7 @@ class Vehicle:
         self.__acquire_token()
 
         response = self.get_vehicles()
-        
+
         if response.status_code == 207:
             result = response.json()
             return result
@@ -597,9 +594,9 @@ class Vehicle:
                     result = response.json()
                     return result
                 i += 1
-                
-            
+                  
         return None
+
     def guard_status(self):
         """Retrieve guard status from API"""
         self.__acquire_token()
@@ -742,7 +739,7 @@ class Vehicle:
             # New code to hanble checking states table from vehicle data
             response = r.json()
             command_id = response["id"]
-            current_status = response["currentStatus"]
+            # current_status = response["currentStatus"]
             i = 1
             while i < 14:
                 # Check status every 10 seconds for 90 seconds until command completes or time expires
@@ -767,7 +764,7 @@ class Vehicle:
                 i += 1
                 _LOGGER.debug("Looping again")
                 time.sleep(10)
-            #time.sleep(90)
+            # time.sleep(90)
             return False
         return False
 

@@ -19,14 +19,11 @@ fp_vin = ""
 # Automatically redact json? (True or False) False is only recommended if you would like to save your json for personal use
 redaction = True
 
-
-
 # Optional: Enter your vehicle year (example: 2023)
 vicYear = ""
 
 # Optional: Enter your vehicle model (example: Lightning)
 vicModel = ""
-
 
 # You can turn off print statements if you want to use this script for other purposes (True or False)
 verbose = True
@@ -98,6 +95,7 @@ def get_vehicle_status(vin, access_token):
     except requests.exceptions.RequestException as err:
         print(f"Something went wrong: {err}")
 
+
 def redact_json(data, redaction):
     # Regular expression to match GPS coordinates
     gps_pattern = r'"gpsDegree":\s*-?\d+\.\d+,\s*"gpsFraction":\s*-?\d+\.\d+,\s*"gpsSign":\s*-?\d+\.\d+'
@@ -119,12 +117,13 @@ def redact_json(data, redaction):
     elif isinstance(data, list):
         for item in data:
             redact_json(item, redaction)
-            
+
+
 if __name__ == "__main__":
     fordPassDir = "/config/custom_components/fordpass"
     existingfordToken = os.path.join(fordPassDir, "*_fordpass_token.txt")
     userToken = glob.glob(existingfordToken)
-    
+
     if userToken:
         for userTokenMatch in userToken:
             with open(userTokenMatch, 'r') as file:
@@ -159,7 +158,6 @@ if __name__ == "__main__":
         vicModel = vicModel.replace(" ", "_")
     else:
         vicModel = "my"
-
 
     fileName = os.path.join(fordPassDir, f"{vicYear}{vicModel}_status_{current_datetime}{redactionStatus}.json")
 

@@ -232,7 +232,7 @@ class FordPassDataUpdateCoordinator(DataUpdateCoordinator):
             if self.data:
                 if "metrics" in self.data:
                     return self.data
-            raise UpdateFailed(    f"Error communicating with FordPass for {self.vin}" ) from ex
+            raise UpdateFailed(f"Error communicating with FordPass for {self.vin}") from ex
 
 
 class FordPassEntity(CoordinatorEntity):
