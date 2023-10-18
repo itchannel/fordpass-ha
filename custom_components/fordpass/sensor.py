@@ -1,7 +1,7 @@
 """All vehicle sensors from the accessible by the API"""
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from homeassistant.util import dt
 
@@ -461,32 +461,48 @@ class CarSensor(
                     "xevPlugChargerStatus" in self.data and self.data["xevPlugChargerStatus"] is not None and self.data["xevPlugChargerStatus"]["value"] is not None
                 ):
                     cs["Plug Status"] = self.data["xevPlugChargerStatus"]["value"]
-
                 if (
-                    "xevBatteryStateOfCharge" in self.data and self.data["xevBatteryStateOfCharge"] is not None and self.data["xevBatteryStateOfCharge"]["value"] is not None
+                    "xevChargeStationCommunicationStatus" in self.data and self.data["xevChargeStationCommunicationStatus"] is not None and self.data["xevChargeStationCommunicationStatus"]["value"] is not None
                 ):
-                    cs["Charging State of Charge"] = self.data["xevBatteryStateOfCharge"]["value"]
+                    cs["Charging Station Status"] = self.data["xevChargeStationCommunicationStatus"]["value"]
                     
                 if ("xevBatteryChargeDisplayStatus" in self.data and self.data["xevBatteryChargeDisplayStatus"] is not None and self.data["xevBatteryChargeDisplayStatus"]["value"] is not None
                 ):
                     cs["Charging Status"] = self.data["xevBatteryChargeDisplayStatus"]["value"]
+
                 if (
                     "xevChargeStationPowerType" in self.data and self.data["xevChargeStationPowerType"] is not None and self.data["xevChargeStationPowerType"]["value"] is not None
                 ):
                     cs["Charging Type"] = self.data["xevChargeStationPowerType"]["value"]
+
+                # if (
+                #     "tripXevBatteryDistanceAccumulated" in self.data and self.data["tripXevBatteryDistanceAccumulated"] is not None and self.data["tripXevBatteryDistanceAccumulated"]["value"] is not None
+                # ):
+                #     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                #         cs["Distance Accumulated"] = round(
+                #                 float(self.data["tripXevBatteryDistanceAccumulated"]["value"]) / 1.60934
+                #             )
+                #     else:
+                #         cs["Distance Accumulated"] = self.data["tripXevBatteryDistanceAccumulated"]["value"]
                 if (
-                    "xevChargeStationCommunicationStatus" in self.data and self.data["xevChargeStationCommunicationStatus"] is not None and self.data["xevChargeStationCommunicationStatus"]["value"] is not None
+                    "xevBatteryChargerVoltageOutput" in self.data and self.data["xevBatteryChargerVoltageOutput"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
                 ):
-                    cs["Charge Station Status"] = self.data["xevChargeStationCommunicationStatus"]["value"]
+                    cs["Charging Voltage"] = float(self.data["xevBatteryChargerVoltageOutput"]["value"])
+                    chVolt = cs["Charging Voltage"]
+                    
                 if (
-                    "tripXevBatteryDistanceAccumulated" in self.data and self.data["tripXevBatteryDistanceAccumulated"] is not None and self.data["tripXevBatteryDistanceAccumulated"]["value"] is not None
+                    "xevBatteryChargerCurrentOutput" in self.data and self.data["xevBatteryChargerCurrentOutput"] is not None and self.data["xevBatteryChargerCurrentOutput"]["value"] is not None
+
                 ):
-                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        cs["Distance Accumulated"] = round(
-                                float(self.data["tripXevBatteryDistanceAccumulated"]["value"]) / 1.60934
-                            )
-                    else:
-                        cs["Distance Accumulated"] = self.data["tripXevBatteryDistanceAccumulated"]["value"]
+                    cs["Charging Amperage"] = float(self.data["xevBatteryChargerCurrentOutput"]["value"])
+                    chAmps = cs["Charging Amperage"]
+
+                if (
+                    "xevBatteryChargerCurrentOutput" in self.data and self.data["xevBatteryChargerCurrentOutput"]["value"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
+                    and "xevBatteryChargerVoltageOutput" in self.data and self.data["xevBatteryChargerVoltageOutput"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
+                ):
+                    cs["Charging kW"] =  round((chVolt * chAmps) / 1000, 2)
+
                 if (
                     "xevBatteryTemperature" in self.data and self.data["xevBatteryTemperature"] is not None and self.data["xevBatteryTemperature"]["value"] is not None
                 ):
@@ -494,27 +510,20 @@ class CarSensor(
                         cs["Battery Temperature °F"] = round(float(self.data["xevBatteryTemperature"]["value"] * 9/5) + 32)
                     else: 
                         cs["Battery Temperature °C"] = self.data["xevBatteryTemperature"]["value"]
+
                 if (
-                    "xevBatteryChargerVoltageOutput" in self.data and self.data["xevBatteryChargerVoltageOutput"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
+                    "xevBatteryStateOfCharge" in self.data and self.data["xevBatteryStateOfCharge"] is not None and self.data["xevBatteryStateOfCharge"]["value"] is not None
                 ):
-                    cs["Charging Voltage"] = float(self.data["xevBatteryChargerVoltageOutput"]["value"])
-                    chVolt = cs["Charging Voltage"]
-                if (
-                    "xevBatteryChargerCurrentOutput" in self.data and self.data["xevBatteryChargerCurrentOutput"] is not None and self.data["xevBatteryChargerCurrentOutput"]["value"] is not None
-                ):
-                    cs["Charging Amperage"] = float(self.data["xevBatteryChargerCurrentOutput"]["value"])
-                    chAmps = cs["Charging Amperage"]
-                if (
-                    "xevBatteryChargerCurrentOutput" in self.data and self.data["xevBatteryChargerCurrentOutput"]["value"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
-                    and "xevBatteryChargerVoltageOutput" in self.data and self.data["xevBatteryChargerVoltageOutput"] is not None and self.data["xevBatteryChargerVoltageOutput"]["value"] is not None
-                ):
-                    cs["Charging kW"] =  round((chVolt * chAmps) / 1000, 2)
+                    cs["State of Charge"] = self.data["xevBatteryStateOfCharge"]["value"]
             
                 if (
                     "xevBatteryTimeToFullCharge" in self.data and self.data["xevBatteryTimeToFullCharge"] is not None and self.data["xevBatteryTimeToFullCharge"]["value"] is not None
+                    and self.data["xevBatteryTimeToFullCharge"]["updateTime"] is not None
                 ):
-                    cs["Time To Full Charge"] = self.data["xevBatteryTimeToFullCharge"]["value"]
-
+                    csUpdateTime = datetime.strptime(self.data["xevBatteryTimeToFullCharge"]["updateTime"], "%Y-%m-%dT%H:%M:%SZ")
+                    csEstEndTime = csUpdateTime + timedelta(minutes=self.data["xevBatteryTimeToFullCharge"]["value"])
+                    csEndTime = csEstEndTime.strftime("%Y-%m-%d %H:%M:%S")
+                    cs["Estimated End Time"] = dt.as_local(datetime.strptime(csEndTime, "%Y-%m-%d %H:%M:%S"))
                 return cs
             
             if self.sensor == "zoneLighting":
