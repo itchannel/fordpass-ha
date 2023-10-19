@@ -144,24 +144,7 @@ class CarSensor(
                     return status
                 return "Unsupported"
             if self.sensor == "lastRefresh":
-                try:
-                    return dt.as_local(
-                        datetime.strptime(
-                            self.coordinator.data["updateTime"], "%Y-%m-%dT%H:%M:%S.%fz"
-                        )
-                    )
-                except Exception as ex:
-                    _LOGGER.debug(f"{ex} conversion failed")
-                try:
-                    return dt.as_local(
-                        datetime.strptime(
-                            self.coordinator.data["updateTime"], "%Y-%m-%dT%H:%M:%Sz"
-                        )
-                    )
-                except Exception as ex:
-                    _LOGGER.debug(f"{ex} conversion failed")
-                    refresh = ""
-                return refresh
+                return dt.as_local(dt.parse_datetime(self.coordinator.data["updateTime"]))
             if self.sensor == "elVeh":
                 if "xevBatteryRange" in self.data:
                     if self.fordoptions[CONF_DISTANCE_UNIT] is not None:
@@ -518,7 +501,7 @@ class CarSensor(
                     cs_update_time = datetime.strptime(self.data["xevBatteryTimeToFullCharge"]["updateTime"], "%Y-%m-%dT%H:%M:%SZ")
                     cs_est_end_time = cs_update_time + timedelta(minutes=self.data["xevBatteryTimeToFullCharge"]["value"])
                     cs_end_time = cs_est_end_time.strftime("%Y-%m-%d %H:%M:%S")
-                    cs["Estimated End Time"] = dt.as_local(datetime.strptime(cs_end_time, "%Y-%m-%d %H:%M:%S"))
+                    cs["Estimated End Time"] = datetime.strptime(cs_end_time, "%Y-%m-%d %H:%M:%S")
                 return cs
 
             if self.sensor == "zoneLighting":
