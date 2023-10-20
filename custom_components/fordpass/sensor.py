@@ -59,6 +59,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif key == "battery":
             if "batteryStateOfCharge" in sensor.coordinator.data["metrics"]:
                 sensors.append(sensor)
+        elif key == "alarm":
+            if "alarmStatus" in sensor.coordinator.data["metrics"]:
+                sensors.append(sensor)
         else:
             sensors.append(sensor)
     async_add_entities(sensors, True)
@@ -115,7 +118,9 @@ class CarSensor(
                     return self.data["position"]["value"]
                 return "Unsupported"
             if self.sensor == "alarm":
-                return self.data["alarmStatus"]["value"]
+                if "alarmStatus" in self.data["metrics"]:
+                    return self.data["alarmStatus"]["value"]
+                return "Unsupported"
             if self.sensor == "ignitionStatus":
                 return self.data[self.sensor]["value"]
             if self.sensor == "firmwareUpgInProgress":
@@ -125,6 +130,8 @@ class CarSensor(
             if self.sensor == "doorStatus":
                 for value in self.data["doorStatus"]:
                     if value["value"] == "Invalid":
+                        continue
+                    if value["value"] == "UNKNOWN":
                         continue
                     if value["value"] != "CLOSED":
                         return "Open"
