@@ -25,14 +25,20 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the Entities from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
     sensors = []
-    for key in SENSORS:
+    for key, value in SENSORS.items():
         sensor = CarSensor(entry, key, config_entry.options)
-        api_key = key["api_key"]
-        if key["api_key"] == "messages":
+        api_key = value["api_key"]
+        string =  isinstance(api_key, str)
+        if string and api_key == "messages" or api_key == "lastRefresh":
             sensors.append(sensor)
-        else:
+        elif string:
             if api_key and api_key in sensor.coordinator.data.get("metrics", {}):
                 sensors.append(sensor)
+        else:
+            for key in api_key:
+                if key and key in sensor.coordinator.data.get("metrics", {}):
+                    sensors.append(sensor)
+                    continue
     async_add_entities(sensors, True)
 
 
