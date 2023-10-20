@@ -24,7 +24,14 @@
                 "data": {
                   "vin": "VIN"
                 }
-              }
+              },
+              "vin": {
+                "title": "Manuelle Vin-Eingabe",
+                "description": "Bitte geben Sie Ihre VIN-Nummer manuell ein, da keine Fahrzeuge automatisch gefunden werden konnten.",
+                "data": {
+                    "vin": "Fahrgestellnummer für das Fahrzeug"
+                }
+            }
         }
     },
     "options": {

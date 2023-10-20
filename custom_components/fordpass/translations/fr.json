@@ -25,7 +25,14 @@
                 "data": {
                   "vin": "VIN"
                 }
-              }
+              },
+              "vin": {
+                "title": "Saisie manuelle du Vin",
+                "description": "Veuillez saisir votre numéro VIN manuellement car aucun véhicule n'a pu être trouvé automatiquement.",
+                "data": {
+                    "vin": "Numéro Vin du véhicule"
+                }
+            }             
         }
     },
     "options": {
