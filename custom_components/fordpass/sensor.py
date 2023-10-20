@@ -2,6 +2,7 @@
 
 import logging
 from datetime import datetime, timedelta
+import json
 
 from homeassistant.const import UnitOfTemperature
 from homeassistant.util import dt
@@ -52,6 +53,7 @@ class CarSensor(
         self._attr = {}
         self.coordinator = coordinator
         self.data = coordinator.data["metrics"]
+        self.events = coordinator.data["events"]
         self._device_id = "fordpass_" + sensor
         # Required for HA 2022.7
         self.coordinator_context = object()
@@ -403,8 +405,50 @@ class CarSensor(
                     and "xevTractionMotorCurrent" in self.data and self.data["xevTractionMotorCurrent"] is not None and self.data["xevTractionMotorCurrent"]["value"] is not None
                 ):
                     elecs["Motor kW"] = round((motor_volt * motor_amps) / 1000, 2)
+                if (
+                    "customEvents" in self.events 
+                    and self.events["customEvents"] is not None
+                    and self.events["customEvents"]["xev-key-off-trip-segment-data"] is not None
+                    and self.events["customEvents"]["xev-key-off-trip-segment-data"]["oemData"] is not None
+                    and self.events["customEvents"]["xev-key-off-trip-segment-data"]["oemData"]["trip_data"] is not None
+                    and self.events["customEvents"]["xev-key-off-trip-segment-data"]["oemData"]["trip_data"]["stringArrayValue"] is not None
+                ):
+                    tripDataStr = self.events["customEvents"]["xev-key-off-trip-segment-data"]["oemData"]["trip_data"]["stringArrayValue"]
+                    for dataStr in tripDataStr:
+                        tripData = json.loads(dataStr)
+                        tempConvert = TemperatureConverter()
+                        if "ambient_temperature" in tripData:
+                            if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                                elecs["Trip Ambient Temp"] = round(tempConvert.convert(float(tripData["ambient_temperature"]), UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT))
+                            else:
+                                elecs["Trip Ambient Temp"] = tripData["ambient_temperature"]
+                        if "outside_air_ambient_temperature" in tripData:
+                            if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                                elecs["Trip Outside Air Ambient Temp"] = round(tempConvert.convert(float(tripData["outside_air_ambient_temperature"]), UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT))
+                            else:
+                                elecs["Trip Outside Air Ambient Temp"] = tripData["outside_air_ambient_temperature"]
+                        if "trip_duration" in tripData:
+                            elecs["Trip Duration"] = tripData["trip_duration"] / 3600
+                        if "cabin_temperature" in tripData:
+                            if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                                elecs["Trip Cabin Temp"] = round(tempConvert.convert(float(tripData["cabin_temperature"]), UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT))
+                            else:
+                                elecs["Trip Cabin Temp"] = tripData["cabin_temperature"]
+                        if "energy_consumed" in tripData:
+                            elecs["Trip Energy Consumed"] = round(tripData["energy_consumed"] / 1000, 2)
+                        if "distance_traveled" in tripData:
+                            if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
+                                elecs["Trip Distance Traveled"] = round(float(tripData["distance_traveled"] / 1.60934))
+                            else:
+                                elecs["Trip Distance Traveled"] = tripData["distance_traveled"]
+                        if (
+                            "energy_consumed" in tripData
+                            and tripData["energy_consumed"] is not None
+                            and "distance_traveled" in tripData
+                            and tripData["distance_traveled"] is not None
+                        ):
+                            elecs["Trip Efficiency"] = elecs["Trip Distance Traveled"] / elecs["Trip Energy Consumed"]
                 return elecs
-
             # SquidBytes: Added elVehCharging
             if self.sensor == "elVehCharging":
                 if "xevPlugChargerStatus" not in self.data:
