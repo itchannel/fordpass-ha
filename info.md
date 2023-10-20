@@ -4,6 +4,14 @@
 - Fix for lastRefresh sensor not returning local time
 - Fix for elVehCharging Estimated End Time not returning local time
 - Fix for elVehCharging Battery Temp debug error
+- Added Trip Data to elVeh.
+  - Trip Ambient Temp
+  - Trip Outside Air Ambient Temp
+  - Trip Duration
+  - Trip Cabin Temp
+  - Trip Energy Consumed (kW)
+  - Trip Distance Traveled
+  - Trip Efficiency
 ### Version 1.58
 - Rewrote auth function to allow for more granular debugging
 - Changed odometer to use native conversions in HA (pick from sensor options)
