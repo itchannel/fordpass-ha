@@ -26,46 +26,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     sensors = []
     for key in SENSORS:
         sensor = CarSensor(entry, key, config_entry.options)
-        # Add support for only adding compatible sensors for the given vehicle
-        if key == "zoneLighting":
-            if "zoneLighting" in sensor.coordinator.data:
-                sensors.append(sensor)
-        elif key == "elVeh":
-            if "xevBatteryRange" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        # SquidBytes: Added elVehCharging
-        elif key == "elVehCharging":
-            if "xevBatteryChargeDisplayStatus" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        elif key == "dieselSystemStatus":
-            if "dieselExhaustFilterStatus" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        elif key == "exhaustFluidLevel":
-            if "dieselExhaustFluidLevel" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        elif key == "indicators":
-            if "indicators" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        elif key == "coolantTemp":
-            if "engineCoolantTemp" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        elif key == "outsideTemp":
-            if "outsideTemperature" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        elif key == "engineOilTemp":
-            if "engineOilTemp" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        elif key == "windowPosition":
-            if "windowStatus" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        elif key == "battery":
-            if "batteryStateOfCharge" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        elif key == "alarm":
-            if "alarmStatus" in sensor.coordinator.data["metrics"]:
-                sensors.append(sensor)
-        else:
+        api_key = key["api_key"]
+        if key["api_key"] == "messages":
             sensors.append(sensor)
+        else:
+            if api_key and api_key in sensor.coordinator.data.get("metrics", {}):
+                sensors.append(sensor)
     async_add_entities(sensors, True)
 
 
