@@ -30,10 +30,10 @@ REGION = "region"
 REGION_OPTIONS = ["UK&Europe", "Australia", "North America & Canada"]
 
 SENSORS = {
-    "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance", "api_key": "odometer"},
-    "fuel": {"icon": "mdi:gas-station", "api_key": ["fuelLevel", "xevBatteryStateOfCharge"]},
-    "battery": {"icon": "mdi:car-battery", "device_class": "battery","state_class": "measurement", "api_key": "batteryStateOfCharge"},
-    "oil": {"icon": "mdi:oil", "api_key": "OilLifeRemaining"},
+    "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance", "api_key": "odometer", "measurement": "km"},
+    "fuel": {"icon": "mdi:gas-station", "api_key": ["fuelLevel", "xevBatteryStateOfCharge"], "measurement": "%"},
+    "battery": {"icon": "mdi:car-battery", "device_class": "battery","state_class": "measurement", "api_key": "batteryStateOfCharge", "measurement": "%"},
+    "oil": {"icon": "mdi:oil", "api_key": "oilLifeRemaining", "measurement": "%"},
     "tirePressure": {"icon": "mdi:car-tire-alert", "api_key": "tirePressure"},
     # "gps": {"icon": "mdi:radar"},
     "alarm": {"icon": "mdi:bell", "api_key": "alarmStatus"},
@@ -41,13 +41,13 @@ SENSORS = {
     "doorStatus": {"icon": "mdi:car-door", "api_key": "doorStatus"},
     "windowPosition": {"icon": "mdi:car-door", "api_key": "windowStatus"},
     "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp", "api_key": "lastRefresh"},
-    "elVeh": {"icon": "mdi:ev-station", "api_key": "xevBatteryRange"},
+    "elVeh": {"icon": "mdi:ev-station", "api_key": "xevBatteryRange", "device_class": "distance", "state_class": "measurement", "measurement": "km"},
     "elVehCharging": {"icon": "mdi:ev-station", "api_key": "xevBatteryChargeDisplayStatus"},
-    "speed": {"icon": "mdi:speedometer", "device_class": "speed", "state_class": "measurement", "api_key": "speed"},
+    "speed": {"icon": "mdi:speedometer", "device_class": "speed", "state_class": "measurement", "api_key": "speed", "measurement": "km/h"},
     "indicators": {"icon": "mdi:engine-outline", "api_key": "indicators"},
-    "coolantTemp": {"icon": "mdi:coolant-temperature", "api_key": "engineCoolantTemp" ,"state_class": "measurement", "device_class": "temperature"},
-    "outsideTemp": {"icon": "mdi:thermometer", "state_class": "measurement", "device_class": "temperature", "api_key": "outsideTemperature"},
-    "engineOilTemp": {"icon": "mdi:oil-temperature", "state_class": "measurement", "device_class": "temperature", "api_key": "engineOilTemp"},
+    "coolantTemp": {"icon": "mdi:coolant-temperature", "api_key": "engineCoolantTemp" ,"state_class": "measurement", "device_class": "temperature", "measurement": "°C"},
+    "outsideTemp": {"icon": "mdi:thermometer", "state_class": "measurement", "device_class": "temperature", "api_key": "outsideTemperature", "measurement": "°C"},
+    "engineOilTemp": {"icon": "mdi:oil-temperature", "state_class": "measurement", "device_class": "temperature", "api_key": "engineOilTemp", "measurement": "°C"},
     # "deepSleepInProgress": {
     #     "icon": "mdi:power-sleep",
     #    "name": "Deep Sleep Mode Active",
@@ -58,9 +58,9 @@ SENSORS = {
     # },
     "remoteStartStatus": {"icon": "mdi:remote", "api_key": "remoteStartCountdownTimer"},
     # "zoneLighting": {"icon": "mdi:spotlight-beam"},
-    "messages": {"icon": "mdi:message-text", "api_key": "messages"},
+    "messages": {"icon": "mdi:message-text", "api_key": "messages", "measurement": "messages"},
     "dieselSystemStatus": {"icon": "mdi:smoking-pipe", "api_key": "dieselExhaustFilterStatus"},
-    "exhaustFluidLevel": {"icon": "mdi:barrel", "api_key": "dieselExhaustFluidLevel"},
+    "exhaustFluidLevel": {"icon": "mdi:barrel", "api_key": "dieselExhaustFluidLevel", "measurement": "%"},
 }
 
 SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
