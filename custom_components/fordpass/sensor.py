@@ -140,55 +140,7 @@ class CarSensor(
                 return self.data.get("engineOilTemp", {}).get("value", "Unsupported")
             return None
         if ftype == "measurement":
-            if self.sensor == "odometer":
-                return "km"
-            if self.sensor == "fuel":
-                return "%"
-            if self.sensor == "battery":
-                return "%"
-            if self.sensor == "oil":
-                return "%"
-            if self.sensor == "coolantTemp":
-                return "°C"
-            if self.sensor == "outsideTemp":
-                return "°C"
-            if self.sensor == "engineOilTemp":
-                return "°C"
-            if self.sensor == "tirePressure":
-                return None
-            if self.sensor == "gps":
-                return None
-            if self.sensor == "alarm":
-                return None
-            if self.sensor == "ignitionStatus":
-                return None
-            if self.sensor == "firmwareUpgInProgress":
-                return None
-            if self.sensor == "deepSleepInProgress":
-                return None
-            if self.sensor == "doorStatus":
-                return None
-            if self.sensor == "windowsPosition":
-                return None
-            if self.sensor == "lastRefresh":
-                return None
-            if self.sensor == "zoneLighting":
-                return None
-            if self.sensor == "remoteStartStatus":
-                return None
-            if self.sensor == "messages":
-                return "Messages"
-            if self.sensor == "elVeh":
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return "mi"
-                return "km"
-            if self.sensor == "speed":
-                if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                    return "mph"
-                return "km/h"
-            if self.sensor == "exhaustFluidLevel":
-                return "%"
-            return None
+            return SENSORS.get(self.sensor, {}).get("measurement", None)
         if ftype == "attribute":
             if self.sensor == "odometer":
                 return self.data[self.sensor].items()
