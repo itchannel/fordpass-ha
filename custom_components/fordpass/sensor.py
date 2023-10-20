@@ -3,7 +3,9 @@
 import logging
 from datetime import datetime, timedelta
 
+from homeassistant.const import UnitOfTemperature
 from homeassistant.util import dt
+from homeassistant.util.unit_conversion import TemperatureConverter
 
 from homeassistant.components.sensor import (
     SensorEntity,
@@ -485,9 +487,10 @@ class CarSensor(
                     "xevBatteryTemperature" in self.data and self.data["xevBatteryTemperature"] is not None and self.data["xevBatteryTemperature"]["value"] is not None
                 ):
                     if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        cs["Battery Temperature °F"] = round(float(self.data["xevBatteryTemperature"]["value"] * 9 / 5) + 32)
+                        tempConvert = TemperatureConverter()
+                        cs["Battery Temperature"] = round(tempConvert.convert(float(self.data["xevBatteryTemperature"]["value"]), UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT))
                     else:
-                        cs["Battery Temperature °C"] = self.data["xevBatteryTemperature"]["value"]
+                        cs["Battery Temperature"] = self.data["xevBatteryTemperature"]["value"]
 
                 if (
                     "xevBatteryStateOfCharge" in self.data and self.data["xevBatteryStateOfCharge"] is not None and self.data["xevBatteryStateOfCharge"]["value"] is not None
