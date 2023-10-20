@@ -4,7 +4,7 @@ import logging
 from datetime import datetime, timedelta
 import json
 
-from homeassistant.const import UnitOfTemperature
+from homeassistant.const import UnitOfTemperature, UnitOfLength, UnitOfPressure
 from homeassistant.util import dt
 from homeassistant.util.unit_conversion import TemperatureConverter
 
@@ -13,6 +13,7 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass
 )
+
 
 from . import FordPassEntity
 from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR
@@ -39,6 +40,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 if key and key in sensor.coordinator.data.get("metrics", {}):
                     sensors.append(sensor)
                     continue
+    _LOGGER.debug(hass.config.units)
     async_add_entities(sensors, True)
 
 
@@ -58,6 +60,7 @@ class CarSensor(
         self.fordoptions = options
         self._attr = {}
         self.coordinator = coordinator
+        self.units = coordinator.hass.config.units
         self.data = coordinator.data["metrics"]
         self.events = coordinator.data["events"]
         self._device_id = "fordpass_" + sensor
@@ -67,6 +70,8 @@ class CarSensor(
     def get_value(self, ftype):
         """Get sensor value and attributes from coordinator data"""
         self.data = self.coordinator.data["metrics"]
+        self.events = self.coordinator.data["events"]
+        self.units = self.coordinator.hass.config.units
         if ftype == "state":
             if self.sensor == "odometer":
                 return self.data.get("odometer", {}).get("value")
@@ -100,7 +105,7 @@ class CarSensor(
                     if value["value"] in ["CLOSED", "Invalid", "UNKNOWN"]:
                         continue
                     return "Open"
-                if "hoodStatus" in self.data and self.data["hoodStatus"]["value"] == "OPEN":
+                if  self.data.get("hoodStatus", {}).get("value") == "OPEN":
                     return "Open"
                 return "Closed"
             if self.sensor == "windowPosition":
@@ -143,74 +148,54 @@ class CarSensor(
             return SENSORS.get(self.sensor, {}).get("measurement", None)
         if ftype == "attribute":
             if self.sensor == "odometer":
-                return self.data[self.sensor].items()
+                return self.data.get("odometer", {})
             if self.sensor == "outsideTemp":
-                if "ambientTemp" in self.data:
-                    return {"Ambient Temp": self.data["ambientTemp"]["value"]}
+                ambient_temp = self.data.get("ambientTemp", {}).get("value")
+                if ambient_temp is not None:
+                    return { "Ambient Temp": ambient_temp}
+                return None
             if self.sensor == "fuel":
                 if "fuelRange" in self.data:
-                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        return {"fuelRange": round(
-                            float(self.data["fuelRange"]["value"]) / 1.60934
-                        )}
-                    return {"fuelRange": self.data["fuelRange"]["value"]}
+                    return {"fuelRange" : self.units.length(self.data.get("fuelRange", {}).get("value", 0),UnitOfLength.KILOMETERS)}
                 if "xevBatteryRange" in self.data:
-                    if self.fordoptions[CONF_DISTANCE_UNIT] == "mi":
-                        return {"batteryRange": round(
-                            float(self.data["xevBatteryRange"]["value"]) / 1.60934
-                        )}
-                    return {"batteryRange": self.data["xevBatteryRange"]["value"]}
+                    return {"batteryRange": self.units.length(self.data.get("xevBatteryRange", {}).get("value", 0),UnitOfLength.KILOMETERS)}
             if self.sensor == "battery":
                 return {
-                    "Battery Voltage": self.data["batteryVoltage"]["value"]
+                    "Battery Voltage": self.data.get("batteryVoltage", {}).get("value", 0)
                 }
             if self.sensor == "oil":
-                return self.data["oilLifeRemaining"].items()
-            if self.sensor == "tirePressure":
-                if "tirePressure" in self.data:
-                    _LOGGER.debug(self.fordoptions[CONF_PRESSURE_UNIT])
-                    if self.fordoptions[CONF_PRESSURE_UNIT] == "PSI":
-                        _LOGGER.debug("PSIIIII")
-                        sval = 0.1450377377
-                        # rval = 1
-                        decimal = 0
-                    elif self.fordoptions[CONF_PRESSURE_UNIT] == "BAR":
-                        sval = 0.01
-                        # rval = 0.0689475729
-                        decimal = 2
-                    elif self.fordoptions[CONF_PRESSURE_UNIT] == "kPa":
-                        sval = 1
-                        # rval = 6.8947572932
-                        decimal = 0
-                    else:
-                        _LOGGER.debug("HITT")
-                        sval = 1
-                        # rval = 1
-                        decimal = 0
-                    tirepress = {}
-                    for value in self.data["tirePressure"]:
-                        # if "recommended" in key:
-                        # tirepress[key] = round(float(value["value"]) * rval, decimal)
-                        # else:
-                        tirepress[value["vehicleWheel"]] = round(float(value["value"]) * sval, decimal)
-                    return tirepress
-                return None
+                return self.data.get("oilLifeRemaining", {})
+            if self.sensor == "tirePressure" and "tirePressure" in self.data:
+                pressure_unit = self.fordoptions.get(CONF_PRESSURE_UNIT)
+                if pressure_unit == "PSI":
+                    conversion_factor = 0.1450377377
+                    decimal_places = 0
+                elif pressure_unit == "BAR":
+                    conversion_factor = 0.01
+                    decimal_places = 2
+                elif pressure_unit == "kPa":
+                    conversion_factor = 1
+                    decimal_places = 0
+                else:
+                    conversion_factor = 1
+                    decimal_places = 0
+                tire_pressures = {}
+                for value in self.data["tirePressure"]:
+                    tire_pressures[value["vehicleWheel"]] = round(float(value["value"]) * conversion_factor, decimal_places)
+                return tire_pressures
             if self.sensor == "gps":
-                if "position" in self.data:
-                    return self.data["position"].items()
-                return None
+                return self.data.get("position", {})
             if self.sensor == "alarm":
-                return self.data["alarmStatus"].items()
+                return self.data.get("alarmStatus", {})
             if self.sensor == "ignitionStatus":
-                return self.data[self.sensor].items()
+                return self.data.get("ignitionStatus", {})
             if self.sensor == "firmwareUpgInProgress":
-                return self.data[self.sensor].items()
+                return self.data.get("firmwareUpgradeInProgress", {})
             if self.sensor == "deepSleepInProgress":
-                return self.data[self.sensor].items()
+                return self.data.get("deepSleepInProgress", {})
             if self.sensor == "doorStatus":
                 doors = {}
-                for value in self.data[self.sensor]:
-                    _LOGGER.debug(value)
+                for value in self.data.get(self.sensor, []):
                     if "vehicleSide" in value:
                         if value['vehicleDoor'] == "UNSPECIFIED_FRONT":
                             doors[value['vehicleSide']] = value['value']
@@ -219,15 +204,15 @@ class CarSensor(
                     else:
                         doors[value["vehicleDoor"]] = value['value']
                 if "hoodStatus" in self.data:
-                    doors["Hood"] = self.data["hoodStatus"]["value"]
-                return doors
-
+                    doors["HOOD"] = self.data["hoodStatus"]["value"]
+                return doors or None
             if self.sensor == "windowPosition":
-                if "windowStatus" not in self.data:
-                    return None
                 windows = {}
-                for window in self.data["windowStatus"]:
-                    windows[window["vehicleWindow"]] = window
+                for window in self.data.get("windowStatus", []):
+                    if window["vehicleWindow"] == "UNSPECIFIED_FRONT":
+                        windows[window["vehicleSide"]] = window
+                    else:
+                        windows[window["vehicleWindow"]] = window
                 return windows
             if self.sensor == "lastRefresh":
                 return None
@@ -474,32 +459,27 @@ class CarSensor(
                     return zone
                 return None
             if self.sensor == "remoteStartStatus":
-                if self.data["remoteStartCountdownTimer"] is None:
-                    return None
-                return {"Countdown": self.data["remoteStartCountdownTimer"]["value"]}
+                return {"Countdown:": self.data.get("remoteStartCountdownTimer", {}).get("value", 0)}
             if self.sensor == "messages":
-                if self.coordinator.data["messages"] is None:
-                    return None
                 messages = {}
-                for value in self.coordinator.data["messages"]:
-
+                for value in  self.coordinator.data.get("messages", []):
                     messages[value["messageSubject"]] = value["createdDate"]
                 return messages
             if self.sensor == "dieselSystemStatus":
-                if "indicators" in self.data and "dieselExhaustOverTemp" in self.data["indicators"]:
+                if self.data.get("indicators", {}).get("dieselExhaustOverTemp", {}).get("value") is not None:
                     return {
                         "Diesel Exhaust Over Temp": self.data["indicators"]["dieselExhaustOverTemp"]["value"]
                     }
                 return None
             if self.sensor == "exhaustFluidLevel":
                 exhaustdata = {}
-                if "dieselExhaustFluidLevelRangeRemaining" in self.data:
+                if self.data.get("dieselExhaustFluidLevelRangeRemaining", {}).get("value") is not None:
                     exhaustdata["Exhaust Fluid Range"] = self.data["dieselExhaustFluidLevelRangeRemaining"]["value"]
-                if "indicators" in self.data and "dieselExhaustFluidLow" in self.data["indicators"]:
+                if self.data.get("indicators", {}).get("dieselExhaustFluidLow", {}).get("value") is not None:
                     exhaustdata["Exhaust Fluid Low"] = self.data["indicators"]["dieselExhaustFluidLow"]["value"]
-                if "indicators" in self.data and "dieselExhaustFluidSystemFault" in self.data["indicators"]:
+                if self.data.get("indicators", {}).get("dieselExhaustFluidSystemFault", {}).get("value") is not None:
                     exhaustdata["Exhaust Fluid System Fault"] = self.data["indicators"]["dieselExhaustFluidSystemFault"]["value"]
-                return exhaustdata
+                return exhaustdata or None
             if self.sensor == "speed":
                 attribs = {}
                 if "acceleratorPedalPosition" in self.data:
@@ -508,33 +488,26 @@ class CarSensor(
                     attribs["brakePedalStatus"] = self.data["brakePedalStatus"]["value"]
                 if "brakeTorque" in self.data:
                     attribs["brakeTorque"] = self.data["brakeTorque"]["value"]
-                if "engineSpeed" in self.data:
-                    if "xevBatteryVoltage" not in self.data:
-                        # Do not display for EV
-                        attribs["engineSpeed"] = self.data["engineSpeed"]["value"]
+                if "engineSpeed" in self.data and "xevBatteryVoltage" not in self.data:
+                    attribs["engineSpeed"] = self.data["engineSpeed"]["value"]
                 if "gearLeverPosition" in self.data:
                     attribs["gearLeverPosition"] = self.data["gearLeverPosition"]["value"]
                 if "parkingBrakeStatus" in self.data:
                     attribs["parkingBrakeStatus"] = self.data["parkingBrakeStatus"]["value"]
                 if "torqueAtTransmission" in self.data:
                     attribs["torqueAtTransmission"] = self.data["torqueAtTransmission"]["value"]
-                if "tripFuelEconomy" in self.data:
-                    if "xevBatteryVoltage" not in self.data:
-                        # Do not display tripFuelEconomy if EV
-                        if "xevBatteryRange" in self.data:
-                            # DO display for Hybrid
-                            attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
-                        attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
-
-                return attribs
+                if "tripFuelEconomy" in self.data and "xevBatteryVoltage" not in self.data:
+                    attribs["tripFuelEconomy"] = self.data["tripFuelEconomy"]["value"]
+                return attribs or None
             if self.sensor == "indicators":
                 alerts = {}
-                for key, value in self.data["indicators"].items():
-                    if "value" in value:
+                for key, value in self.data.get("indicators", {}).items():
+                    if value.get("value") is not None:
                         alerts[key] = value["value"]
-                return alerts
-            return None
+                return alerts or None
         return None
+
+
 
     @property
     def name(self):
