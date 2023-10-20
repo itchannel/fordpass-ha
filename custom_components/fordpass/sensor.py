@@ -670,6 +670,8 @@ class CarSensor(
                 return SensorStateClass.TOTAL
             if SENSORS[self.sensor]["state_class"] == "measurement":
                 return SensorStateClass.MEASUREMENT
+            if SENSORS[self.sensor]["state_class"] == "total_increasing":
+                return SensorStateClass.TOTAL_INCREASING
             return None
         return None
 
@@ -683,4 +685,8 @@ class CarSensor(
                 return SensorDeviceClass.TIMESTAMP
             if SENSORS[self.sensor]["device_class"] == "temperature":
                 return SensorDeviceClass.TEMPERATURE
+            if SENSORS[self.sensor]["device_class"] == "battery":
+                return SensorDeviceClass.BATTERY
+            if SENSORS[self.sensor]["device_class"] == "speed":
+                return SensorDeviceClass.SPEED
         return None
