@@ -498,10 +498,9 @@ class CarSensor(
                     "xevBatteryTimeToFullCharge" in self.data and self.data["xevBatteryTimeToFullCharge"] is not None and self.data["xevBatteryTimeToFullCharge"]["value"] is not None
                     and self.data["xevBatteryTimeToFullCharge"]["updateTime"] is not None
                 ):
-                    cs_update_time = datetime.strptime(self.data["xevBatteryTimeToFullCharge"]["updateTime"], "%Y-%m-%dT%H:%M:%SZ")
+                    cs_update_time = dt.parse_datetime(self.data["xevBatteryTimeToFullCharge"]["updateTime"])
                     cs_est_end_time = cs_update_time + timedelta(minutes=self.data["xevBatteryTimeToFullCharge"]["value"])
-                    cs_end_time = cs_est_end_time.strftime("%Y-%m-%d %H:%M:%S")
-                    cs["Estimated End Time"] = datetime.strptime(cs_end_time, "%Y-%m-%d %H:%M:%S")
+                    cs["Estimated End Time"] = dt.as_local(cs_est_end_time)
                 return cs
 
             if self.sensor == "zoneLighting":
