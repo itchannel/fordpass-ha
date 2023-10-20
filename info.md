@@ -1,9 +1,11 @@
 ## **Changelog**
 ### Version 1.59
-- Add support for manual VIN entry (Lincoln cars hopefuly)
+- Add support for manual VIN entry (Lincoln cars hopefuly) - Please test this and report any errrors back!
 - Fix for lastRefresh sensor not returning local time
 - Fix for elVehCharging Estimated End Time not returning local time
 - Fix for elVehCharging Battery Temp debug error
+- Added device class for battery
+- Fix for incorrect DoorStatus
 - Added Trip Data to elVeh.
   - Trip Ambient Temp
   - Trip Outside Air Ambient Temp
