@@ -1,8 +1,9 @@
 ## **Changelog**
-### Version 1.60
+### Version 1.61
 - Deepsleep status is now reported again as a sensor
 - Compass Direction is now an attribute under the device_tracker entity
-
+### Version 1.60
+- Versioning issue 1.59 is 1.60
 ### Version 1.59
 - Add support for manual VIN entry (Lincoln cars hopefuly) - Please test this and report any errrors back!
 - Fix for lastRefresh sensor not returning local time

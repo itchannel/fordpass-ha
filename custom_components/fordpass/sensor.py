@@ -67,18 +67,18 @@ class CarSensor(
         self._attr = {}
         self.coordinator = coordinator
         self.units = coordinator.hass.config.units
-        self.data = coordinator.data["metrics"]
-        self.events = coordinator.data["events"]
-        self.states = coordinator.data["states"]
+        self.data = coordinator.data.get("metrics", {})
+        self.events = coordinator.data("events", {})
+        self.states = coordinator.data("states", {})
         self._device_id = "fordpass_" + sensor
         # Required for HA 2022.7
         self.coordinator_context = object()
 
     def get_value(self, ftype):
         """Get sensor value and attributes from coordinator data"""
-        self.data = self.coordinator.data["metrics"]
-        self.events = self.coordinator.data["events"]
-        self.states = self.coordinator.data["states"]
+        self.data = self.coordinator.data.get("metrics", {})
+        self.events = self.coordinator.data("events", {})
+        self.states = self.coordinator.data("states", {})
         self.units = self.coordinator.hass.config.units
         if ftype == "state":
             if self.sensor == "odometer":
