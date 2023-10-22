@@ -25,7 +25,14 @@
                 "data": {
                   "vin": "VIN"
                 }
-              }
+              },
+              "vin": {
+                "title": "Inserimento manuale del vin",
+                "description": "Inserisci manualmente il numero VIN poiché non è stato possibile trovare veicoli automaticamente.",
+                "data": {
+                    "vin": "Numero di telaio del veicolo"
+                }
+            }
         }
     },
     "options": {

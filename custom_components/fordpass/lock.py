@@ -8,17 +8,19 @@ from .const import DOMAIN, COORDINATOR
 
 _LOGGER = logging.getLogger(__name__)
 
-
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add the lock from the config."""
     entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
 
     lock = Lock(entry)
-    if lock.coordinator.data["metrics"]["doorLockStatus"] and lock.coordinator.data["metrics"]["doorLockStatus"][0]["value"] != "ERROR":
+    
+    door_lock_status = lock.coordinator.data.get("metrics", {}).get("doorLockStatus", [])
+    all_doors_status = next((item for item in door_lock_status if item.get("vehicleDoor") == "ALL_DOORS"), None)
+    
+    if all_doors_status and all_doors_status.get("value") != "ERROR":
         async_add_entities([lock], False)
     else:
         _LOGGER.debug("Ford model doesn't support remote locking")
-
 
 class Lock(FordPassEntity, LockEntity):
     """Defines the vehicle's lock."""
@@ -26,7 +28,7 @@ class Lock(FordPassEntity, LockEntity):
         """Initialize."""
         self._device_id = "fordpass_doorlock"
         self.coordinator = coordinator
-        self.data = coordinator.data["metrics"]
+        self.data = coordinator.data.get("metrics", {})
 
         # Required for HA 2022.7
         self.coordinator_context = object()
@@ -61,9 +63,11 @@ class Lock(FordPassEntity, LockEntity):
     @property
     def is_locked(self):
         """Determine if the lock is locked."""
-        if self.coordinator.data["metrics"] is None or self.coordinator.data["metrics"]["doorLockStatus"] is None:
+        door_lock_status = self.coordinator.data.get("metrics", {}).get("doorLockStatus", [])
+        all_doors_status = next((item for item in door_lock_status if item.get("vehicleDoor") == "ALL_DOORS"), None)
+        if not all_doors_status:
             return None
-        return self.coordinator.data["metrics"]["doorLockStatus"][0]["value"] == "LOCKED"
+        return all_doors_status.get("value") == "LOCKED" or all_doors_status.get("value") == "DOUBLE_LOCKED"
 
     @property
     def icon(self):

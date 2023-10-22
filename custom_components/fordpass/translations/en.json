@@ -15,7 +15,6 @@
                 "data": {
                     "password": "FordPass Password",
                     "username": "FordPass Username (Email)",
-                    "vin": "VIN",
                     "region" : "FordPass Region"
                 }
             },
@@ -25,7 +24,14 @@
                 "data": {
                   "vin": "VIN"
                 }
-              }
+              },
+            "vin": {
+                "title": "Manual Vin Entry",
+                "description": "Please enter your VIN number manually as no vehicles could be found automatticaly.",
+                "data": {
+                    "vin": "Vin Number for vehicle"
+                }
+            }
         }
     },
     "options": {
@@ -67,3 +73,4 @@
     },
     "title": "Fordpass"
 }
+    
