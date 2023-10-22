@@ -2,6 +2,8 @@
 ### Version 1.61
 - Deepsleep status is now reported again as a sensor
 - Compass Direction is now an attribute under the device_tracker entity
+- Handle missing countdownTimer variable
+- Handle missing events dictionary
 ### Version 1.60
 - Versioning issue 1.59 is 1.60
 ### Version 1.59
