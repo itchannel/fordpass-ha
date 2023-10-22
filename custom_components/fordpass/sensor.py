@@ -151,7 +151,7 @@ class CarSensor(
                 return self.data.get("outsideTemperature", {}).get("value", "Unsupported")
             if self.sensor == "engineOilTemp":
                 return self.data.get("engineOilTemp", {}).get("value", "Unsupported")
-            if self.sensor == "deepSleepInProgress":
+            if self.sensor == "deepSleep":
                 state = self.states.get("commandPreclusion", {}).get("value", {}).get("toState", "Unsupported")
                 if state == "COMMANDS_PRECLUDED":
                     return "ACTIVE"
@@ -207,8 +207,8 @@ class CarSensor(
                 return self.data.get("ignitionStatus", {})
             if self.sensor == "firmwareUpgInProgress":
                 return self.data.get("firmwareUpgradeInProgress", {})
-            if self.sensor == "deepSleepInProgress":
-                return self.data.get("deepSleepInProgress", {})
+            if self.sensor == "deepSleep":
+                return None
             if self.sensor == "doorStatus":
                 doors = {}
                 for value in self.data.get(self.sensor, []):
