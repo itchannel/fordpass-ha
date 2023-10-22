@@ -6,7 +6,7 @@
 - Fix for elVehCharging Battery Temp debug error
 - elVehCharging now displays Plug Status as default
 - Added device class for battery
-- Fix for incorrect DoorStatus
+- Fix for incorrect DoorStatus @sarangcr03 
 - Added Trip Data to elVeh.
   - Trip Ambient Temp
   - Trip Outside Air Ambient Temp
