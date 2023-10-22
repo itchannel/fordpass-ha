@@ -68,6 +68,8 @@ class CarTracker(FordPassEntity, TrackerEntity):
             atts["gpsCoordinateMethod"] = self.coordinator.data["metrics"]["position"]["value"]["gpsCoordinateMethod"]
         if "gpsDimension" in self.coordinator.data["metrics"]["position"]["value"]:
             atts["gpsDimension"] = self.coordinator.data["metrics"]["position"]["value"]["gpsDimension"]
+        atts["compassDirection"] = self.coordinator.data.get("metrics", {}).get("compassDirection", {}).get("value", "Unknown")
+        
         return atts
 
     @property
