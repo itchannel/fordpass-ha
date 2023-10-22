@@ -4,6 +4,7 @@
 - Fix for lastRefresh sensor not returning local time
 - Fix for elVehCharging Estimated End Time not returning local time
 - Fix for elVehCharging Battery Temp debug error
+- elVehCharging now displays Plug Status as default
 - Added device class for battery
 - Fix for incorrect DoorStatus
 - Added Trip Data to elVeh.
@@ -14,6 +15,8 @@
   - Trip Energy Consumed (kW)
   - Trip Distance Traveled
   - Trip Efficiency
+  - Driving Score now Trip Driving Score
+  - Range Regen now Trip Range Regeneration
 ### Version 1.58
 - Rewrote auth function to allow for more granular debugging
 - Changed odometer to use native conversions in HA (pick from sensor options)
