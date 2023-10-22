@@ -253,22 +253,22 @@ class CarSensor(
 
                 if "xevBatteryVoltage" in self.data:
                     elecs["Battery Voltage"] = float(self.data.get("xevBatteryVoltage", {}).get("value", 0))
-                    batt_volt = elecs["Battery Voltage"]
+                    batt_volt = elecs.get("Battery Voltage", 0)
 
                 if "xevBatteryIoCurrent" in self.data:
                     elecs["Battery Amperage"] = float(self.data.get("xevBatteryIoCurrent", {}).get("value", 0))
-                    batt_amps = elecs["Battery Amperage"]
+                    batt_amps = elecs.get("Battery Amperage", 0)
 
                 if batt_volt != 0 and batt_amps != 0:
                     elecs["Battery kW"] = round((batt_volt * batt_amps) / 1000, 2)
 
                 if "xevTractionMotorVoltage" in self.data:
                     elecs["Motor Voltage"] = float(self.data.get("xevTractionMotorVoltage", {}).get("value", 0))
-                    motor_volt = elecs["Motor Voltage"]
+                    motor_volt = elecs.get("Motor Voltage",0)
 
                 if "xevTractionMotorCurrent" in self.data:
                     elecs["Motor Amperage"] = float(self.data.get("xevTractionMotorCurrent", {}).get("value", 0))
-                    motor_amps = elecs["Motor Amperage"]
+                    motor_amps = elecs.get("Motor Amperage", 0)
 
                 # This will make Motor kW not display if vehicle is not in use. Not sure if that is bad practice
                 if motor_volt != 0 and motor_amps != 0:
@@ -303,7 +303,10 @@ class CarSensor(
                             and "distance_traveled" in tripData
                             and tripData["distance_traveled"] is not None
                         ):
-                            elecs["Trip Efficiency"] = elecs["Trip Distance Traveled"] / elecs["Trip Energy Consumed"]
+                            if elecs["Trip Distance Traveled"] == 0 or elecs["Trip Energy Consumed"] == 0:
+                                elecs["Trip Efficiency"] = 0
+                            else:
+                                elecs["Trip Efficiency"] = elecs["Trip Distance Traveled"] / elecs["Trip Energy Consumed"]
                 return elecs
             # SquidBytes: Added elVehCharging
             if self.sensor == "elVehCharging":
