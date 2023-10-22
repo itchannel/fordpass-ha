@@ -48,10 +48,7 @@ SENSORS = {
     "coolantTemp": {"icon": "mdi:coolant-temperature", "api_key": "engineCoolantTemp" ,"state_class": "measurement", "device_class": "temperature", "measurement": "°C"},
     "outsideTemp": {"icon": "mdi:thermometer", "state_class": "measurement", "device_class": "temperature", "api_key": "outsideTemperature", "measurement": "°C"},
     "engineOilTemp": {"icon": "mdi:oil-temperature", "state_class": "measurement", "device_class": "temperature", "api_key": "engineOilTemp", "measurement": "°C"},
-    # "deepSleepInProgress": {
-    #     "icon": "mdi:power-sleep",
-    #    "name": "Deep Sleep Mode Active",
-    # },
+    "deepSleep": {"icon": "mdi:power-sleep", "name": "Deep Sleep Mode Active", "api_key": "commandPreclusion", "api_class": "states"},
     # "firmwareUpgInProgress": {
     #    "icon": "mdi:one-up",
     #   "name": "Firmware Update In Progress",

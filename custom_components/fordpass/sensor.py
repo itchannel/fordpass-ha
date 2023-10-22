@@ -31,10 +31,14 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for key, value in SENSORS.items():
         sensor = CarSensor(entry, key, config_entry.options)
         api_key = value["api_key"]
+        api_class = value.get("api_class", None)
         string =  isinstance(api_key, str)
         if string and api_key == "messages" or api_key == "lastRefresh":
             sensors.append(sensor)
         elif string:
+            if api_key and api_class and api_key in sensor.coordinator.data.get(api_class, {}):
+                sensors.append(sensor)
+                continue
             if api_key and api_key in sensor.coordinator.data.get("metrics", {}):
                 sensors.append(sensor)
         else:
@@ -65,6 +69,7 @@ class CarSensor(
         self.units = coordinator.hass.config.units
         self.data = coordinator.data["metrics"]
         self.events = coordinator.data["events"]
+        self.states = coordinator.data["states"]
         self._device_id = "fordpass_" + sensor
         # Required for HA 2022.7
         self.coordinator_context = object()
@@ -73,6 +78,7 @@ class CarSensor(
         """Get sensor value and attributes from coordinator data"""
         self.data = self.coordinator.data["metrics"]
         self.events = self.coordinator.data["events"]
+        self.states = self.coordinator.data["states"]
         self.units = self.coordinator.hass.config.units
         if ftype == "state":
             if self.sensor == "odometer":
@@ -145,6 +151,14 @@ class CarSensor(
                 return self.data.get("outsideTemperature", {}).get("value", "Unsupported")
             if self.sensor == "engineOilTemp":
                 return self.data.get("engineOilTemp", {}).get("value", "Unsupported")
+            if self.sensor == "deepSleepInProgress":
+                state = self.states.get("commandPreclusion", {}).get("value", {}).get("toState", "Unsupported")
+                if state == "COMMANDS_PRECLUDED":
+                    return "ACTIVE"
+                elif state == "COMMANDS_PERMITTED":
+                    return "DISABLED"
+                else:
+                    return state
             return None
         if ftype == "measurement":
             return SENSORS.get(self.sensor, {}).get("measurement", None)
