@@ -259,8 +259,9 @@ class CarSensor(
                     elecs["Battery Amperage"] = float(self.data.get("xevBatteryIoCurrent", {}).get("value", 0))
                     batt_amps = elecs.get("Battery Amperage", 0)
 
-                if batt_volt != 0 and batt_amps != 0:
-                    elecs["Battery kW"] = round((batt_volt * batt_amps) / 1000, 2)
+                if "xevBatteryIoCurrent" in self.data and "xevBatteryVoltage" in self.data:
+                    if batt_volt != 0 and batt_amps != 0:
+                        elecs["Battery kW"] = round((batt_volt * batt_amps) / 1000, 2)
 
                 if "xevTractionMotorVoltage" in self.data:
                     elecs["Motor Voltage"] = float(self.data.get("xevTractionMotorVoltage", {}).get("value", 0))
@@ -271,8 +272,9 @@ class CarSensor(
                     motor_amps = elecs.get("Motor Amperage", 0)
 
                 # This will make Motor kW not display if vehicle is not in use. Not sure if that is bad practice
-                if motor_volt != 0 and motor_amps != 0:
-                    elecs["Motor kW"] = round((motor_volt * motor_amps) / 1000, 2)
+                if "xevTractionMotorVoltage" in self.data and "xevTractionMotorCurrent" in self.data:
+                    if motor_volt != 0 and motor_amps != 0:
+                        elecs["Motor kW"] = round((motor_volt * motor_amps) / 1000, 2)
 
                 # tripXevBatteryChargeRegenerated should be a previous FordPass feature called "Driving Score". A % based on how much regen vs brake you use
                 if "tripXevBatteryChargeRegenerated" in self.data:
@@ -338,8 +340,9 @@ class CarSensor(
                     ch_amps = cs["Charging Amperage"]
 
                 # This will make Charging kW not display if vehicle is not charging. Not sure if that is bad practice by having it pop in and out
-                if ch_volt != 0 and ch_amps != 0:
-                    cs["Charging kW"] = round((ch_volt * ch_amps) / 1000, 2)
+                if "xevBatteryChargerVoltageOutput" in self.data and "xevBatteryChargerCurrentOutput" in self.data:
+                    if ch_volt != 0 and ch_amps != 0:
+                        cs["Charging kW"] = round((ch_volt * ch_amps) / 1000, 2)
 
                 if "xevBatteryTemperature" in self.data:
                     cs["Battery Temperature"] = self.units.temperature(self.data.get("xevBatteryTemperature", {}).get("value", 0), UnitOfTemperature.CELSIUS)
