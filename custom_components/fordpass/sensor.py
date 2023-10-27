@@ -283,6 +283,18 @@ class CarSensor(
                 if "tripXevBatteryRangeRegenerated" in self.data:
                     elecs["Trip Range Regenerated"] = self.units.length(self.data.get("tripXevBatteryRangeRegenerated", {}).get("value", 0),UnitOfLength.KILOMETERS)
 
+                if "customMetrics" in self.data and "xevBatteryCapacity" in self.data:
+                    for key in self.data.get("customMetrics", {}):
+                        if "accumulated-vehicle-speed-cruising-coaching-score" in key:
+                            elecs["Trip Speed Score"] = self.data.get("customMetrics", {}).get(key, {}).get("value")
+                        if "accumulated-deceleration-coaching-score" in key:
+                            elecs["Trip Deceleration Score"] = self.data.get("customMetrics", {}).get(key, {}).get("value")
+                        if "accumulated-acceleration-coaching-score" in key:
+                            elecs["Trip Acceleration Score"] = self.data.get("customMetrics", {}).get(key, {}).get("value")
+                        if "custom:vehicle-electrical-efficiency" in key:
+                            # Still don't know what this value is, but if I add it and get more data it could help to figure it out
+                            elecs["Trip Electrical Efficiency"] = self.data.get("customMetrics", {}).get(key, {}).get("value")
+                            
                 if "customEvents" in self.events:
                     tripDataStr = self.events.get("customEvents", {}).get("xev-key-off-trip-segment-data", {}).get("oemData", {}).get("trip_data", {}).get("stringArrayValue", [])
                     for dataStr in tripDataStr:
