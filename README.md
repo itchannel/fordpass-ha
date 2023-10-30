@@ -48,23 +48,25 @@ A number of users have encountered their accounts being banned for containing "+
 ## **Changelog**
 [Updates](info.md)
 
-## Install
-Use HACS and add as a custom repo. Once the integration is installed go to your integrations and follow the configuration options to specify the below:
+## Installation
+Use [HACS](https://hacs.xyz/) to add this repository as a custom repo. Upon installation navigate to your integrations, and follow the configuration options. You will need to provide:
 - Username (Fordpass App)
 - Password (Fordpass App)
-- VIN Number (Not required in 1.50)
 - Region (Where you are based, required for tokens to work correctly)
 
-## Usage
+## Requirement
 Your car must have the lastest onboard modem functionality and have registered/authorised the fordpass application
 
-### Car Refresh
-I have added a service to poll the car for updates, due to the battery drain I have left this up to you to set the interval. The service to be called is "refresh_status" and can be accessed in home assistant using "fordpas.refresh_status". 
+## Services
+
+ ### Car Refresh
+I have added a service to poll the car for updates, due to the battery drain I have left this up to you to set the interval. The service to be called is "refresh_status" and can be accessed in home assistant using "fordpass.refresh_status". 
 
 Optionally you can add the "vin" parameter followed by your VIN number to only refresh one vehicle. By default this service will refresh all registered cars in HA.
 
 **This will take up to 5 mins to update from the car once the service has been run**
-###
+
+### Unit Conversion
 Click on options and choose imperial or metric to display in km/miles. Takes effect on next restart of home assistant. Default is Metric
 
 ### Clear Tokens
@@ -75,30 +77,35 @@ This service allows you to manually refresh/poll the API without waiting the set
 
 
 ## Currently Working
+Depending on your vehicles capability
 
-- Fuel Level
-- Odometer
+### Switches
+- Guard Mode
 - Lock/Unlock
-- Oil Status
-- Last known GPS Coordinates/Map
-- Tyre Status
-- Battery Status
-- Ignition Status
-- Alarm Status
-- Individual door statuses
 - Remote Start
-- Window Status (Only if your car supports it!)
-- Last Car Refresh status
-- Car Tracker
-- Supports Multiple Regions
-- Electric Vehicle Support
-- TPMS Sensors
-- Guard Mode (Only supported cars)
+
+### Sensors
+- Alarm Status
+- Battery Status (12v)
+- Coolant Temperature
 - Deep sleep status
-- Fordpass messages and alerts
-
-
+- Diesel System
+- Door Status
+- Electric Vehicle Support
+- Firmware Update Status
+- Fuel Level
+- Ignition Status
+- Indicators (Value of various vehicles indicators)
+- Last Refresh
+- FordPass messages and alerts
+- Odometer
+- Oil Status
+- Outside Temperature
+- Speed
+- Tyre Status
+- TPMS Sensors
+- Car Tracker
+- Window Status
 
 ## Disclaimer
-
 This integration is not officially supported by Ford and as such using this integration could result in your account being locked out!
