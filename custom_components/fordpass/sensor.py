@@ -67,28 +67,28 @@ class CarSensor(
         self._attr = {}
         self.coordinator = coordinator
         self.units = coordinator.hass.config.units
-        self.data = coordinator.data["metrics"]
-        self.events = coordinator.data["events"]
-        self.states = coordinator.data["states"]
+        self.data = coordinator.data.get("metrics", {})
+        self.events = coordinator.data.get("events", {})
+        self.states = coordinator.data.get("states", {})
         self._device_id = "fordpass_" + sensor
         # Required for HA 2022.7
         self.coordinator_context = object()
 
     def get_value(self, ftype):
         """Get sensor value and attributes from coordinator data"""
-        self.data = self.coordinator.data["metrics"]
-        self.events = self.coordinator.data["events"]
-        self.states = self.coordinator.data["states"]
+        self.data = self.coordinator.data.get("metrics", {})
+        self.events = self.coordinator.data.get("events", {})
+        self.states = self.coordinator.data.get("states", {})
         self.units = self.coordinator.hass.config.units
         if ftype == "state":
             if self.sensor == "odometer":
                 return self.data.get("odometer", {}).get("value")
                     #return self.data.get("odometer", {}).get("value", {})
             if self.sensor == "fuel":
-                fuel_level = self.data.get("fuelLevel", {}).get("value", 0)
+                fuel_level = self.data.get("fuelLevel", {}).get("value")
                 if fuel_level is not None:
                     return round(fuel_level)
-                battery_soc = self.data.get("xevBatteryStateOfCharge", {}).get("value", 0)
+                battery_soc = self.data.get("xevBatteryStateOfCharge", {}).get("value")
                 if battery_soc is not None:
                     return round(battery_soc)
                 return None
@@ -151,7 +151,7 @@ class CarSensor(
                 return self.data.get("outsideTemperature", {}).get("value", "Unsupported")
             if self.sensor == "engineOilTemp":
                 return self.data.get("engineOilTemp", {}).get("value", "Unsupported")
-            if self.sensor == "deepSleepInProgress":
+            if self.sensor == "deepSleep":
                 state = self.states.get("commandPreclusion", {}).get("value", {}).get("toState", "Unsupported")
                 if state == "COMMANDS_PRECLUDED":
                     return "ACTIVE"
@@ -171,10 +171,16 @@ class CarSensor(
                     return { "Ambient Temp": ambient_temp}
                 return None
             if self.sensor == "fuel":
-                if "fuelRange" in self.data:
-                    return {"fuelRange" : self.units.length(self.data.get("fuelRange", {}).get("value", 0),UnitOfLength.KILOMETERS)}
-                if "xevBatteryRange" in self.data:
-                    return {"batteryRange": self.units.length(self.data.get("xevBatteryRange", {}).get("value", 0),UnitOfLength.KILOMETERS)}
+                fuel = {}
+                fuel_range = self.data.get("fuelRange", {}).get("value", 0)
+                battery_range = self.data.get("xevBatteryRange", {}).get("value", 0)
+                if fuel_range != 0:
+                    # Display fuel range for both Gas and Hybrid (assuming its not 0)
+                    fuel["fuelRange"] = self.units.length(fuel_range,UnitOfLength.KILOMETERS)
+                if battery_range != 0:
+                    # Display Battery range for EV and Hybrid
+                    fuel["batteryRange"] = self.units.length(battery_range,UnitOfLength.KILOMETERS)
+                return fuel
             if self.sensor == "battery":
                 return {
                     "Battery Voltage": self.data.get("batteryVoltage", {}).get("value", 0)
@@ -207,8 +213,8 @@ class CarSensor(
                 return self.data.get("ignitionStatus", {})
             if self.sensor == "firmwareUpgInProgress":
                 return self.data.get("firmwareUpgradeInProgress", {})
-            if self.sensor == "deepSleepInProgress":
-                return self.data.get("deepSleepInProgress", {})
+            if self.sensor == "deepSleep":
+                return None
             if self.sensor == "doorStatus":
                 doors = {}
                 for value in self.data.get(self.sensor, []):
@@ -253,26 +259,33 @@ class CarSensor(
 
                 if "xevBatteryVoltage" in self.data:
                     elecs["Battery Voltage"] = float(self.data.get("xevBatteryVoltage", {}).get("value", 0))
-                    batt_volt = elecs["Battery Voltage"]
+                    batt_volt = elecs.get("Battery Voltage", 0)
 
                 if "xevBatteryIoCurrent" in self.data:
                     elecs["Battery Amperage"] = float(self.data.get("xevBatteryIoCurrent", {}).get("value", 0))
-                    batt_amps = elecs["Battery Amperage"]
+                    batt_amps = elecs.get("Battery Amperage", 0)
 
-                if batt_volt != 0 and batt_amps != 0:
-                    elecs["Battery kW"] = round((batt_volt * batt_amps) / 1000, 2)
+                # Returning 0 in else - to prevent attribute from not displaying
+                if "xevBatteryIoCurrent" in self.data and "xevBatteryVoltage" in self.data:
+                    if batt_volt != 0 and batt_amps != 0:
+                        elecs["Battery kW"] = round((batt_volt * batt_amps) / 1000, 2)
+                    else:
+                        elecs["Battery kW"] = 0
 
                 if "xevTractionMotorVoltage" in self.data:
                     elecs["Motor Voltage"] = float(self.data.get("xevTractionMotorVoltage", {}).get("value", 0))
-                    motor_volt = elecs["Motor Voltage"]
+                    motor_volt = elecs.get("Motor Voltage",0)
 
                 if "xevTractionMotorCurrent" in self.data:
                     elecs["Motor Amperage"] = float(self.data.get("xevTractionMotorCurrent", {}).get("value", 0))
-                    motor_amps = elecs["Motor Amperage"]
+                    motor_amps = elecs.get("Motor Amperage", 0)
 
-                # This will make Motor kW not display if vehicle is not in use. Not sure if that is bad practice
-                if motor_volt != 0 and motor_amps != 0:
-                    elecs["Motor kW"] = round((motor_volt * motor_amps) / 1000, 2)
+                # Returning 0 in else - to prevent attribute from not displaying
+                if "xevTractionMotorVoltage" in self.data and "xevTractionMotorCurrent" in self.data:
+                    if motor_volt != 0 and motor_amps != 0:
+                        elecs["Motor kW"] = round((motor_volt * motor_amps) / 1000, 2)
+                    else:
+                        elecs["Motor kW"] = 0
 
                 # tripXevBatteryChargeRegenerated should be a previous FordPass feature called "Driving Score". A % based on how much regen vs brake you use
                 if "tripXevBatteryChargeRegenerated" in self.data:
@@ -281,6 +294,18 @@ class CarSensor(
                 if "tripXevBatteryRangeRegenerated" in self.data:
                     elecs["Trip Range Regenerated"] = self.units.length(self.data.get("tripXevBatteryRangeRegenerated", {}).get("value", 0),UnitOfLength.KILOMETERS)
 
+                if "customMetrics" in self.data and "xevBatteryCapacity" in self.data:
+                    for key in self.data.get("customMetrics", {}):
+                        if "accumulated-vehicle-speed-cruising-coaching-score" in key:
+                            elecs["Trip Speed Score"] = self.data.get("customMetrics", {}).get(key, {}).get("value")
+                        if "accumulated-deceleration-coaching-score" in key:
+                            elecs["Trip Deceleration Score"] = self.data.get("customMetrics", {}).get(key, {}).get("value")
+                        if "accumulated-acceleration-coaching-score" in key:
+                            elecs["Trip Acceleration Score"] = self.data.get("customMetrics", {}).get(key, {}).get("value")
+                        if "custom:vehicle-electrical-efficiency" in key:
+                            # Still don't know what this value is, but if I add it and get more data it could help to figure it out
+                            elecs["Trip Electrical Efficiency"] = self.data.get("customMetrics", {}).get(key, {}).get("value")
+                            
                 if "customEvents" in self.events:
                     tripDataStr = self.events.get("customEvents", {}).get("xev-key-off-trip-segment-data", {}).get("oemData", {}).get("trip_data", {}).get("stringArrayValue", [])
                     for dataStr in tripDataStr:
@@ -290,7 +315,7 @@ class CarSensor(
                         if "outside_air_ambient_temperature" in tripData:
                             elecs["Trip Outside Air Ambient Temp"] = self.units.temperature(tripData["outside_air_ambient_temperature"], UnitOfTemperature.CELSIUS)
                         if "trip_duration" in tripData:
-                            elecs["Trip Duration"] = tripData["trip_duration"] / 3600
+                            elecs["Trip Duration"] = str(dt.parse_duration(str(tripData["trip_duration"])))
                         if "cabin_temperature" in tripData:
                             elecs["Trip Cabin Temp"] = self.units.temperature(tripData["cabin_temperature"], UnitOfTemperature.CELSIUS)
                         if "energy_consumed" in tripData:
@@ -303,7 +328,10 @@ class CarSensor(
                             and "distance_traveled" in tripData
                             and tripData["distance_traveled"] is not None
                         ):
-                            elecs["Trip Efficiency"] = elecs["Trip Distance Traveled"] / elecs["Trip Energy Consumed"]
+                            if elecs["Trip Distance Traveled"] == 0 or elecs["Trip Energy Consumed"] == 0:
+                                elecs["Trip Efficiency"] = 0
+                            else:
+                                elecs["Trip Efficiency"] = elecs["Trip Distance Traveled"] / elecs["Trip Energy Consumed"]
                 return elecs
             # SquidBytes: Added elVehCharging
             if self.sensor == "elVehCharging":
@@ -334,9 +362,12 @@ class CarSensor(
                     cs["Charging Amperage"] = float(self.data.get("xevBatteryChargerCurrentOutput", {}).get("value", 0))
                     ch_amps = cs["Charging Amperage"]
 
-                # This will make Charging kW not display if vehicle is not charging. Not sure if that is bad practice by having it pop in and out
-                if ch_volt != 0 and ch_amps != 0:
-                    cs["Charging kW"] = round((ch_volt * ch_amps) / 1000, 2)
+                # Returning 0 in else - to prevent attribute from not displaying
+                if "xevBatteryChargerVoltageOutput" in self.data and "xevBatteryChargerCurrentOutput" in self.data:
+                    if ch_volt != 0 and ch_amps != 0:
+                        cs["Charging kW"] = round((ch_volt * ch_amps) / 1000, 2)
+                    else:
+                        cs["Charging kW"] = 0
 
                 if "xevBatteryTemperature" in self.data:
                     cs["Battery Temperature"] = self.units.temperature(self.data.get("xevBatteryTemperature", {}).get("value", 0), UnitOfTemperature.CELSIUS)

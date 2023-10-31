@@ -1,8 +1,20 @@
 ## **Changelog**
-### Version 1.60
+### Version 1.61
 - Deepsleep status is now reported again as a sensor
 - Compass Direction is now an attribute under the device_tracker entity
-
+- Handle missing countdownTimer variable
+- Handle missing events dictionary
+- Temporary fix for elveh errors
+- Added more Trip Data to elVeh (will assess to determine if previous Trip scores can be removed)
+  - Trip Speed Score
+  - Trip Deceleration Score
+  - Trip Acceleration Score
+  - Trip Electrical Efficiency (unsure what this value is, adding it to get more data)
+- Fix for fuel not displaying properly for EV's (will assess to determine if duplicate values in other sensors can be removed)
+- Better display for Trip Duration under elVeh
+- elVeh kW conversions will display 0 if voltage or amperage is 0
+### Version 1.60
+- Versioning issue 1.59 is 1.60
 ### Version 1.59
 - Add support for manual VIN entry (Lincoln cars hopefuly) - Please test this and report any errrors back!
 - Fix for lastRefresh sensor not returning local time

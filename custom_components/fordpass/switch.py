@@ -36,7 +36,7 @@ class Switch(FordPassEntity, SwitchEntity):
         self._device_id = "fordpass_" + switch
         self.switch = switch
         self.coordinator = coordinator
-        self.data = coordinator.data["metrics"]
+        self.data = coordinator.data.get("metrics", {})
         # Required for HA 2022.7
         self.coordinator_context = object()
 
@@ -83,24 +83,13 @@ class Switch(FordPassEntity, SwitchEntity):
         """Check status of switch"""
         if self.switch == "ignition":
             # Return None if both ignitionStatus and remoteStartCountdownTimer are None
-            if (
-                self.coordinator.data["metrics"] is None
-                or (
-                    self.coordinator.data["metrics"]["ignitionStatus"] is None
-                    and self.coordinator.data["metrics"]["remoteStartCountdownTimer"] is None
-                )
-            ):
-                return None
+            metrics = self.coordinator.data.get("metrics", {})
+            ignition_status = metrics.get("ignitionStatus", {}).get("value")
+            countdown_timer = metrics.get("remoteStartCountdownTimer", {}).get("value")
+            if ignition_status == "ON" or countdown_timer is not None and countdown_timer > 0:
+                return True
+            return False
 
-            # First check if ignitionStatus is ON
-            if self.coordinator.data["metrics"]["ignitionStatus"] is not None:
-                if self.coordinator.data["metrics"]["ignitionStatus"]["value"] == "ON":
-                    return True
-
-            # Then check if remoteStartCountdownTimer is greater than 0, which means a remote start is in progress
-            if self.coordinator.data["metrics"]["remoteStartCountdownTimer"] is not None:
-                if self.coordinator.data["metrics"]["remoteStartCountdownTimer"]["value"] > 0:
-                    return True
         if self.switch == "guardmode":
             # Need to find the correct response for enabled vs disabled so this may be spotty at the moment
             guardstatus = self.coordinator.data["guardstatus"]
