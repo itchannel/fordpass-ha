@@ -1,0 +1,76 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Conta já configurada",
+            "no_vehicles": "Nenhum veículo encontrado na conta ou todos já configurados"
+        },
+        "error": {
+            "cannot_connect": "Falha ao conectar",
+            "invalid_auth": "Credenciais Inválidas",
+            "invalid_vin": "Vin não encontrado na conta informada",
+            "unknown": "Erro desconhecido"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "password": "Senha do FordPass",
+                    "username": "Nome de Usuário (Email) do FordPass",
+                    "region" : "Região Usada no FordPass"
+                }
+            },
+            "vehicle": {
+                "title": "Selecione o veículo para adicionar",
+                "description": "Apenas veículos não adicionados serão exibidos",
+                "data": {
+                  "vin": "VIN"
+                }
+              },
+            "vin": {
+                "title": "Entrada Manual do Vin",
+                "description": "Por favor forneça o número VIN manualmente pois nenhum veículo foi encontrado automaticamente.",
+                "data": {
+                    "vin": "Número Vin do veículo"
+                }
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "pressure_unit": "Unidade de Pressão",
+                    "distance_unit": "Unidade de Distância",
+                    "distance_conversion": "Desabilitar conversão de distância",
+                    "update_interval": "Intervalo de conexão ao API da Fordpass (em segundos)"
+                },
+                "description": "Configurar opções da fordpass"
+            }
+        }
+    }, 
+    "services": {
+        "refresh_status": {
+            "name": "Recarregar Informações do Veículo",
+            "description": "Conecta ao veículo para atualizar informações (Pode levar até 5 minutos para a atualização completar!)",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "Entre um número vin para apenas consultar um veículo específico (O padrão é consultar todos os veículos adicionados)"
+                }
+            }
+        },
+        "clear_tokens": {
+            "name": "Apagar Tokens",
+            "description": "Apaga os tokens atuais"
+        },
+        "reload": {
+            "name": "Recarregar",
+            "description": "Recarregar a Integração Fordpass"
+        },
+        "poll_api": {
+            "name": "Conectar ao API",
+            "description": "Manualmente se conecta ao API para atualizar os dados (Atenção: executando isso com frequência pode resultar em sua conta sendo banida)"
+        }
+    },
+    "title": "Fordpass"
+}
+    
