@@ -12,6 +12,7 @@ import requests
 
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from homeassistant import exceptions
 
 _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
@@ -746,7 +747,14 @@ class Vehicle:
                                 _LOGGER.debug("Command succeeded")
                                 return True
                             if status["states"][f"{command}Command"]["value"]["toState"] == "expired":
-                                _LOGGER.debug("Command expired")
+                                _LOGGER.warning(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Expired Status')}")
+                                if "statusRefresh" in command:
+                                    raise exceptions.HomeAssistantError(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Expired Status')}")
+                                return False
+                            if status["states"][f"{command}Command"]["value"]["toState"] == "failed":
+                                _LOGGER.warning(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Failed Status')}")
+                                if "statusRefresh" in command:
+                                    raise exceptions.HomeAssistantError(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Failed Status')}")
                                 return False
                 i += 1
                 _LOGGER.debug("Looping again")
