@@ -8,6 +8,7 @@
             "cannot_connect": "Impossible de se connecter",
             "invalid_auth": "Authentification invalide",
             "invalid_vin": "Le NIV n'est pas valide pour ce compte",
+            "invalid_mobile": "Le numéro de mobile comme nom d'utilisateur doit être spécifié si vous utilisez la région sud-africaine (par exemple 07123456789, sans l'indicatif du pays)",
             "unknown": "Erreur inconnue"
         },
         "step": {

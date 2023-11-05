@@ -8,6 +8,7 @@
             "cannot_connect": "Kan geen verbinding maken",
             "invalid_auth": "Onjuiste logingegevens",
             "invalid_vin": "VIN niet bekend onder opgegeven account",
+            "invalid_mobile": "Mobilnummer som brukernavn må angis hvis du bruker Sør-Afrika (f.eks. 07123456789, uten landskode)",
             "unknown": "Onbekende fout"
         },
         "step": {

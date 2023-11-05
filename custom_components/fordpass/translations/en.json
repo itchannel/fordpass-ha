@@ -8,6 +8,7 @@
             "cannot_connect": "Failed to connect",
             "invalid_auth": "Invalid Credentials",
             "invalid_vin": "Vin not found for given account",
+            "invalid_mobile": "Mobile number as username must be specified if using South African Region (e.g. 07123456789 , without country code)",
             "unknown": "Unexpected error"
         },
         "step": {

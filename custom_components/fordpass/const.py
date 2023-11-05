@@ -27,7 +27,7 @@ COORDINATOR = "coordinator"
 
 REGION = "region"
 
-REGION_OPTIONS = ["UK&Europe", "Australia", "North America & Canada"]
+REGION_OPTIONS = ["UK&Europe", "Australia", "North America & Canada", "South Africa"]
 
 SENSORS = {
     "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance", "api_key": "odometer", "measurement": "km"},

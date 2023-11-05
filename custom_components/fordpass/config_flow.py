@@ -1,5 +1,6 @@
 """Config flow for FordPass integration."""
 import logging
+import re
 
 import voluptuous as vol
 from homeassistant import config_entries, core, exceptions
@@ -111,6 +112,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             try:
+                if user_input[REGION] == "South Africa":
+                    if self.validNumber(user_input[CONF_USERNAME]) != True:
+                        raise InvalidMobile
+                    else:
+                        if user_input[CONF_USERNAME][0] == "0":
+                            user_input[CONF_USERNAME].replace("0", "", 1)
+                        user_input[REGION] = "North America & Canada"
+                _LOGGER.debug(user_input[REGION])
                 info = await validate_input(self.hass, user_input)
                 self.login_input = user_input
                 if info is None:
@@ -127,6 +136,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "cannot_connect"
             except InvalidAuth:
                 errors["base"] = "invalid_auth"
+            except InvalidMobile:
+                errors["base"] = "invalid_mobile"
             except InvalidVin:
                 errors["base"] = "invalid_vin"
             except Exception:  # pylint: disable=broad-except
@@ -136,7 +147,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
-    
+    def validNumber(self, phone_number):
+        pattern = re.compile("^([+]\d{2})?\d{10}$", re.IGNORECASE)
+        pattern2 = re.compile("^([+]\d{2})?\d{9}$", re.IGNORECASE)
+        return pattern.match(phone_number) is not None or pattern2.match(phone_number) is not None  
+        
     async def async_step_vin(self, user_input=None):
         """Handle manual VIN entry"""
         errors = {}
@@ -247,3 +262,6 @@ class InvalidAuth(exceptions.HomeAssistantError):
 
 class InvalidVin(exceptions.HomeAssistantError):
     """Error to indicate the wrong vin"""
+
+class InvalidMobile(exceptions.HomeAssistantError):
+    """Error to no mobile specified for South African Account"""
