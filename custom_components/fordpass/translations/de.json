@@ -7,6 +7,7 @@
             "cannot_connect": "Verbindungsfehler",
             "invalid_auth": "Authentifizierungsfehler",
             "invalid_vin": "Die FIN kann nicht in deinem Konto gefunden werden",
+            "invalid_mobile": "Bei Verwendung der südafrikanischen Region muss eine Mobiltelefonnummer als Benutzername angegeben werden (z. B. 07123456789, ohne Landesvorwahl).",
             "unknown": "Unbekannter Fehler"
         },
         "step": {

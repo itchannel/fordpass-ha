@@ -12,6 +12,7 @@ import requests
 
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from homeassistant import exceptions
 
 _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
@@ -94,6 +95,7 @@ class Vehicle:
             code1 = ''.join(random.choice(string.ascii_lowercase) for i in range(43))
             code_verifier = self.generate_hash(code1)
             url1 = f"{SSO_URL}/v1.0/endpoint/default/authorize?redirect_uri=fordapp://userauthorized&response_type=code&scope=openid&max_age=3600&client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&code_challenge={code_verifier}&code_challenge_method=S256"
+            _LOGGER.debug(url1)
             response = session.get(
                 url1,
                 headers=headers,
@@ -276,6 +278,7 @@ class Vehicle:
         if ibm_urls is None:
             self.errors += 1
             if self.errors <= 10:
+                time.sleep(10)
                 self.auth()
             else:
                 raise Exception("Step 1 has reached error limit")
@@ -744,7 +747,14 @@ class Vehicle:
                                 _LOGGER.debug("Command succeeded")
                                 return True
                             if status["states"][f"{command}Command"]["value"]["toState"] == "expired":
-                                _LOGGER.debug("Command expired")
+                                _LOGGER.warning(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Expired Status')}")
+                                if "statusRefresh" in command:
+                                    raise exceptions.HomeAssistantError(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Expired Status')}")
+                                return False
+                            if status["states"][f"{command}Command"]["value"]["toState"] == "failed":
+                                _LOGGER.warning(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Failed Status')}")
+                                if "statusRefresh" in command:
+                                    raise exceptions.HomeAssistantError(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Failed Status')}")
                                 return False
                 i += 1
                 _LOGGER.debug("Looping again")

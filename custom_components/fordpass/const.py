@@ -27,7 +27,7 @@ COORDINATOR = "coordinator"
 
 REGION = "region"
 
-REGION_OPTIONS = ["UK&Europe", "Australia", "North America & Canada"]
+REGION_OPTIONS = ["UK&Europe", "Australia", "North America & Canada", "South Africa"]
 
 SENSORS = {
     "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance", "api_key": "odometer", "measurement": "km"},
@@ -59,9 +59,6 @@ SENSORS = {
     "dieselSystemStatus": {"icon": "mdi:smoking-pipe", "api_key": "dieselExhaustFilterStatus"},
     "exhaustFluidLevel": {"icon": "mdi:barrel", "api_key": "dieselExhaustFluidLevel", "measurement": "%"},
 }
-
-SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
-
 WINDOW_POSITIONS = {
     "CLOSED": {
         "Fully_Closed": "Closed",
@@ -76,6 +73,5 @@ WINDOW_POSITIONS = {
 }
 
 SWITCHES = {
-    "ignition": {"icon": "hass:power"},
-    # "guardmode": {"icon": "mdi:shield-key"}
+    "ignition": {"icon": "hass:power"}
 }

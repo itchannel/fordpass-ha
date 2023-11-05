@@ -1,4 +1,8 @@
 ## **Changelog**
+### Version 1.62
+- Added South Africa as region option as well as verification of mobile number as username
+- Added precise error feedback when sending commands to Fordpass API
+- Added extra timeout to step1 in auth thread (May solve Step1 timeout error)
 ### Version 1.61
 - Deepsleep status is now reported again as a sensor
 - Compass Direction is now an attribute under the device_tracker entity
@@ -22,7 +26,7 @@
 - Fix for elVehCharging Battery Temp debug error
 - elVehCharging now displays Plug Status as default
 - Added device class for battery
-- Fix for incorrect DoorStatus @sarangcr03 
+- Fix for incorrect DoorStatus @sarangcr03
 - Added Trip Data to elVeh.
   - Trip Ambient Temp
   - Trip Outside Air Ambient Temp

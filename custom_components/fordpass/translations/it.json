@@ -7,6 +7,7 @@
             "cannot_connect": "Errore di collegamento",
             "invalid_auth": "Errore di autenticazione",
             "invalid_vin": "VIN non trovato nel tuo account",
+            "invalid_mobile": "Se si utilizza la regione sudafricana è necessario specificare il numero di cellulare come nome utente (ad es. 07123456789, senza prefisso internazionale)",
             "unknown": "Errore sconosciuto"
         },
         "step": {
