@@ -94,6 +94,7 @@ class Vehicle:
             code1 = ''.join(random.choice(string.ascii_lowercase) for i in range(43))
             code_verifier = self.generate_hash(code1)
             url1 = f"{SSO_URL}/v1.0/endpoint/default/authorize?redirect_uri=fordapp://userauthorized&response_type=code&scope=openid&max_age=3600&client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&code_challenge={code_verifier}&code_challenge_method=S256"
+            _LOGGER.debug(url1)
             response = session.get(
                 url1,
                 headers=headers,
@@ -276,6 +277,7 @@ class Vehicle:
         if ibm_urls is None:
             self.errors += 1
             if self.errors <= 10:
+                time.sleep(10)
                 self.auth()
             else:
                 raise Exception("Step 1 has reached error limit")
