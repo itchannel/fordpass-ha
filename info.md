@@ -1,4 +1,8 @@
 ## **Changelog**
+### Version 1.63 - Beta
+- Reworked authentication to use login.ford.com
+### Version 1.62
+- Skipped due to emergency release of auth changes
 ### Version 1.61
 - Deepsleep status is now reported again as a sensor
 - Compass Direction is now an attribute under the device_tracker entity
