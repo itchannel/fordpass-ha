@@ -143,7 +143,7 @@ class Vehicle:
             "signInName": self.username,
             "password": self.password,
         }
-        urlp = f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_en-AU/SelfAsserted?tx={transId}&p=B2C_1A_SignInSignUp_en-AU"
+        urlp = f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/SelfAsserted?tx={transId}&p=B2C_1A_SignInSignUp_en-AU"
         _LOGGER.debug(urlp)
         headers = {
             **loginHeaders,
@@ -167,7 +167,7 @@ class Vehicle:
 
 
         step1pt2 = step1_session.get(
-            f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_en-AU/api/CombinedSigninAndSignup/confirmed?rememberMe=false&csrf_token={csrfToken}",
+            f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/api/CombinedSigninAndSignup/confirmed?rememberMe=false&csrf_token={csrfToken}",
             headers=headers,
             allow_redirects=False,
         )
@@ -190,7 +190,7 @@ class Vehicle:
         }
 
         step1pt3 = step1_session.post(
-            f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_en-AU/oauth2/v2.0/token",
+            f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/oauth2/v2.0/token",
             headers=headers,
             data=data
         )
