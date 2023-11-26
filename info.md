@@ -1,5 +1,5 @@
 ## **Changelog**
-### Version 1.63 - Beta
+### Version 1.63 
 - Reworked authentication to use login.ford.com
 ### Version 1.62
 - Skipped due to emergency release of auth changes
