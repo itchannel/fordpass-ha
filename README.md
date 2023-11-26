@@ -4,14 +4,6 @@
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/itchannel)
 
-# Important Update 14/11/2023
-It appears Ford have decided to switch over their authentication to a new system (login.ford.com). Unfortunately this requires a complete rewrite of how the current integration handles auth. I'll try and have a look this week but unfortunately I'm a little snowed under. In the meantime I recommend disabling the integration  to prevent excessive errors.
-
-***Please try 1.63 Beta1 which has the latest login fix***
-
-Thanks for your patience, 
-itchannel
-
 
 # Important Update: New Ford API Challenges and Updates
 
