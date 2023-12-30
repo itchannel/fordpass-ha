@@ -32,8 +32,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         sensor = CarSensor(entry, key, config_entry.options)
         api_key = value["api_key"]
         api_class = value.get("api_class", None)
+        sensor_type = value.get("sensor_type", None)
         string =  isinstance(api_key, str)
-        if string and api_key == "messages" or api_key == "lastRefresh":
+        if string and sensor_type == "single":
             sensors.append(sensor)
         elif string:
             if api_key and api_class and api_key in sensor.coordinator.data.get(api_class, {}):
@@ -159,6 +160,14 @@ class CarSensor(
                     return "DISABLED"
                 else:
                     return state
+            if self.sensor == "events":
+                return len(self.events)
+            if self.sensor == "states":
+                return len(self.states)
+            if self.sensor == "vehicles":
+                return len(self.coordinator.data.get("vehicles", {}))
+            if self.sensor == "metrics":
+                return len(self.data)
             return None
         if ftype == "measurement":
             return SENSORS.get(self.sensor, {}).get("measurement", None)
@@ -470,6 +479,14 @@ class CarSensor(
                     if value.get("value") is not None:
                         alerts[key] = value["value"]
                 return alerts or None
+            if self.sensor == "events":
+                return self.events
+            if self.sensor == "states":
+                return self.states
+            if self.sensor == "vehicles":
+                return self.coordinator.data.get("vehicles", {})
+            if self.sensor == "metrics":
+                return self.data
         return None
 
 
@@ -537,3 +554,10 @@ class CarSensor(
             if SENSORS[self.sensor]["device_class"] == "speed":
                 return SensorDeviceClass.SPEED
         return None
+ 
+    @property
+    def entity_registry_enabled_default(self):
+        """Return if entity should be enabled when first added to the entity registry."""
+        if "debug" in SENSORS[self.sensor]:
+            return False
+        return True

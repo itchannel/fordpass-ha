@@ -12,6 +12,7 @@ import requests
 
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from homeassistant import exceptions
 
 _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
@@ -162,6 +163,9 @@ class Vehicle:
         _LOGGER.debug(step1post.status_code)
         cookie_dict = step1_session.cookies.get_dict()
         _LOGGER.debug(cookie_dict)
+
+        if step1post.status_code == 400:
+            raise exceptions.HomeAssistantError(step1post.json()["message"])
 
 
 
