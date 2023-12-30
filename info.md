@@ -1,4 +1,7 @@
 ## **Changelog**
+### Version 1.64
+- Add helper text for initial login when using a mobile number
+- Added sensors containing all returned data from API (Disabled by default in HA) can be used for templates and other automations/research
 ### Version 1.63 
 - Reworked authentication to use login.ford.com
 ### Version 1.62
