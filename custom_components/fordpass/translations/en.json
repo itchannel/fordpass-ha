@@ -16,7 +16,10 @@
                     "password": "FordPass Password",
                     "username": "FordPass Username (Email)",
                     "region" : "FordPass Region"
-                }
+                },
+                "data_description": {
+                    "username": "If using a mobile instead of email please enter your number (minus initial 0) also include + and the country code (e.g. +99123456789)"
+                }   
             },
             "vehicle": {
                 "title": "Select vehicle to add",

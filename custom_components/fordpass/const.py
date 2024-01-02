@@ -40,7 +40,7 @@ SENSORS = {
     "ignitionStatus": {"icon": "hass:power", "api_key": "ignitionStatus"},
     "doorStatus": {"icon": "mdi:car-door", "api_key": "doorStatus"},
     "windowPosition": {"icon": "mdi:car-door", "api_key": "windowStatus"},
-    "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp", "api_key": "lastRefresh"},
+    "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp", "api_key": "lastRefresh" , "sensor_type": "single"},
     "elVeh": {"icon": "mdi:ev-station", "api_key": "xevBatteryRange", "device_class": "distance", "state_class": "measurement", "measurement": "km"},
     "elVehCharging": {"icon": "mdi:ev-station", "api_key": "xevBatteryChargeDisplayStatus"},
     "speed": {"icon": "mdi:speedometer", "device_class": "speed", "state_class": "measurement", "api_key": "speed", "measurement": "km/h"},
@@ -55,9 +55,14 @@ SENSORS = {
     # },
     "remoteStartStatus": {"icon": "mdi:remote", "api_key": "remoteStartCountdownTimer"},
     # "zoneLighting": {"icon": "mdi:spotlight-beam"},
-    "messages": {"icon": "mdi:message-text", "api_key": "messages", "measurement": "messages"},
+    "messages": {"icon": "mdi:message-text", "api_key": "messages", "measurement": "messages", "sensor_type": "single"},
     "dieselSystemStatus": {"icon": "mdi:smoking-pipe", "api_key": "dieselExhaustFilterStatus"},
     "exhaustFluidLevel": {"icon": "mdi:barrel", "api_key": "dieselExhaustFluidLevel", "measurement": "%"},
+    # Debug Sensors (Disabled by default)
+    "events": {"icon": "mdi:calendar", "api_key": "events", "sensor_type": "single", "debug": True},
+    "metrics": {"icon": "mdi:chart-line", "api_key": "metrics", "sensor_type": "single", "debug": True},
+    "states": {"icon": "mdi:car", "api_key": "states", "sensor_type": "single", "debug": True},
+    "vehicles": {"icon": "mdi:car-multiple", "api_key": "vehicles", "sensor_type": "single", "debug": True},
 }
 
 SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
