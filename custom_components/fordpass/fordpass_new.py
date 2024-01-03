@@ -640,6 +640,9 @@ class Vehicle:
         """Get status from Autonomics endpoint"""
         params = {"lrdt": "01-01-1970 00:00:00"}
 
+        if self.auto_token is None:
+            self.__acquire_token()
+
         headers = {
             **apiHeaders,
             "auth-token": self.token,
