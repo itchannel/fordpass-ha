@@ -17,7 +17,10 @@
                     "username": "FordPass gebruikersnaam (e-mailadres)",
                     "vin": "VIN",
                     "region" : "FordPass regio"
-                }
+                },
+                "data_description": {
+                    "username": "Hvis du bruker en mobil i stedet for e-post, skriv inn nummeret ditt (minus initial 0), inkluder også + og landskoden (f.eks. +99123456789)"
+                } 
             },
             "vehicle": {
                 "title": "Velg kjøretøy som skal legges til",

@@ -17,7 +17,10 @@
                     "username": "Utilisateur FordPass (Email)",
                     "vin": "NIV",
                     "region" : "Région FordPass"
-                }
+                },
+                "data_description": {
+                    "username": "Si vous utilisez un mobile au lieu d'un e-mail, veuillez saisir votre numéro (moins le 0 initial), inclure également + et l'indicatif du pays (par exemple +99123456789)."
+                } 
             },
             "vehicle": {
                 "title": "Sélectionnez le véhicule à ajouter",

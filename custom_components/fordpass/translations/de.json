@@ -16,7 +16,10 @@
                     "username": "FordPass Username (E-Mail)",
                     "vin": "FIN",
                     "region" : "FordPass Region"
-                }
+                },
+                "data_description": {
+                    "username": "Wenn Sie ein Mobiltelefon anstelle einer E-Mail verwenden, geben Sie bitte Ihre Nummer (minus die anfängliche 0) sowie + und die Landesvorwahl ein (z. B. +99123456789)."
+                } 
             },
             "vehicle": {
                 "title": "Selecteer voertuig om toe te voegen",

@@ -16,7 +16,10 @@
                     "username": "FordPass Username (Email)",
                     "vin": "VIN",
                     "region" : "FordPass Regione"
-                }
+                },
+                "data_description": {
+                    "username": "Se utilizzi un cellulare anziché un'e-mail, inserisci il tuo numero (meno lo 0 iniziale), includi anche + e il prefisso internazionale (ad esempio +99123456789)"
+                } 
             },
             "vehicle": {
                 "title": "Seleziona il veicolo da aggiungere",
