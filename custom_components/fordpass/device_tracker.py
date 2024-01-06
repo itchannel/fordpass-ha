@@ -1,7 +1,7 @@
 """Vehicle Tracker Sensor"""
 import logging
 
-from homeassistant.components.device_tracker import SOURCE_TYPE_GPS
+from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 
 from . import FordPassEntity
@@ -46,7 +46,7 @@ class CarTracker(FordPassEntity, TrackerEntity):
     @property
     def source_type(self):
         """Set source type to GPS"""
-        return SOURCE_TYPE_GPS
+        return SourceType.GPS
 
     @property
     def name(self):

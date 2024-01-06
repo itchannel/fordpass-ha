@@ -1,4 +1,7 @@
 ## **Changelog**
+### Version 1.66
+- Remove deprecated GPS source type
+- Added data_description translations
 ### Version 1.65
 - Add ability to use Lincoln vehicles again
 ### Version 1.64
