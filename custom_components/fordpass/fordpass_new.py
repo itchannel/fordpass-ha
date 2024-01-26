@@ -855,6 +855,98 @@ class Vehicle:
         status = self.__request_and_poll_command("statusRefresh", vinnum)
         return status
 
+    def charge_start(self):
+        """
+        Issue a start charge command to the electric vehicle
+        """
+        return self.__ev_request_and_poll_command("START")
+
+    def charge_cancel(self):
+        """
+        Issue a stop charge command to the electric vehicle
+        """
+        return self.__ev_request_and_poll_command("CANCEL")
+    
+    def charge_pause(self):
+        """
+        Issue a pause charge command to the electric vehicle
+        """
+        return self.__ev_request_and_poll_command("PAUSE")
+
+    def __ev_request_and_poll_command(self, command):
+
+        # Tried to copy the existing code for the EV charging switch. Not working yet but still need to tinker
+
+        _LOGGER.debug("EV Charging")
+        if self.auto_token is None:
+            self.__acquire_token()
+
+        headers = {
+            **apiHeaders,
+            "auth-token": self.token,
+            "Application-Id": self.region,
+        }
+        _LOGGER.debug("Status function before auto_token")
+        _LOGGER.debug(self.auto_token)
+        _LOGGER.debug(self.vin)
+
+        _LOGGER.debug("Trying new vehicle API endpoint")
+        headers = {
+            **apiHeaders,
+            "authorization": f"Bearer {self.auto_token}",
+            "Application-Id": self.region,
+        }
+        r = session.post(
+            f"{GUARD_URL}/electrification/experiences/v1/vehicles/{self.vin}/global-charge-command/{command}", headers=headers
+        )
+        _LOGGER.debug(r.status_code)
+        
+        if r.status_code == 202:
+            response = r.json()
+            _LOGGER.debug("EV Charge Command Accepted")
+            _LOGGER.debug(r)
+            Correlationid = response.get('Correlationid', {})
+            if Correlationid is not None:
+                cidStatus = session.get(
+                    f"{GUARD_URL}/electrification/experiences/v1/vehicles/{self.vin}/command-status/{Correlationid}",
+                    headers=headers)
+
+                _LOGGER.debug("Checking command status")
+                _LOGGER.debug(cidStatus.status_code)
+                _LOGGER.debug(cidStatus.text)
+                if cidStatus.status_code == 200:
+                    response = cidStatus.json()
+                    i = 1
+                    while i < 14:
+                        # Check status every 10 seconds for 90 seconds until command completes or time expires
+                        status = self.status()
+                        _LOGGER.debug("EV COMMAND STATUS")
+                        _LOGGER.debug(status)
+
+                        if status.get('commandStatus', {}) == "SUCCESS":
+                            _LOGGER.debug("Command succeeded")
+                            return True
+                        
+                        i += 1
+                        _LOGGER.debug("Looping again")
+                        _LOGGER.debug(cidStatus)
+                        time.sleep(10)
+                    # time.sleep(90)
+                    return False
+                return False
+
+
+    # def energy_transfer_status(self):
+
+        # {GUARD_URL}/electrification/experiences/v1/devices/{self.vin}/energy-transfer-status
+        # This response json contains
+        #   "chargeProfile": {
+        #     "chargeMode": "CHARGE_NOW",
+        #     "targetSoc": 90,
+        #     "schedules": [
+
+
+
     def __make_request(self, method, url, data, params):
         """
         Make a request to the given URL, passing data/params as needed

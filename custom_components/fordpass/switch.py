@@ -24,6 +24,13 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                     async_add_entities([sw], False)
                 else:
                     _LOGGER.debug("Guard mode not supported on this vehicle")
+        if key == "evcharging":
+            vicmetrics = sw.coordinator.data.get('metrics', {})
+            if "xevBatteryStateOfCharge" in vicmetrics:
+                _LOGGER.debug("Adding charging switch for electric vehicle")
+                async_add_entities([sw], False)
+            else:
+                _LOGGER.debug("Vehicle does not have charging capability")
         else:
             async_add_entities([sw], False)
 
@@ -52,6 +59,12 @@ class Switch(FordPassEntity, SwitchEntity):
                 self.coordinator.vehicle.enableGuard
             )
             await self.coordinator.async_request_refresh()
+        elif self.switch == "evcharging":
+            # Not working, still need to tinker
+            await self.coordinator.hass.async_add_executor_job(
+                self.coordinator.vehicle.charge_start()
+            )
+            await self.coordinator.async_request_refresh()
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
@@ -64,6 +77,12 @@ class Switch(FordPassEntity, SwitchEntity):
         elif self.switch == "guardmode":
             await self.coordinator.hass.async_add_executor_job(
                 self.coordinator.vehicle.disableGuard
+            )
+            await self.coordinator.async_request_refresh()
+        elif self.switch == "evcharging":
+            # Not working, still need to tinker
+            await self.coordinator.hass.async_add_executor_job(
+                self.coordinator.vehicle.charge_pause()
             )
             await self.coordinator.async_request_refresh()
         self.async_write_ha_state()
@@ -101,6 +120,15 @@ class Switch(FordPassEntity, SwitchEntity):
                         return True
                     return False
                 return False
+            return False
+
+        if self.switch == "evcharging":
+            metrics = self.coordinator.data.get("metrics", {})
+            charge_status = metrics.get("xevBatteryChargeDisplayStatus", {}).get("value")
+            _LOGGER.debug("Charging Display Status")
+            _LOGGER.debug(charge_status)
+            if charge_status == "IN_PROGRESS" or "COMPLETED":
+                return True
             return False
         return False
 

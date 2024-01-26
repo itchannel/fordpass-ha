@@ -65,7 +65,9 @@ SENSORS = {
     "vehicles": {"icon": "mdi:car-multiple", "api_key": "vehicles", "sensor_type": "single", "debug": True},
 }
 
-SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
+SWITCHES = {"ignition": {"icon": "hass:power"},
+            "guardmode": {"icon": "mdi:shield-key"},
+            "evcharging": {"icon": "mdi:ev-station"}}
 
 WINDOW_POSITIONS = {
     "CLOSED": {
@@ -82,5 +84,6 @@ WINDOW_POSITIONS = {
 
 SWITCHES = {
     "ignition": {"icon": "hass:power"},
+    "evcharging": {"icon": "mdi:ev-station"}
     # "guardmode": {"icon": "mdi:shield-key"}
 }
