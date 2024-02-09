@@ -2,6 +2,8 @@
 import logging
 
 from homeassistant.components.switch import SwitchEntity
+from homeassistant import exceptions
+
 
 from . import FordPassEntity
 from .const import DOMAIN, SWITCHES, COORDINATOR
@@ -60,9 +62,13 @@ class Switch(FordPassEntity, SwitchEntity):
             )
             await self.coordinator.async_request_refresh()
         elif self.switch == "evcharging":
+            plug_status = self.data.get("xevPlugChargerStatus", {}).get("value")
+            if plug_status == "NOT_READY":
+                _LOGGER.debug("Plug status is NOT READY, cannot start charging")
+                raise exceptions.HomeAssistantError(f"EV Plug Status is {plug_status}: Cannot start charging")
             # Not working, still need to tinker
             await self.coordinator.hass.async_add_executor_job(
-                self.coordinator.vehicle.charge_start()
+                self.coordinator.vehicle.charge_start
             )
             await self.coordinator.async_request_refresh()
         self.async_write_ha_state()
@@ -82,7 +88,7 @@ class Switch(FordPassEntity, SwitchEntity):
         elif self.switch == "evcharging":
             # Not working, still need to tinker
             await self.coordinator.hass.async_add_executor_job(
-                self.coordinator.vehicle.charge_pause()
+                self.coordinator.vehicle.charge_pause
             )
             await self.coordinator.async_request_refresh()
         self.async_write_ha_state()
@@ -127,7 +133,7 @@ class Switch(FordPassEntity, SwitchEntity):
             charge_status = metrics.get("xevBatteryChargeDisplayStatus", {}).get("value")
             _LOGGER.debug("Charging Display Status")
             _LOGGER.debug(charge_status)
-            if charge_status == "IN_PROGRESS" or "COMPLETED":
+            if charge_status == "IN_PROGRESS":# or "COMPLETED":
                 return True
             return False
         return False

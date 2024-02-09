@@ -674,7 +674,7 @@ class Vehicle:
             _LOGGER.debug("NEW API???")
 
             if r.status_code == 200:
-                #_LOGGER.debug(r.text)
+                _LOGGER.debug(r.text)
                 result = r.json()
 
                 return result
@@ -859,25 +859,28 @@ class Vehicle:
         """
         Issue a start charge command to the electric vehicle
         """
+        _LOGGER.debug("EV Charge Start")
         return self.__ev_request_and_poll_command("START")
 
     def charge_cancel(self):
         """
         Issue a stop charge command to the electric vehicle
         """
+        _LOGGER.debug("EV Charge Cancel")
         return self.__ev_request_and_poll_command("CANCEL")
     
     def charge_pause(self):
         """
         Issue a pause charge command to the electric vehicle
         """
+        _LOGGER.debug("EV Charge Pause")
         return self.__ev_request_and_poll_command("PAUSE")
 
     def __ev_request_and_poll_command(self, command):
 
         # Tried to copy the existing code for the EV charging switch. Not working yet but still need to tinker
 
-        _LOGGER.debug("EV Charging")
+        _LOGGER.debug("EV Charging request and poll")
         if self.auto_token is None:
             self.__acquire_token()
 
@@ -887,8 +890,6 @@ class Vehicle:
             "Application-Id": self.region,
         }
         _LOGGER.debug("Status function before auto_token")
-        _LOGGER.debug(self.auto_token)
-        _LOGGER.debug(self.vin)
 
         _LOGGER.debug("Trying new vehicle API endpoint")
         headers = {
@@ -896,9 +897,11 @@ class Vehicle:
             "authorization": f"Bearer {self.auto_token}",
             "Application-Id": self.region,
         }
+        _LOGGER.debug("EV Charging Session Post")
         r = session.post(
             f"{GUARD_URL}/electrification/experiences/v1/vehicles/{self.vin}/global-charge-command/{command}", headers=headers
         )
+        _LOGGER.debug("Status Code")
         _LOGGER.debug(r.status_code)
         
         if r.status_code == 202:

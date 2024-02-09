@@ -149,7 +149,9 @@ class CarSensor(
             if self.sensor == "coolantTemp":
                 return self.data.get("engineCoolantTemp", {}).get("value", "Unsupported")
             if self.sensor == "outsideTemp":
-                return self.data.get("outsideTemperature", {}).get("value", "Unsupported")
+                outsidetemp = self.data.get("outsideTemperature", {})
+                if outsidetemp is not None:
+                    return outsidetemp.get("value", "Unsupported")
             if self.sensor == "engineOilTemp":
                 return self.data.get("engineOilTemp", {}).get("value", "Unsupported")
             if self.sensor == "deepSleep":
