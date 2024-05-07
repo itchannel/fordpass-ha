@@ -4,6 +4,9 @@
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/itchannel)
 
+> [!WARNING]
+> Due to what looks like a Ford API change the integration isn't currently working as of 08/05/2024. I recommend disabling it for the time being until we can take a look at what has changed.
+
 
 # Important Update: New Ford API Challenges and Updates
 
