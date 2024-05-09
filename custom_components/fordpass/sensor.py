@@ -373,8 +373,17 @@ class CarSensor(
 
                 # Returning 0 in else - to prevent attribute from not displaying
                 if "xevBatteryChargerVoltageOutput" in self.data and "xevBatteryChargerCurrentOutput" in self.data:
+
+                    # Get Battery Io Current for DC Charging calculation
+                    if "xevBatteryIoCurrent" in self.data:
+                        batt_amps = float(self.data.get("xevBatteryIoCurrent", {}).get("value", 0))
+
+                    # AC Charging calculation
                     if ch_volt != 0 and ch_amps != 0:
                         cs["Charging kW"] = round((ch_volt * ch_amps) / 1000, 2)
+                    # DC Charging calculation: Use absolute value for amperage to handle negative values
+                    elif ch_volt != 0 and batt_amps != 0:
+                        cs["Charging kW"] = round((ch_volt * abs(batt_amps)) / 1000, 2)
                     else:
                         cs["Charging kW"] = 0
 
