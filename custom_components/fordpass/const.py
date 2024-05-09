@@ -67,7 +67,8 @@ SENSORS = {
 
 SWITCHES = {
     "ignition": {"icon": "hass:power"},
-    "guardmode": {"icon": "mdi:shield-key"}}
+    #"guardmode": {"icon": "mdi:shield-key"}
+}
 
 WINDOW_POSITIONS = {
     "CLOSED": {
