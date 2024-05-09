@@ -62,10 +62,12 @@ SENSORS = {
     "events": {"icon": "mdi:calendar", "api_key": "events", "sensor_type": "single", "debug": True},
     "metrics": {"icon": "mdi:chart-line", "api_key": "metrics", "sensor_type": "single", "debug": True},
     "states": {"icon": "mdi:car", "api_key": "states", "sensor_type": "single", "debug": True},
-    "vehicles": {"icon": "mdi:car-multiple", "api_key": "vehicles", "sensor_type": "single", "debug": True},
+    "vehicles": {"icon": "mdi:car-multiple", "api_key": "vehicles", "sensor_type": "single", "debug": True}
 }
 
-SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
+SWITCHES = {
+    "ignition": {"icon": "hass:power"},
+    "guardmode": {"icon": "mdi:shield-key"}}
 
 WINDOW_POSITIONS = {
     "CLOSED": {
@@ -78,11 +80,6 @@ WINDOW_POSITIONS = {
         "Fully_Open": "Open",
         "Btwn 10% and 60% open": "Open-Partial",
     },
-}
-
-SWITCHES = {
-    "ignition": {"icon": "hass:power"},
-    # "guardmode": {"icon": "mdi:shield-key"}
 }
 
 REGIONS = {
