@@ -13,6 +13,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from homeassistant import exceptions
+from .const import REGIONS
 
 _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
@@ -34,23 +35,6 @@ apiHeaders = {
     "Content-Type": "application/json",
 }
 
-region_lookup = {
-    "UK&Europe": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
-    "Australia": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
-    "North America & Canada": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592",
-}
-
-locale_lookup = {
-    "UK&Europe": "EN-GB",
-    "Australia": "EN-AU",
-    "North America & Canada": "EN-US",
-}
-
-locale_short_lookup = {
-    "UK&Europe": "GB",
-    "Australia": "AUS",
-    "North America & Canada": "USA",
-}
 
 
 NEW_API = True
@@ -60,7 +44,7 @@ GUARD_URL = "https://api.mps.ford.com/api"
 SSO_URL = "https://sso.ci.ford.com"
 AUTONOMIC_URL = "https://api.autonomic.ai/v1"
 AUTONOMIC_ACCOUNT_URL = "https://accounts.autonomic.ai/v1"
-FORD_LOGIN_URL = "https://login.ford.com"
+#FORD_LOGIN_URL = "https://login.ford.com"
 
 session = requests.Session()
 
@@ -74,10 +58,11 @@ class Vehicle:
         self.username = username
         self.password = password
         self.save_token = save_token
-        self.region = region_lookup[region]
-        self.country_code = locale_lookup[region]
-        self.short_code = locale_short_lookup[region]
-        self.region2 = region
+        self.region = REGIONS[region]["region"]
+        self.country_code = REGIONS[region]["locale"]
+        self.short_code = REGIONS[region]["locale_short"]
+        self.region2 = REGIONS[region]["region"]
+        self.ford_login_url = REGIONS[region]["locale_url"]
         self.vin = vin
         self.token = None
         self.expires = None
@@ -115,7 +100,7 @@ class Vehicle:
         code1 = ''.join(random.choice(string.ascii_lowercase) for i in range(43))
         code_verifier = self.generate_hash(code1)
         step1_session = requests.session()
-        step1_url = f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/oauth2/v2.0/authorize?redirect_uri=fordapp://userauthorized&response_type=code&max_age=3600&scope=%2009852200-05fd-41f6-8c21-d36d3497dc64%20openid&client_id=09852200-05fd-41f6-8c21-d36d3497dc64&code_challenge={code_verifier}&code_challenge_method=S256&ui_locales={self.country_code}&language_code={self.country_code}&country_code={self.short_code}&ford_application_id=5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98"
+        step1_url = f"{self.ford_login_url}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/oauth2/v2.0/authorize?redirect_uri=fordapp://userauthorized&response_type=code&max_age=3600&scope=%2009852200-05fd-41f6-8c21-d36d3497dc64%20openid&client_id=09852200-05fd-41f6-8c21-d36d3497dc64&code_challenge={code_verifier}&code_challenge_method=S256&ui_locales={self.country_code}&language_code={self.country_code}&country_code={self.short_code}&ford_application_id=5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98"
 
         step1get = step1_session.get(
             step1_url,
@@ -144,11 +129,11 @@ class Vehicle:
             "signInName": self.username,
             "password": self.password,
         }
-        urlp = f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/SelfAsserted?tx={transId}&p=B2C_1A_SignInSignUp_en-AU"
+        urlp = f"{self.ford_login_url}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/SelfAsserted?tx={transId}&p=B2C_1A_SignInSignUp_{self.country_code}"
         _LOGGER.debug(urlp)
         headers = {
             **loginHeaders,
-            "Origin": "https://login.ford.com",
+            "Origin": self.ford_login_url,
             "Referer": step1_url,
             "X-Csrf-Token": csrfToken
         }
@@ -171,7 +156,7 @@ class Vehicle:
 
 
         step1pt2 = step1_session.get(
-            f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/api/CombinedSigninAndSignup/confirmed?rememberMe=false&csrf_token={csrfToken}",
+            f"{self.ford_login_url}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/api/CombinedSigninAndSignup/confirmed?rememberMe=false&csrf_token={csrfToken}",
             headers=headers,
             allow_redirects=False,
         )
@@ -194,7 +179,7 @@ class Vehicle:
         }
 
         step1pt3 = step1_session.post(
-            f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/oauth2/v2.0/token",
+            f"{self.ford_login_url}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/oauth2/v2.0/token",
             headers=headers,
             data=data
         )

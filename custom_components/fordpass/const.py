@@ -84,3 +84,28 @@ SWITCHES = {
     "ignition": {"icon": "hass:power"},
     # "guardmode": {"icon": "mdi:shield-key"}
 }
+
+REGIONS = {
+    "UK&Europe": {
+        "region": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
+        "locale": "EN-IE",
+        "locale_short": "IE", #Temp fix 
+        "locale_url": "https://login.ford.ie"
+    },
+    "Australia": {
+        "region": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
+        "locale": "EN-AU",
+        "locale_short": "AUS",
+        "locale_url": "https://login.ford.com.au"
+    },
+    "North America & Canada": {
+        "region": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592",
+        "locale": "EN-AU",
+        "locale_short": "AUS",
+        "locale_url": "https://login.ford.com.au" #Temp fix until I can implement the correct American URL
+    }
+
+}
+
+
+

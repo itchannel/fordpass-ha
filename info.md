@@ -1,4 +1,8 @@
 ## **Changelog**
+### Version 1.68
+- Fix for missing locale
+### Version 1.67
+- Temp fix for login issues (Uses different region login servers, may get blocked soon!)
 ### Version 1.66
 - Remove deprecated GPS source type
 - Added data_description translations
