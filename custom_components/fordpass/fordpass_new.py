@@ -501,9 +501,12 @@ class Vehicle:
             self.token = result["access_token"]
             self.refresh_token = result["refresh_token"]
             self.expires_at = time.time() + result["expires_in"]
+            _LOGGER.debug("WRITING REFRESH TOKEN")
+            return result
         if response.status_code == 401:
             _LOGGER.debug("401 response stage 2: refresh stage 1 token")
             self.auth()
+
 
     def __acquire_token(self):
         # Fetch and refresh token as needed
@@ -539,7 +542,10 @@ class Vehicle:
         _LOGGER.debug(self.auto_token)
         _LOGGER.debug(self.auto_expires_at)
         if self.auto_token is None or self.auto_expires_at is None:
-            self.auth()
+            #self.auth()
+            result = self.refresh_token_func(data)
+            _LOGGER.debug("Result Above for new TOKEN")
+            self.refresh_auto_token(result)
         # self.auto_token = data["auto_token"]
         # self.auto_expires_at = data["auto_expiry"]
         if self.expires_at:
@@ -550,7 +556,9 @@ class Vehicle:
         if self.auto_expires_at:
             if time.time() >= self.auto_expires_at:
                 _LOGGER.debug("Autonomic token expired")
-                self.auth()
+                result = self.refresh_token_func(data)
+                _LOGGER.debug("Result Above for new TOKEN")
+                self.refresh_auto_token(result)
         if self.token is None:
             _LOGGER.debug("Fetching token4")
             # No existing token exists so refreshing library
@@ -586,6 +594,20 @@ class Vehicle:
             os.remove("/tmp/token.txt")
         if os.path.isfile(self.token_location):
             os.remove(self.token_location)
+
+    def refresh_auto_token(self, result):
+        auto_token = self.get_auto_token()
+        _LOGGER.debug("AUTO Refresh")
+        self.auto_token = auto_token["access_token"]
+        self.auto_token_refresh = auto_token["refresh_token"]
+        self.auto_expires_at = time.time() + result["expires_in"]
+        if self.save_token:
+            result["expiry_date"] = time.time() + result["expires_in"]
+            result["auto_token"] = auto_token["access_token"]
+            result["auto_refresh"] = auto_token["refresh_token"]
+            result["auto_expiry"] = time.time() + auto_token["expires_in"]
+
+            self.write_token(result)
 
     def get_auto_token(self):
         """Get token from new autonomic API"""

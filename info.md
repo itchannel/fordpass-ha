@@ -1,4 +1,8 @@
 ## **Changelog**
+### Version 1.69
+**WARNING - This version will only work if you have tokens already, Login is currently broke!!
+Valid tokens should work for upto 90days!!
+- Fix token refresh
 ### Version 1.68
 - Fix for missing locale
 - Fix duplicate Switches dictionary
