@@ -1,7 +1,9 @@
 ## **Changelog**
 ### Version 1.69
-**WARNING - This version will only work if you have tokens already, Login is currently broke!!
+**WARNING - This version will only work if you have tokens already, Login is currently broke!!**
 Valid tokens should work for upto 90days!!
+
+If you have lost your token try branch 1.70, you will need to manually update the files as this isn't ready for HACS release yet
 - Fix token refresh
 ### Version 1.68
 - Fix for missing locale
