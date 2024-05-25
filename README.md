@@ -12,6 +12,11 @@
 - https://github.com/JacobWasFramed - Updated unit conversions
 - https://github.com/heehoo59 - French Translation
 
+## 1.70 Change
+Due to the new security controls the old way of entering a username and password no longer works. This branch has been updated to allow for requesting a set of tokens via the browser, which solves the security requirements. However it does require manual intervention. 
+
+Please see [Obtaining Tokens] (https://github.com/itchannel/fordpass-ha/wiki/Obtaining-Tokens-(As-of-25-05-2024)) on how to use the new version and grab the required token it asks for on initial setup. Once done the tokens should last for at least 90 days. 
+
 ## Account Warning (Sep 2023)
 A number of users have encountered their accounts being banned for containing "+" symbols in their email. It appears Ford thinks this is a disposable email. So if you have a + in your email I recommend changing it.
 
