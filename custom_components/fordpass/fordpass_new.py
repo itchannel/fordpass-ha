@@ -26,6 +26,13 @@ apiHeaders = {
     "Content-Type": "application/json",
 }
 
+loginHeaders = {
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept-Language": "en-US,en;q=0.5",
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1",
+    "Accept-Encoding": "gzip, deflate, br",
+}
+
 region_lookup = {
     "UK&Europe": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
     "Australia": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
@@ -39,6 +46,7 @@ GUARD_URL = "https://api.mps.ford.com/api"
 SSO_URL = "https://sso.ci.ford.com"
 AUTONOMIC_URL = "https://api.autonomic.ai/v1"
 AUTONOMIC_ACCOUNT_URL = "https://accounts.autonomic.ai/v1"
+FORD_LOGIN_URL = "https://login.ford.com"
 
 session = requests.Session()
 
@@ -74,6 +82,51 @@ class Vehicle:
     def base64_url_encode(self, data):
         """Encode string to base64"""
         return urlsafe_b64encode(data).rstrip(b'=')
+    
+    def generate_tokens(self, urlstring, code_verifier):
+        code_new = urlstring.replace("fordapp://userauthorized/?code=","")
+        print(code_new)
+        print(self.country_code)
+        print(code_verifier)
+        data = {
+            "client_id" : "09852200-05fd-41f6-8c21-d36d3497dc64",
+            "grant_type": "authorization_code",
+            #"code_verifier": code_verifier,
+            "code": code_new,
+            "redirect_uri": "fordapp://userauthorized"
+
+        }
+
+        _LOGGER.debug(data)
+        headers = {
+            **loginHeaders,
+        }
+        req = requests.post(
+                f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/oauth2/v2.0/token",
+                headers=headers,
+                data=data,
+                verify=False
+            )
+        print(req.status_code)
+        print(req.text)
+        return self.generate_fulltokens(req.json())
+
+    def generate_fulltokens(self, token):
+        data = {"idpToken": token["access_token"]}
+        headers = {**apiHeaders, "Application-Id": self.region}
+        response = requests.post(
+            f"{GUARD_URL}/token/v2/cat-with-b2c-access-token",
+            data=json.dumps(data),
+            headers=headers,
+            verify=False
+        )
+        print(response.status_code)
+        print(response.text)
+        final_tokens = response.json()
+        final_tokens["expiry_date"] = time.time() + final_tokens["expires_in"]
+
+        self.write_token(final_tokens)
+        return True
 
     def generate_hash(self, code):
         """Generate hash for login"""
