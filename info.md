@@ -1,4 +1,8 @@
 ## **Changelog**
+### Version 1.70
+- New config flow to allow for a user to generate a token in their browser then enter into the application, bypasses WAF. 
+### Version 1.59
+- Fix for token expiration (Only works if user has valid tokens)
 ### Version 1.57
 - Rewrote command function to actively poll until success or failure is returned
 - Fixed bug where elveh attributes wasn't showing
