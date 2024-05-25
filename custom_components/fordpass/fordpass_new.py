@@ -195,14 +195,6 @@ class Vehicle:
         else:
             _LOGGER.debug("DAM IT WENT WRONG")
 
-        
-
-
-
-
-
-
-
     def auth2_step2(self, result):
         _LOGGER.debug(result)
 
@@ -236,190 +228,6 @@ class Vehicle:
         session.cookies.clear()
         _LOGGER.debug("Step 5 Complete")
         return True
-
-
-    def auth_step1(self):
-        """Obtain data-ibm-login-url"""
-        _LOGGER.debug("Running Step1")
-        try:
-            headers = {
-                **defaultHeaders,
-                'Content-Type': 'application/json',
-            }
-            # _LOGGER.debug("Before")
-            code1 = ''.join(random.choice(string.ascii_lowercase) for i in range(43))
-            code_verifier = self.generate_hash(code1)
-            url1 = f"https://login.ford.com/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_en-AU/oauth2/v2.0/authorize?redirect_uri=fordapp://userauthorized&response_type=code&scope=%2009852200-05fd-41f6-8c21-d36d3497dc64%20openid&max_age=3600&client_id=09852200-05fd-41f6-8c21-d36d3497dc64&code_challenge={code_verifier}&code_challenge_method=S256&ui_locales=en-AU&language_code=en-AU&country_code=AUS&ford_application_id=5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98"
-            response = session.get(
-                url1,
-                headers=headers,
-            )
-            _LOGGER.debug(response.text)
-            _LOGGER.debug(response.status_code)
-            if response.status_code != 200:
-                _LOGGER.debug("Incorrect response from URL")
-                raise Exception("Response from URL was invalid")
-
-            ibm_url = re.findall('data-ibm-login-url="(.*)"\s', response.text)[0]
-            _LOGGER.debug("Step 1 Complete")
-            return {"ibm_url": ibm_url, "code1": code1}
-        except Exception as ex:
-            _LOGGER.debug("Step 1 Exception")
-            _LOGGER.debug(ex)
-            return None
-
-    def auth_step2(self, ibm_url):
-        """Login using credentials"""
-        _LOGGER.debug("Running Step2")
-        try:
-            next_url = SSO_URL + ibm_url
-            headers = {
-                **defaultHeaders,
-                "Content-Type": "application/x-www-form-urlencoded",
-            }
-            data = {
-                "operation": "verify",
-                "login-form-type": "password",
-                "username": self.username,
-                "password": self.password
-
-            }
-            response = session.post(
-                next_url,
-                headers=headers,
-                data=data,
-                allow_redirects=False
-            )
-
-            if response.status_code == 302:
-                next_url = response.headers["Location"]
-                _LOGGER.debug("Step 2 Complete")
-                return next_url
-            return None
-        except Exception as ex:
-            _LOGGER.debug("Step 2 Exception")
-            _LOGGER.debug(ex)
-            if response.text is not None:
-                _LOGGER.debug(response.text)
-            return None
-
-    def auth_step3(self, next_url):
-        """Obtain code and grant_id"""
-        _LOGGER.debug("Running Step3")
-        try:
-
-            headers = {
-                **defaultHeaders,
-                'Content-Type': 'application/json',
-            }
-
-            response = session.get(
-                next_url,
-                headers=headers,
-                allow_redirects=False
-            )
-
-            if response.status_code == 302:
-                next_url = response.headers["Location"]
-                query = requests.utils.urlparse(next_url).query
-                params = dict(x.split('=') for x in query.split('&'))
-                code = params["code"]
-                grant_id = params["grant_id"]
-                _LOGGER.debug("Step 3 Complete")
-                return {"code": code, "grant_id": grant_id}
-            response.raise_for_status()
-            return None
-
-        except Exception as ex:
-            _LOGGER.debug("Step 3 Exception")
-            _LOGGER.debug(ex)
-            if response.status_code is not None:
-                _LOGGER.debug(response.status_code)
-            if response.headers is not None:
-                _LOGGER.debug(response.headers)
-            return None
-
-    def auth_step4(self, codes, code1):
-        """Obtain access_token"""
-        _LOGGER.debug("Running Step4")
-        try:
-            grant_id = codes["grant_id"]
-            code = codes["code"]
-            headers = {
-                **defaultHeaders,
-                "Content-Type": "application/x-www-form-urlencoded",
-            }
-
-            data = {
-                "client_id": "9fb503e0-715b-47e8-adfd-ad4b7770f73b",
-                "grant_type": "authorization_code",
-                "redirect_uri": 'fordapp://userauthorized',
-                "grant_id": grant_id,
-                "code": code,
-                "code_verifier": code1
-            }
-
-            response = session.post(
-                f"{SSO_URL}/oidc/endpoint/default/token",
-                headers=headers,
-                data=data
-
-            )
-
-            if response.status_code == 200:
-                result = response.json()
-                if result["access_token"]:
-                    access_token = result["access_token"]
-                    _LOGGER.debug("Step 4 Complete")
-                    return access_token
-            response.raise_for_status()
-            return None
-        except Exception as ex:
-            _LOGGER.debug("Step 4 exception")
-            _LOGGER.debug(ex)
-            if response.text is not None:
-                _LOGGER.debug(response.text)
-            return None
-
-    def auth_step5(self, access_token):
-        """Get tokens"""
-        _LOGGER.debug("Running Step5")
-        try:
-            data = {"ciToken": access_token}
-            headers = {**apiHeaders, "Application-Id": self.region}
-            response = session.post(
-                f"{GUARD_URL}/token/v2/cat-with-ci-access-token",
-                data=json.dumps(data),
-                headers=headers,
-            )
-
-            if response.status_code == 200:
-                result = response.json()
-
-                self.token = result["access_token"]
-                self.refresh_token = result["refresh_token"]
-                self.expires_at = time.time() + result["expires_in"]
-                auto_token = self.get_auto_token()
-                self.auto_token = auto_token["access_token"]
-                self.auto_expires_at = time.time() + result["expires_in"]
-                if self.save_token:
-                    result["expiry_date"] = time.time() + result["expires_in"]
-                    result["auto_token"] = auto_token["access_token"]
-                    result["auto_refresh"] = auto_token["refresh_token"]
-                    result["auto_expiry"] = time.time() + auto_token["expires_in"]
-
-                    self.write_token(result)
-                session.cookies.clear()
-                _LOGGER.debug("Step 5 Complete")
-                return True
-            response.raise_for_status()
-            return False
-        except Exception as ex:
-            _LOGGER.debug("Step 5 exception")
-            _LOGGER.debug(ex)
-            if response.text is not None:
-                _LOGGER.debug(response.text)
-            return False
 
     def auth(self):
         """New Authentication System """
@@ -501,9 +309,12 @@ class Vehicle:
             self.token = result["access_token"]
             self.refresh_token = result["refresh_token"]
             self.expires_at = time.time() + result["expires_in"]
+            _LOGGER.debug("WRITING REFRESH TOKEN")
+            return result
         if response.status_code == 401:
             _LOGGER.debug("401 response stage 2: refresh stage 1 token")
             self.auth()
+
 
     def __acquire_token(self):
         # Fetch and refresh token as needed
@@ -539,7 +350,10 @@ class Vehicle:
         _LOGGER.debug(self.auto_token)
         _LOGGER.debug(self.auto_expires_at)
         if self.auto_token is None or self.auto_expires_at is None:
-            self.auth()
+            #self.auth()
+            result = self.refresh_token_func(data)
+            _LOGGER.debug("Result Above for new TOKEN")
+            self.refresh_auto_token(result)
         # self.auto_token = data["auto_token"]
         # self.auto_expires_at = data["auto_expiry"]
         if self.expires_at:
@@ -550,7 +364,9 @@ class Vehicle:
         if self.auto_expires_at:
             if time.time() >= self.auto_expires_at:
                 _LOGGER.debug("Autonomic token expired")
-                self.auth()
+                result = self.refresh_token_func(data)
+                _LOGGER.debug("Result Above for new TOKEN")
+                self.refresh_auto_token(result)
         if self.token is None:
             _LOGGER.debug("Fetching token4")
             # No existing token exists so refreshing library
@@ -586,6 +402,20 @@ class Vehicle:
             os.remove("/tmp/token.txt")
         if os.path.isfile(self.token_location):
             os.remove(self.token_location)
+
+    def refresh_auto_token(self, result):
+        auto_token = self.get_auto_token()
+        _LOGGER.debug("AUTO Refresh")
+        self.auto_token = auto_token["access_token"]
+        self.auto_token_refresh = auto_token["refresh_token"]
+        self.auto_expires_at = time.time() + result["expires_in"]
+        if self.save_token:
+            result["expiry_date"] = time.time() + result["expires_in"]
+            result["auto_token"] = auto_token["access_token"]
+            result["auto_refresh"] = auto_token["refresh_token"]
+            result["auto_expiry"] = time.time() + auto_token["expires_in"]
+
+            self.write_token(result)
 
     def get_auto_token(self):
         """Get token from new autonomic API"""
