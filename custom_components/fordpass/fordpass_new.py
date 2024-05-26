@@ -314,8 +314,9 @@ class Vehicle:
         _LOGGER.debug(self.auto_token)
         _LOGGER.debug(self.auto_expires_at)
         if self.auto_token is None or self.auto_expires_at is None:
-            self.auth()
-            pass
+            result = self.refresh_token_func(data)
+            _LOGGER.debug("Result Above for new TOKEN")
+            self.refresh_auto_token(result)
         # self.auto_token = data["auto_token"]
         # self.auto_expires_at = data["auto_expiry"]
         if self.expires_at:
@@ -326,7 +327,9 @@ class Vehicle:
         if self.auto_expires_at:
             if time.time() >= self.auto_expires_at:
                 _LOGGER.debug("Autonomic token expired")
-                self.auth()
+                result = self.refresh_token_func(data)
+                _LOGGER.debug("Result Above for new TOKEN")
+                self.refresh_auto_token(result)
         if self.token is None:
             _LOGGER.debug("Fetching token4")
             # No existing token exists so refreshing library
