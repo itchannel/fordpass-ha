@@ -292,11 +292,17 @@ class Vehicle:
         if self.save_token:
             if os.path.isfile(self.token_location):
                 data = self.read_token()
+                _LOGGER.debug(data)
                 self.token = data["access_token"]
                 self.refresh_token = data["refresh_token"]
                 self.expires_at = data["expiry_date"]
-                self.auto_token = data["auto_token"]
-                self.auto_expires_at = data["auto_expiry"]
+                if "auto_token" in data and "auto_expiry" in data:
+                    self.auto_token = data["auto_token"]
+                    self.auto_expires_at = data["auto_expiry"]
+                else:
+                    _LOGGER.debug("AUTO token not set in file")
+                    self.auto_token = None
+                    self.auto_expires_at = None
             else:
                 data = {}
                 data["access_token"] = self.token
@@ -365,7 +371,19 @@ class Vehicle:
             os.remove("/tmp/token.txt")
         if os.path.isfile(self.token_location):
             os.remove(self.token_location)
+    def refresh_auto_token(self, result):
+        auto_token = self.get_auto_token()
+        _LOGGER.debug("AUTO Refresh")
+        self.auto_token = auto_token["access_token"]
+        self.auto_token_refresh = auto_token["refresh_token"]
+        self.auto_expires_at = time.time() + result["expires_in"]
+        if self.save_token:
+            result["expiry_date"] = time.time() + result["expires_in"]
+            result["auto_token"] = auto_token["access_token"]
+            result["auto_refresh"] = auto_token["refresh_token"]
+            result["auto_expiry"] = time.time() + auto_token["expires_in"]
 
+            self.write_token(result)
     def get_auto_token(self):
         """Get token from new autonomic API"""
         _LOGGER.debug("Getting Auto Token")
