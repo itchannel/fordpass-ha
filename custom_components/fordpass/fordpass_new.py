@@ -279,6 +279,8 @@ class Vehicle:
             self.token = result["access_token"]
             self.refresh_token = result["refresh_token"]
             self.expires_at = time.time() + result["expires_in"]
+            _LOGGER.debug("WRITING REFRESH TOKEN")
+            return result
         if response.status_code == 401:
             _LOGGER.debug("401 response stage 2: refresh stage 1 token")
             self.auth()
@@ -376,9 +378,9 @@ class Vehicle:
         _LOGGER.debug("AUTO Refresh")
         self.auto_token = auto_token["access_token"]
         self.auto_token_refresh = auto_token["refresh_token"]
-        self.auto_expires_at = time.time() + result["expires_in"]
+        self.auto_expires_at = time.time() + auto_token["expires_in"]
         if self.save_token:
-            result["expiry_date"] = time.time() + result["expires_in"]
+            #result["expiry_date"] = time.time() + result["expires_in"]
             result["auto_token"] = auto_token["access_token"]
             result["auto_refresh"] = auto_token["refresh_token"]
             result["auto_expiry"] = time.time() + auto_token["expires_in"]
