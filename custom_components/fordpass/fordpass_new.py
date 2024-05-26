@@ -12,6 +12,7 @@ import requests
 
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from.const import REGIONS
 
 _LOGGER = logging.getLogger(__name__)
 defaultHeaders = {
@@ -60,7 +61,10 @@ class Vehicle:
         self.username = username
         self.password = password
         self.save_token = save_token
-        self.region = region_lookup[region]
+        self.region = REGIONS[region]["region"]
+        self.country_code = REGIONS[region]["locale"]
+        self.short_code = REGIONS[region]["locale_short"]
+        self.region2 = region
         self.region2 = region
         self.vin = vin
         self.token = None
