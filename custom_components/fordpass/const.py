@@ -30,40 +30,45 @@ REGION = "region"
 REGION_OPTIONS = ["UK&Europe", "Australia", "North America & Canada"]
 
 SENSORS = {
-    "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance"},
-    "fuel": {"icon": "mdi:gas-station"},
-    "battery": {"icon": "mdi:car-battery"},
-    "oil": {"icon": "mdi:oil"},
-    "tirePressure": {"icon": "mdi:car-tire-alert"},
+    "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance", "api_key": "odometer", "measurement": "km"},
+    "fuel": {"icon": "mdi:gas-station", "api_key": ["fuelLevel", "xevBatteryStateOfCharge"], "measurement": "%"},
+    "battery": {"icon": "mdi:car-battery", "device_class": "battery","state_class": "measurement", "api_key": "batteryStateOfCharge", "measurement": "%"},
+    "oil": {"icon": "mdi:oil", "api_key": "oilLifeRemaining", "measurement": "%"},
+    "tirePressure": {"icon": "mdi:car-tire-alert", "api_key": "tirePressure"},
     # "gps": {"icon": "mdi:radar"},
-    "alarm": {"icon": "mdi:bell"},
-    "ignitionStatus": {"icon": "hass:power"},
-    "doorStatus": {"icon": "mdi:car-door"},
-    "windowPosition": {"icon": "mdi:car-door"},
-    "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp"},
-    "elVeh": {"icon": "mdi:ev-station"},
-    "elVehCharging": {"icon": "mdi:ev-station"},
-    "speed": {"icon": "mdi:speedometer"},
-    "indicators": {"icon": "mdi:engine-outline"},
-    "coolantTemp" : {"icon": "mdi:coolant-temperature", "state_class": "measurement", "device_class": "temperature"},
-    "outsideTemp" : {"icon": "mdi:thermometer", "state_class": "measurement", "device_class": "temperature"},
-    "engineOilTemp" : {"icon": "mdi:oil-temperature", "state_class": "measurement", "device_class": "temperature"},
-    # "deepSleepInProgress": {
-    #     "icon": "mdi:power-sleep",
-    #    "name": "Deep Sleep Mode Active",
-    # },
+    "alarm": {"icon": "mdi:bell", "api_key": "alarmStatus"},
+    "ignitionStatus": {"icon": "hass:power", "api_key": "ignitionStatus"},
+    "doorStatus": {"icon": "mdi:car-door", "api_key": "doorStatus"},
+    "windowPosition": {"icon": "mdi:car-door", "api_key": "windowStatus"},
+    "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp", "api_key": "lastRefresh" , "sensor_type": "single"},
+    "elVeh": {"icon": "mdi:ev-station", "api_key": "xevBatteryRange", "device_class": "distance", "state_class": "measurement", "measurement": "km"},
+    "elVehCharging": {"icon": "mdi:ev-station", "api_key": "xevBatteryChargeDisplayStatus"},
+    "speed": {"icon": "mdi:speedometer", "device_class": "speed", "state_class": "measurement", "api_key": "speed", "measurement": "km/h"},
+    "indicators": {"icon": "mdi:engine-outline", "api_key": "indicators"},
+    "coolantTemp": {"icon": "mdi:coolant-temperature", "api_key": "engineCoolantTemp" ,"state_class": "measurement", "device_class": "temperature", "measurement": "°C"},
+    "outsideTemp": {"icon": "mdi:thermometer", "state_class": "measurement", "device_class": "temperature", "api_key": "outsideTemperature", "measurement": "°C"},
+    "engineOilTemp": {"icon": "mdi:oil-temperature", "state_class": "measurement", "device_class": "temperature", "api_key": "engineOilTemp", "measurement": "°C"},
+    "deepSleep": {"icon": "mdi:power-sleep", "name": "Deep Sleep Mode Active", "api_key": "commandPreclusion", "api_class": "states"},
     # "firmwareUpgInProgress": {
     #    "icon": "mdi:one-up",
     #   "name": "Firmware Update In Progress",
     # },
-    "remoteStartStatus": {"icon": "mdi:remote"},
+    "remoteStartStatus": {"icon": "mdi:remote", "api_key": "remoteStartCountdownTimer"},
     # "zoneLighting": {"icon": "mdi:spotlight-beam"},
-    "messages": {"icon": "mdi:message-text"},
-    "dieselSystemStatus": {"icon": "mdi:smoking-pipe"},
-    "exhaustFluidLevel": {"icon": "mdi:barrel"}
+    "messages": {"icon": "mdi:message-text", "api_key": "messages", "measurement": "messages", "sensor_type": "single"},
+    "dieselSystemStatus": {"icon": "mdi:smoking-pipe", "api_key": "dieselExhaustFilterStatus"},
+    "exhaustFluidLevel": {"icon": "mdi:barrel", "api_key": "dieselExhaustFluidLevel", "measurement": "%"},
+    # Debug Sensors (Disabled by default)
+    "events": {"icon": "mdi:calendar", "api_key": "events", "sensor_type": "single", "debug": True},
+    "metrics": {"icon": "mdi:chart-line", "api_key": "metrics", "sensor_type": "single", "debug": True},
+    "states": {"icon": "mdi:car", "api_key": "states", "sensor_type": "single", "debug": True},
+    "vehicles": {"icon": "mdi:car-multiple", "api_key": "vehicles", "sensor_type": "single", "debug": True}
 }
 
-SWITCHES = {"ignition": {"icon": "hass:power"}, "guardmode": {"icon": "mdi:shield-key"}}
+SWITCHES = {
+    "ignition": {"icon": "hass:power"},
+    #"guardmode": {"icon": "mdi:shield-key"}
+}
 
 WINDOW_POSITIONS = {
     "CLOSED": {
@@ -78,7 +83,24 @@ WINDOW_POSITIONS = {
     },
 }
 
-SWITCHES = {
-    "ignition": {"icon": "hass:power"},
-    # "guardmode": {"icon": "mdi:shield-key"}
+REGIONS = {
+    "UK&Europe": {
+        "region": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
+        "locale": "EN-IE",
+        "locale_short": "IE", #Temp fix 
+        "locale_url": "https://login.ford.ie"
+    },
+    "Australia": {
+        "region": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
+        "locale": "EN-AU",
+        "locale_short": "AUS",
+        "locale_url": "https://login.ford.com.au"
+    },
+    "North America & Canada": {
+        "region": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592",
+        "locale": "EN-AU",
+        "locale_short": "AUS",
+        "locale_url": "https://login.ford.com.au" #Temp fix until I can implement the correct American URL
+    }
+
 }
