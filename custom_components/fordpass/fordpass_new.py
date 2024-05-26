@@ -95,7 +95,7 @@ class Vehicle:
         data = {
             "client_id" : "09852200-05fd-41f6-8c21-d36d3497dc64",
             "grant_type": "authorization_code",
-            #"code_verifier": code_verifier,
+            "code_verifier": code_verifier,
             "code": code_new,
             "redirect_uri": "fordapp://userauthorized"
 
