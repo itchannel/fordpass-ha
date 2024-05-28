@@ -213,7 +213,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         code_verifier = self.generate_hash(code1)
         self.login_input["code_verifier"] = code1
         
-        url = f"https://login.ford.com/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{REGIONS[region]["locale"]}/oauth2/v2.0/authorize?redirect_uri=fordapp://userauthorized&response_type=code&max_age=3600&code_challenge={code_verifier}&code_challenge_method=S256&scope=%2009852200-05fd-41f6-8c21-d36d3497dc64%20openid&client_id=09852200-05fd-41f6-8c21-d36d3497dc64&ui_locales={REGIONS[region]["locale"]}&language_code={REGIONS[region]["locale"]}&country_code={REGIONS[region]["locale_short"]}&ford_application_id={REGIONS[region]["region"]}"
+        url = f"{REGIONS[region]["locale_url"]}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{REGIONS[region]["locale"]}/oauth2/v2.0/authorize?redirect_uri=fordapp://userauthorized&response_type=code&max_age=3600&code_challenge={code_verifier}&code_challenge_method=S256&scope=%2009852200-05fd-41f6-8c21-d36d3497dc64%20openid&client_id=09852200-05fd-41f6-8c21-d36d3497dc64&ui_locales={REGIONS[region]["locale"]}&language_code={REGIONS[region]["locale"]}&country_code={REGIONS[region]["locale_short"]}&ford_application_id={REGIONS[region]["region"]}"
         
         return url
     def base64_url_encode(self, data):
