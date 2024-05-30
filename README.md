@@ -6,6 +6,8 @@
 
 > [!WARNING]
 > Due to what looks like a Ford API change the integration isn't currently working as of 08/05/2024. I recommend disabling it for the time being until we can take a look at what has changed.
+>
+> For anyone who wants to try there is a version 1.70 which works but is more fiddly to setup. Please see https://github.com/itchannel/fordpass-ha/wiki/Obtaining-Tokens-(As-of-25-05-2024) for instructions
 
 
 # Important Update: New Ford API Challenges and Updates
