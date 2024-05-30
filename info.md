@@ -1,8 +1,72 @@
 ## **Changelog**
 ### Version 1.70
 - New config flow to allow for a user to generate a token in their browser then enter into the application, bypasses WAF. 
+### Version 1.69
+- Versioning issue 1.69 is 1.70
+### Version 1.68
+- Fix for missing locale
+- Fix duplicate Switches dictionary
+- Fix DC fast charging bug
+### Version 1.67
+- Temp fix for login issues (Uses different region login servers, may get blocked soon!)
+### Version 1.66
+- Remove deprecated GPS source type
+- Added data_description translations
+### Version 1.65
+- Add ability to use Lincoln vehicles again
+### Version 1.64
+- Add helper text for initial login when using a mobile number
+- Added sensors containing all returned data from API (Disabled by default in HA) can be used for templates and other automations/research
+### Version 1.63 
+- Reworked authentication to use login.ford.com
+### Version 1.62
+- Skipped due to emergency release of auth changes
+### Version 1.61
+- Deepsleep status is now reported again as a sensor
+- Compass Direction is now an attribute under the device_tracker entity
+- Handle missing countdownTimer variable
+- Handle missing events dictionary
+- Temporary fix for elveh errors
+- Added more Trip Data to elVeh (will assess to determine if previous Trip scores can be removed)
+  - Trip Speed Score
+  - Trip Deceleration Score
+  - Trip Acceleration Score
+  - Trip Electrical Efficiency (unsure what this value is, adding it to get more data)
+- Fix for fuel not displaying properly for EV's (will assess to determine if duplicate values in other sensors can be removed)
+- Better display for Trip Duration under elVeh
+- elVeh kW conversions will display 0 if voltage or amperage is 0
+### Version 1.60
+- Versioning issue 1.59 is 1.60
 ### Version 1.59
-- Fix for token expiration (Only works if user has valid tokens)
+- Add support for manual VIN entry (Lincoln cars hopefuly) - Please test this and report any errrors back!
+- Fix for lastRefresh sensor not returning local time
+- Fix for elVehCharging Estimated End Time not returning local time
+- Fix for elVehCharging Battery Temp debug error
+- elVehCharging now displays Plug Status as default
+- Added device class for battery
+- Fix for incorrect DoorStatus @sarangcr03 
+- Added Trip Data to elVeh.
+  - Trip Ambient Temp
+  - Trip Outside Air Ambient Temp
+  - Trip Duration
+  - Trip Cabin Temp
+  - Trip Energy Consumed (kW)
+  - Trip Distance Traveled
+  - Trip Efficiency
+  - Driving Score now Trip Driving Score
+  - Range Regen now Trip Range Regeneration
+### Version 1.58
+- Rewrote auth function to allow for more granular debugging
+- Changed odometer to use native conversions in HA (pick from sensor options)
+- No longer displays "unavaliable" if sensor goes offline, will instead show previous data and report an error in logs
+- More EV features
+- Add hood status to door locks
+- Added tripFuelEconomy attribute under speed
+- Added "Driving Score" and Range Regeneration attributes to elVeh (Driving score was a previous feature in the FordPass app. Its basically a "score" based on the maximum brake regen gained from a trip)
+- Removed duplicate attributes from elVeh / elVehCharging
+- Returning Estimated End Time as a timestamp for elVehCharging (previously was Time To Complete)
+- Improved the elVehCharging display
+
 ### Version 1.57
 - Rewrote command function to actively poll until success or failure is returned
 - Fixed bug where elveh attributes wasn't showing
@@ -227,4 +291,3 @@ Fordpass can be configured via Integrations UI
 2. Click the orange + icon at the bottom right to bring up new integration window
 3. Find and click on fordpass
 4. Enter required information and click Submit
-
