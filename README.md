@@ -4,31 +4,26 @@
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/itchannel)
 
+<!-- Wrote up a little note thing for the breaking change. Not sure if you want to use it but I figured this could be a good start or something since I was already editing the readme. -->
 > [!WARNING]
 > # Breaking Change
 > There is a new token obtaining system.
 > 
-<!-- Wrote up a little note thing for the breaking change. Not sure if you want to use it but I figured this could be a good start or something since I was already editing the readme. -->
+> The token used by this integration is currently removed whenever the integration is updated. With this 1.70 update, the token will be wiped during every update, requiring users to manually add the token during the initial setup.
+> 
+> To prevent this issue, we will be moving the token file outside of the FordPass directory. This change will ensure that the token is preserved during updates. This will require reconfiguration of your setup.
+> Please see the Installation section, or the Wiki for help.
 
-The token used by this integration is currently removed whenever the integration is updated. With this 1.70 update, the token will be wiped during every update, requiring users to manually add the token during the initial setup.
-
-To prevent this issue, we will be moving the token file outside of the FordPass directory. This change will ensure that the token is preserved during updates. This will require reconfiguration of your setup.
-
-Please see the Installation section, or the Wiki for help.
-
-
+<!-- Tried to update the update with the new information -->
 > [!IMPORTANT]  
 > # FordConnect API
-
-Dear FordPass Integration Users,
-
-As you know there have been many challenges with the Ford API. We are actively working on developments but please note that these developments **will take time.**
-
-- **FordConnect API:** Ford has enabled developer accounts and released their `FordConnect API`. However, this API and its documentation currently **lack many data points** or **are not fully implemented**. It is presently supported only in North America. 
-
-- **FordPass APP:** Ford has also released their refreshed `FordPass App`. This refreshed app includes some new features while also removing certain items, similar to the FordConnect API.
-
-It is important to understand that our integration depends on the data provided by either the `FordConnect API` or the `FordPass App`, which may limit some functionalities.
+>
+> Dear FordPass Integration Users,
+> As you know there have been many challenges with the Ford API. We > are actively working on developments but please note that these developments **will take time.**
+> - **FordConnect API:** Ford has enabled developer accounts and released their `FordConnect API`. However, this API and its documentation currently **lack many data points** or **are not fully >implemented**. It is presently supported only in North America. 
+> - **FordPass APP:** Ford has also released their refreshed `FordPass App`. This refreshed app includes some new features while also >removing certain items, similar to the FordConnect API.
+> 
+> It is important to understand that our integration depends on the data provided by either the `FordConnect API` or the `FordPass App`, >which may limit some functionalities.
 
 ## Future Updates:
 
