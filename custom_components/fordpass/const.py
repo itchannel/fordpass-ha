@@ -88,30 +88,35 @@ REGIONS = {
         "region": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
         "locale": "nl-NL",
         "locale_short": "NL",
-        "locale_url": "https://login.ford.nl"
+        "locale_url": "https://login.ford.nl",
+        "countrycode": "NLD"
     },
     "UK&Europe": {
         "region": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
         "locale": "EN-IE",
         "locale_short": "IE", #Temp fix 
-        "locale_url": "https://login.ford.ie"
+        "locale_url": "https://login.ford.ie",
+        "countrycode": "GBR"
     },
     "Australia": {
         "region": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
         "locale": "EN-AU",
         "locale_short": "AUS",
-        "locale_url": "https://login.ford.com.au"
+        "locale_url": "https://login.ford.com.au",
+        "countrycode": "AUS"
     },
     "USA": {
         "region": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592", # ???
         "locale": "en-US",
         "locale_short": "USA",
-        "locale_url": "https://login.ford.com" # Reverted from AU to US because it appears to be working
+        "locale_url": "https://login.ford.com", # Reverted from AU to US because it appears to be working
+        "countrycode": "USA"
     },
     "Canada": {
         "region": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592",
         "locale": "en-CA",
         "locale_short": "CAN",
-        "locale_url": "https://login.ford.com"
+        "locale_url": "https://login.ford.com",
+        "countrycode": "USA"
     }
 }

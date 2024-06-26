@@ -65,8 +65,7 @@ class Vehicle:
         self.region = REGIONS[region]["region"]
         self.country_code = REGIONS[region]["locale"]
         self.short_code = REGIONS[region]["locale_short"]
-        self.region2 = region
-        self.region2 = region
+        self.countrycode = REGIONS[region]["countrycode"]
         self.vin = vin
         self.token = None
         self.expires = None
@@ -500,21 +499,11 @@ class Vehicle:
         """Get vehicle list from account"""
         self.__acquire_token()
 
-        if self.region2 == "Australia":
-            countryheader = "AUS"
-        elif self.region2 == "North America & Canada":
-            countryheader = "USA"
-        elif self.region2 == "UK&Europe":
-            countryheader = "GBR"
-        elif self.region2 == "Netherlands":
-            countryheader = "NLD"
-        else:
-            countryheader = "USA"
         headers = {
             **apiHeaders,
             "Auth-Token": self.token,
             "Application-Id": self.region,
-            "Countrycode": countryheader,
+            "Countrycode": self.countrycode,
             "Locale": "EN-US"
         }
 
