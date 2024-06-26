@@ -27,7 +27,7 @@ COORDINATOR = "coordinator"
 
 REGION = "region"
 
-REGION_OPTIONS = ["UK&Europe", "Australia", "USA", "Canada"]
+REGION_OPTIONS = ["Netherlands", "UK&Europe", "Australia", "USA", "Canada"]
 
 SENSORS = {
     "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance", "api_key": "odometer", "measurement": "km"},
@@ -84,6 +84,12 @@ WINDOW_POSITIONS = {
 }
 
 REGIONS = {
+    "Netherlands": {
+        "region": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
+        "locale": "nl-NL",
+        "locale_short": "NL",
+        "locale_url": "https://login.ford.nl"
+    },
     "UK&Europe": {
         "region": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
         "locale": "EN-IE",
