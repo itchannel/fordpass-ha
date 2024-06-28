@@ -35,6 +35,7 @@ loginHeaders = {
 }
 
 region_lookup = {
+    "Netherlands": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
     "UK&Europe": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
     "Australia": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
     "North America & Canada": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592",
@@ -64,8 +65,7 @@ class Vehicle:
         self.region = REGIONS[region]["region"]
         self.country_code = REGIONS[region]["locale"]
         self.short_code = REGIONS[region]["locale_short"]
-        self.region2 = region
-        self.region2 = region
+        self.countrycode = REGIONS[region]["countrycode"]
         self.vin = vin
         self.token = None
         self.expires = None
@@ -499,19 +499,11 @@ class Vehicle:
         """Get vehicle list from account"""
         self.__acquire_token()
 
-        if self.region2 == "Australia":
-            countryheader = "AUS"
-        elif self.region2 == "North America & Canada":
-            countryheader = "USA"
-        elif self.region2 == "UK&Europe":
-            countryheader = "GBR"
-        else:
-            countryheader = "USA"
         headers = {
             **apiHeaders,
             "Auth-Token": self.token,
             "Application-Id": self.region,
-            "Countrycode": countryheader,
+            "Countrycode": self.countrycode,
             "Locale": "EN-US"
         }
 
