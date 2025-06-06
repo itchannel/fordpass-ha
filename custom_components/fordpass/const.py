@@ -35,9 +35,9 @@ DEFAULT_REGION = "USA"
 
 SENSORS = {
     "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance", "api_key": "odometer", "measurement": "km"},
-    "fuel": {"icon": "mdi:gas-station", "api_key": ["fuelLevel", "xevBatteryStateOfCharge"], "measurement": "%"},
+    "fuel": {"icon": "mdi:gas-station", "api_key": ["fuelLevel", "xevBatteryStateOfCharge"], "measurement": "%", "state_class": "measurement"},
     "battery": {"icon": "mdi:car-battery", "device_class": "battery", "state_class": "measurement", "api_key": "batteryStateOfCharge", "measurement": "%"},
-    "oil": {"icon": "mdi:oil", "api_key": "oilLifeRemaining", "measurement": "%"},
+    "oil": {"icon": "mdi:oil", "api_key": "oilLifeRemaining", "measurement": "%", "state_class": "measurement"},
     "tirePressure": {"icon": "mdi:car-tire-alert", "api_key": "tirePressure"},
     # "gps": {"icon": "mdi:radar"},
     "alarm": {"icon": "mdi:bell", "api_key": "alarmStatus"},
