@@ -1,38 +1,64 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Account già configurato"
+            "already_configured": "Account già configurato",
+            "no_vehicles": "Nessun veicolo non configurato trovato su questo account"
         },
         "error": {
-            "cannot_connect": "Errore di collegamento",
-            "invalid_auth": "Errore di autenticazione",
-            "invalid_vin": "VIN non trovato nel tuo account",
-            "unknown": "Errore sconosciuto"
+            "cannot_connect": "Connessione fallita",
+            "invalid_auth": "Credenziali non valide",
+            "invalid_vin": "VIN non trovato per l'account specificato",
+            "invalid_mobile": "Il numero di cellulare come nome utente deve essere specificato se si utilizza la regione sudafricana",
+            "invalid_token": "Il token non è valido, verifica di aver copiato il token corretto dall'header Location, dovrebbe iniziare con fordapp://",
+            "unknown": "Errore imprevisto"
         },
         "step": {
             "user": {
+                "title": "Configurazione FordPass",
+                "description": "Scegli come vuoi configurare FordPass",
                 "data": {
-                    "password": "FordPass Password",
-                    "username": "FordPass Username (Email)",
-                    "vin": "VIN",
-                    "region" : "FordPass Regione"
+                    "setup_type": "Tipo di configurazione"
+                }
+            },
+            "new_account": {
+                "title": "Nuovo account FordPass", 
+                "description": "Configura un nuovo account FordPass",
+                "data": {
+                    "password": "Password FordPass",
+                    "username": "Nome utente FordPass (Email)",
+                    "region": "Regione FordPass"
                 },
                 "data_description": {
-                    "username": "Se utilizzi un cellulare anziché un'e-mail, inserisci il tuo numero (meno lo 0 iniziale), includi anche + e il prefisso internazionale (ad esempio +99123456789)"
-                } 
+                    "username": "Se utilizzi un numero di cellulare invece dell'email, inserisci il tuo numero (senza lo 0 iniziale) e includi + e il prefisso del paese (es: +99123456789)"
+                }   
+            },
+            "add_vehicle": {
+                "title": "Aggiungi veicolo a account esistente",
+                "description": "Aggiungi un altro veicolo a un account FordPass esistente. Questo utilizzerà i token di autenticazione esistenti.",
+                "data": {
+                    "account": "Seleziona account"
+                }
+            },
+            "token": {
+                "title": "Configura token",
+                "description": "Inserisci il token completo dall'header Location: dopo aver effettuato l'accesso usando l'URL sottostante. Per aiuto vedi [Ottenere un Token](https://github.com/itchannel/fordpass-ha/wiki/Obtaining-Tokens-(As-of-25-05-2024))",
+                "data": {
+                    "url": "URL",
+                    "tokenstr": "Token"
+                }
             },
             "vehicle": {
                 "title": "Seleziona il veicolo da aggiungere",
-                "description": "Verranno visualizzati solo i veicoli attualmente non aggiunti",
+                "description": "Verranno mostrati solo i veicoli attualmente non aggiunti",
                 "data": {
-                  "vin": "VIN"
+                    "vin": "VIN"
                 }
-              },
-              "vin": {
-                "title": "Inserimento manuale del vin",
-                "description": "Inserisci manualmente il numero VIN poiché non è stato possibile trovare veicoli automaticamente.",
+            },
+            "vin": {
+                "title": "Inserimento manuale VIN",
+                "description": "Inserisci manualmente il tuo numero VIN poiché nessun veicolo è stato trovato automaticamente.",
                 "data": {
-                    "vin": "Numero di telaio del veicolo"
+                    "vin": "Numero VIN del veicolo"
                 }
             }
         }
@@ -43,34 +69,35 @@
                 "data": {
                     "pressure_unit": "Unità di misura della pressione",
                     "distance_unit": "Unità di misura della distanza",
-                    "update_interval": "Intervallo di aggiornamento della FordPass-API (secondi)"
+                    "distance_conversion": "Disabilita conversione distanza",
+                    "update_interval": "Intervallo per interrogare l'API Fordpass (secondi)"
                 },
-                "description": "Configurazione delle opzioni"
+                "description": "Configura le opzioni fordpass"
             }
         }
-    },
+    }, 
     "services": {
         "refresh_status": {
-            "name": "Aggiorna lo status del veicolo",
-            "description": "Aggiorna lo status e le entità del Veicolo. Il processo può durare fino a 5 minuti.",
+            "name": "Aggiorna stato del veicolo",
+            "description": "Interroga l'auto per l'ultimo stato (Ci vogliono fino a 5 minuti per aggiornare una volta eseguita questa funzione!)",
             "fields": {
                 "vin": {
                     "name": "VIN",
-                    "description": "Se specificato, aggiorna solo lo stato del veicolo con questo VIN. Altrimenti, viene aggiornato lo stato di tutti i veicoli."
+                    "description": "Inserisci un numero VIN per aggiornare solo il veicolo specificato (Default aggiorna tutti i veicoli aggiunti)"
                 }
             }
         },
         "clear_tokens": {
-            "name": "Svuota la token-cache",
-            "description": "Svuota la cache dei tokens."
+            "name": "Cancella token",
+            "description": "Cancella la cache dei token"
         },
         "reload": {
-            "name": "Ricarica l'integrazione",
-            "description": "Ricaricara l'integrazione Fordpass."
+            "name": "Ricarica",
+            "description": "Ricarica l'integrazione Fordpass"
         },
         "poll_api": {
-            "name": "Chiama l'API",
-            "description": "Chiama manualmente la Fordpass-API per aggiornare le informazioni. (Attenzione: Chiamate troppo frequenti possono portare a un blocco temporaneo del traffico.)"
+            "name": "Interroga API",
+            "description": "Interroga manualmente l'API per l'aggiornamento dei dati (Attenzione: farlo troppo spesso potrebbe risultare in un ban)"
         }
     },
     "title": "FordPass"

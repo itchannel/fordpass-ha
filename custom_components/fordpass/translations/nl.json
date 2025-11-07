@@ -2,38 +2,63 @@
     "config": {
         "abort": {
             "already_configured": "Account is al geconfigureerd",
-            "no_vehicles": "Geen voertuigen op account of ze zijn allemaal al geconfigureerd"
+            "no_vehicles": "Geen niet-geconfigureerde voertuigen gevonden op dit account"
         },
         "error": {
-            "cannot_connect": "Kan geen verbinding maken",
-            "invalid_auth": "Onjuiste logingegevens",
-            "invalid_vin": "VIN niet bekend onder opgegeven account",
-            "unknown": "Onbekende fout"
+            "cannot_connect": "Verbinding mislukt",
+            "invalid_auth": "Ongeldige inloggegevens",
+            "invalid_vin": "VIN niet gevonden voor gegeven account",
+            "invalid_mobile": "Mobiele nummer als gebruikersnaam moet worden opgegeven bij gebruik van Zuid-Afrikaanse regio",
+            "invalid_token": "Token is ongeldig, controleer of je het juiste token hebt gekopieerd uit de Location header, het moet beginnen met fordapp://",
+            "unknown": "Onverwachte fout"
         },
         "step": {
             "user": {
+                "title": "FordPass Setup",
+                "description": "Kies hoe je FordPass wilt instellen",
+                "data": {
+                    "setup_type": "Setup Type"
+                }
+            },
+            "new_account": {
+                "title": "Nieuw FordPass Account", 
+                "description": "Stel een nieuw FordPass account in",
                 "data": {
                     "password": "FordPass wachtwoord",
-                    "username": "FordPass gebruikersnaam (e-mailadres)",
-                    "vin": "VIN",
-                    "region" : "FordPass regio"
+                    "username": "FordPass gebruikersnaam (Email)",
+                    "region": "FordPass regio"
                 },
                 "data_description": {
-                    "username": "Hvis du bruker en mobil i stedet for e-post, skriv inn nummeret ditt (minus initial 0), inkluder også + og landskoden (f.eks. +99123456789)"
-                } 
+                    "username": "Als je een mobiel nummer gebruikt in plaats van email, voer dan je nummer in (zonder voorloop 0) en voeg + en de landcode toe (bijv. +99123456789)"
+                }   
+            },
+            "add_vehicle": {
+                "title": "Voeg voertuig toe aan bestaand account",
+                "description": "Voeg een ander voertuig toe aan een bestaand FordPass account. Dit zal de bestaande authenticatie tokens gebruiken.",
+                "data": {
+                    "account": "Selecteer account"
+                }
+            },
+            "token": {
+                "title": "Setup token",
+                "description": "Voer het volledige token in uit de Location: header na inloggen met de onderstaande URL. Voor hulp zie [Een Token Verkrijgen](https://github.com/itchannel/fordpass-ha/wiki/Obtaining-Tokens-(As-of-25-05-2024))",
+                "data": {
+                    "url": "URL",
+                    "tokenstr": "Token"
+                }
             },
             "vehicle": {
-                "title": "Velg kjøretøy som skal legges til",
-                "description": "Kun kjøretøy som ikke er lagt til for øyeblikket, vises",
+                "title": "Selecteer voertuig om toe te voegen",
+                "description": "Alleen voertuigen die momenteel niet zijn toegevoegd worden getoond",
                 "data": {
-                  "vin": "VIN"
+                    "vin": "VIN"
                 }
-              },
-              "vin": {
-                "title": "Inserimento manuale del vin",
-                "description": "Inserisci manualmente il numero VIN poiché non è stato possibile trovare veicoli automaticamente.",
+            },
+            "vin": {
+                "title": "Handmatige VIN invoer",
+                "description": "Voer je VIN nummer handmatig in omdat er geen voertuigen automatisch gevonden konden worden.",
                 "data": {
-                    "vin": "Numero di telaio del veicolo"
+                    "vin": "VIN nummer voor voertuig"
                 }
             }
         }
@@ -44,10 +69,10 @@
                 "data": {
                     "pressure_unit": "Eenheid voor luchtdruk",
                     "distance_unit": "Eenheid voor afstand",
-                    "distance_conversion": "Deaktiver avstandskonvertering",
+                    "distance_conversion": "Afstand conversie uitschakelen",
                     "update_interval": "Interval om Fordpass API te peilen (seconden)"
                 },
-                "description": "Instellingen FordPass"
+                "description": "Configureer fordpass opties"
             }
         }
     }, 
@@ -58,21 +83,21 @@
             "fields": {
                 "vin": {
                     "name": "VIN",
-                    "description": "Parseer een chassisnummer om alleen het opgegeven voertuig te vernieuwen (standaard vernieuwt alle toegevoegde voertuigen)"
+                    "description": "Voer een VIN nummer in om alleen het opgegeven voertuig te vernieuwen (standaard vernieuwt alle toegevoegde voertuigen)"
                 }
             }
         },
         "clear_tokens": {
             "name": "Tokens wissen",
-            "description": "Wis de tokencache"
+            "description": "Wis de token cache"
         },
         "reload": {
-            "name": "herladen",
-            "description": "Laad de Fordpass-integratie opnieuw"
+            "name": "Herladen",
+            "description": "Laad de Fordpass integratie opnieuw"
         },
         "poll_api": {
             "name": "Poll API",
-            "description": "API handmatig peilen voor gegevensupdate (Waarschuwing: als u dit te vaak doet, kan dit resulteren in een ban)"
+            "description": "API handmatig peilen voor gegevensupdate (Waarschuwing: als je dit te vaak doet, kan dit resulteren in een ban)"
         }
     },
     "title": "FordPass"

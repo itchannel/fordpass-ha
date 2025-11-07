@@ -2,35 +2,61 @@
     "config": {
         "abort": {
             "already_configured": "Account is already configured",
-            "no_vehicles": "No vehicles on account or all are configured already"
+            "no_vehicles": "No unconfigured vehicles found on this account"
         },
         "error": {
             "cannot_connect": "Failed to connect",
             "invalid_auth": "Invalid Credentials",
             "invalid_vin": "Vin not found for given account",
+            "invalid_mobile": "Mobile number as username must be specified if using South African Region",
+            "invalid_token": "Token is invalid, please check you copied the correct token from the Header Location, it should start with fordapp://",
             "unknown": "Unexpected error"
         },
         "step": {
             "user": {
+                "title": "FordPass Setup",
+                "description": "Choose how you want to set up FordPass",
+                "data": {
+                    "setup_type": "Setup Type"
+                }
+            },
+            "new_account": {
+                "title": "New FordPass Account", 
+                "description": "Set up a new FordPass account",
                 "data": {
                     "password": "FordPass Password",
                     "username": "FordPass Username (Email)",
-                    "region" : "FordPass Region"
+                    "region": "FordPass Region"
                 },
                 "data_description": {
                     "username": "If using a mobile instead of email please enter your number (minus initial 0) also include + and the country code (e.g. +99123456789)"
                 }   
             },
+            "add_vehicle": {
+                "title": "Add Vehicle to Existing Account",
+                "description": "Add another vehicle to an existing FordPass account. This will use the existing authentication tokens.",
+                "data": {
+                    "account": "Select Account"
+                }
+            },
+            "token": {
+                "title": "Setup Token",
+                "description": "Please enter the full token from the Location: header once logging in using the URL below. For help see [Obtaining a Token](https://github.com/itchannel/fordpass-ha/wiki/Obtaining-Tokens-(As-of-25-05-2024))",
+                "data": {
+                    "url": "URL",
+                    "tokenstr": "Token"
+                }
+            },
             "vehicle": {
                 "title": "Select vehicle to add",
                 "description": "Only vehicles not currently added will be shown",
                 "data": {
-                  "vin": "VIN"
+                    "vin": "VIN"
                 }
-              },
+            },
             "vin": {
                 "title": "Manual Vin Entry",
-                "description": "Please enter your VIN number manually as no vehicles could be found automatticaly.",
+                "description": "Please enter your VIN number manually as no vehicles could be found automatically.",
                 "data": {
                     "vin": "Vin Number for vehicle"
                 }
@@ -57,7 +83,7 @@
             "fields": {
                 "vin": {
                     "name": "VIN",
-                    "description": "Parse a vin number to only refresh the specified vehicle (Default refreshes all added vehicles)"
+                    "description": "Enter a vin number to only refresh the specified vehicle (Default refreshes all added vehicles)"
                 }
             }
         },
@@ -76,4 +102,3 @@
     },
     "title": "Fordpass"
 }
-    

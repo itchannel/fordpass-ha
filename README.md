@@ -4,40 +4,38 @@
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/itchannel)
 
+<!-- Wrote up a little note thing for the breaking change. Not sure if you want to use it but I figured this could be a good start or something since I was already editing the readme. -->
 > [!WARNING]
-> Due to what looks like a Ford API change the integration isn't currently working as of 08/05/2024. I recommend disabling it for the time being until we can take a look at what has changed.
+> # Breaking Change
+> This update changes how tokens are handled, in order to prevent deletion during future updates or changes. Tokens are now handled by the HA storage system and will persist updates and reboots properly. 
+This change will ensure that the token is preserved during updates. This will require reconfiguration of your setup.
+> Please see the Installation section, or the Wiki for help.
+
+<!-- Tried to update the update with the new information -->
+> [!IMPORTANT]  
+> # FordConnect API
 >
-> For anyone who wants to try there is a version 1.70 which works but is more fiddly to setup. Please see https://github.com/itchannel/fordpass-ha/wiki/Obtaining-Tokens-(As-of-25-05-2024) for instructions
+> Dear FordPass Integration Users,
+> As you know there have been many challenges with the Ford API. We > are actively working on developments but please note that these developments **will take time.**
+> - **FordConnect API:** Ford has enabled developer accounts and released their `FordConnect API`. However, this API and its documentation currently **lack many data points** or **are not fully >implemented**. It is presently supported only in North America. 
+> - **FordPass APP:** Ford has also released their refreshed `FordPass App`. This refreshed app includes some new features while also >removing certain items, similar to the FordConnect API.
+> 
+> It is important to understand that our integration depends on the data provided by either the `FordConnect API` or the `FordPass App`, >which may limit some functionalities.
 
+## Future Updates:
 
-# Important Update: New Ford API Challenges and Updates
+- **Enhancements:** We are committed to enhancing the integration and ensuring its functionality. However, we both have limited time to allocate to this effort.
 
-Dear FordPass Integration Users,
+- **Implementation:** We are actively working on integrating the new `FordConnect API` to ensure users who can access it will benefit from its features. At the same time, we will maintain functionality for users who are unable to use this new API.
 
-We want to keep you informed about the latest developments regarding the integration. Ford has recently introduced a new API, which has presented both opportunities and challenges. Here are some key points to note:
-
-## Challenges and Issues:
-
-- **Increased Complexity:** The new API has brought about several challenges and complexities. While it has enabled new attributes and sensors for different vehicles, it has also made integration more intricate.
-
-- **Vehicle Variety:** In addition to an entirely new data structure, it is difficult to determine the variety of vehicles that can be supported - without knowing their capabilities. We are assessing which vehicles contain the information necessary to enable different sensors.
-
-- **Unstable Nature of the New API:** Currently, the API appears to be unstable and/or changing. Any changes to its structure can disrupt sensor data. It is difficult to determine why: vehicles may still be in the process of migration, needing an update, or have a different data structure. Either way, instability has been noticed, and any updates or changes to the API can impact this integration.
-
-## Ongoing Work and Future Updates:
-
-- **Ongoing Work:** We both want to continue enhancing the integration and ensuring its functionality. However, it's important to note that we have limited time to allocate to this effort.
-
-- **Future Updates:** We are continuing our efforts to adapt to new changes and persue further enhancments.
-
-
-#### Please understand that there may be issues, or disruptions, to different sensors during this process.
+#### Please be aware that there may be issues or disruptions during this process.
 
 If you have any questions or concerns, please either open a new issue or comment on an existing issue related to yours.
 
 Thank you,
 
 itchannel and SquidBytes
+
 
 ## Credit 
 - https://github.com/clarkd - Initial Home Assistant automation idea and Python code (Lock/Unlock)
@@ -48,33 +46,35 @@ itchannel and SquidBytes
 - https://github.com/heehoo59 - French Translation
 - https://github.com/SquidBytes - EV updates and documentation
 
-## Account Warning (Sep 2023)
-A number of users have encountered their accounts being banned for containing "+" symbols in their email. It appears Ford thinks this is a disposable email. So if you have a + in your email I recommend changing it.
-
 ## **Changelog**
 [Updates](info.md)
 
 ## Installation
-Use [HACS](https://hacs.xyz/) to add this repository as a custom repo. Upon installation navigate to your integrations, and follow the configuration options. You will need to provide:
-- Username (Fordpass App)
-- Password (Fordpass App)
+Use [HACS](https://hacs.xyz/) to add this repository as a custom repo. 
+
+Upon installation navigate to your integrations, and follow the configuration options. You will need to provide:
+- Fordpass Email
 - Region (Where you are based, required for tokens to work correctly)
 
-## Requirement
+You will then be prompted with `Setup Token` 
+
+Follow the instructions on the [Wiki](https://github.com/itchannel/fordpass-ha/wiki/Obtaining-Tokens-(As-of-25-05-2024)) to obtain your token
+
+## Usage
 Your car must have the lastest onboard modem functionality and have registered/authorised the fordpass application
 
 ## Services
-
- ### Car Refresh
-I have added a service to poll the car for updates, due to the battery drain I have left this up to you to set the interval. The service to be called is "refresh_status" and can be accessed in home assistant using "fordpass.refresh_status". 
+<!-- I haven't looked into these services, but it might be easier to maintain a Wiki with the various services compared to the README. Just a thought. -->
+### Car Refresh
+I have added a service to poll the car for updates, due to the battery drain I have left this up to you to set the interval. The service to be called is "refresh_status" and can be accessed in home assistant using "fordpas.refresh_status". 
 
 Optionally you can add the "vin" parameter followed by your VIN number to only refresh one vehicle. By default this service will refresh all registered cars in HA.
 
 **This will take up to 5 mins to update from the car once the service has been run**
 
-### Unit Conversion
+###
 Click on options and choose imperial or metric to display in km/miles. Takes effect on next restart of home assistant. Default is Metric
-
+<!-- These might need to be updated since its now different -->
 ### Clear Tokens
 If you are experiencing any sign in issues, please trying clearing your tokens using the "clear_tokens" service call.
 
@@ -82,36 +82,32 @@ If you are experiencing any sign in issues, please trying clearing your tokens u
 This service allows you to manually refresh/poll the API without waiting the set poll interval. Handy if you need quicker updates e.g. when driving for gps coordinates
 
 
-## Currently Working
-Depending on your vehicles capability
+## Sensors
+### Currently Working
+**Sensors may change as the integration is being developed**
+<!-- Keeping this the same, but it will probably change and update alongside Fordconnect and the new app features -->
 
-### Switches
-- Guard Mode
-- Lock/Unlock
-- Remote Start
-
-### Sensors
-- Alarm Status
-- Battery Status (12v)
-- Coolant Temperature
-- Deep sleep status
-- Diesel System
-- Door Status
-- Electric Vehicle Support
-- Firmware Update Status
 - Fuel Level
-- Ignition Status
-- Indicators (Value of various vehicles indicators)
-- Last Refresh
-- FordPass messages and alerts
 - Odometer
+- Lock/Unlock
 - Oil Status
-- Outside Temperature
-- Speed
+- Last known GPS Coordinates/Map
 - Tyre Status
-- TPMS Sensors
+- Battery Status
+- Ignition Status
+- Alarm Status
+- Individual door statuses
+- Remote Start
+- Window Status (Only if your car supports it!)
+- Last Car Refresh status
 - Car Tracker
-- Window Status
+- Supports Multiple Regions
+- Electric Vehicle Support
+- TPMS Sensors
+- Guard Mode (Only supported cars)
+- Deep sleep status
+- Fordpass messages and alerts
 
 ## Disclaimer
+
 This integration is not officially supported by Ford and as such using this integration could result in your account being locked out!

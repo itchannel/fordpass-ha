@@ -2,31 +2,23 @@
 import hashlib
 import json
 import logging
-import os
 import random
 import re
 import string
 import time
+import asyncio
 from base64 import urlsafe_b64encode
-import requests
+import aiohttp
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-from homeassistant import exceptions
 from .const import REGIONS
 
 _LOGGER = logging.getLogger(__name__)
+
 defaultHeaders = {
     "Accept": "*/*",
     "Accept-Language": "en-us",
-    "User-Agent": "FordPass/26 CFNetwork/1485 Darwin/23.1.0",
-    "Accept-Encoding": "gzip, deflate, br",
-}
-
-loginHeaders = {
-    "Accept": "*/*",
-    "Accept-Language": "en-us",
-    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1",
+    "User-Agent": "FordPass/23 CFNetwork/1408.0.4 Darwin/22.5.0",
     "Accept-Encoding": "gzip, deflate, br",
 }
 
@@ -35,34 +27,35 @@ apiHeaders = {
     "Content-Type": "application/json",
 }
 
-
+loginHeaders = {
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept-Language": "en-US,en;q=0.5",
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1",
+    "Accept-Encoding": "gzip, deflate, br",
+}
 
 NEW_API = True
 
-BASE_URL = "https://usapi.cv.ford.com/api"
-GUARD_URL = "https://api.mps.ford.com/api"
+BASE_URL = "https://api.vehicle.ford.com/api"
+GUARD_URL = "https://api.foundational.ford.com/api" #"https://api.mps.ford.com/api"
 SSO_URL = "https://sso.ci.ford.com"
 AUTONOMIC_URL = "https://api.autonomic.ai/v1"
 AUTONOMIC_ACCOUNT_URL = "https://accounts.autonomic.ai/v1"
-#FORD_LOGIN_URL = "https://login.ford.com"
-
-session = requests.Session()
+FORD_LOGIN_URL = "https://login.ford.com"
 
 
 class Vehicle:
     # Represents a Ford vehicle, with methods for status and issuing commands
 
     def __init__(
-        self, username, password, vin, region, save_token=False, config_location=""
+        self, username, password, vin, region, token_store, hass
     ):
         self.username = username
         self.password = password
-        self.save_token = save_token
         self.region = REGIONS[region]["region"]
         self.country_code = REGIONS[region]["locale"]
         self.short_code = REGIONS[region]["locale_short"]
-        self.region2 = REGIONS[region]["region"]
-        self.ford_login_url = REGIONS[region]["locale_url"]
+        self.countrycode = REGIONS[region]["countrycode"]
         self.vin = vin
         self.token = None
         self.expires = None
@@ -70,276 +63,237 @@ class Vehicle:
         self.refresh_token = None
         self.auto_token = None
         self.auto_expires_at = None
-        self.errors = 0
-        retry = Retry(connect=3, backoff_factor=0.5)
-        adapter = HTTPAdapter(max_retries=retry)
-        session.mount("http://", adapter)
-        session.mount("https://", adapter)
-        if config_location == "":
-            self.token_location = "custom_components/fordpass/fordpass_token.txt"
-        else:
-            _LOGGER.debug(config_location)
-            self.token_location = config_location
+        self.token_store = token_store
+        self.hass = hass
+        self.session = async_get_clientsession(hass)
 
     def base64_url_encode(self, data):
         """Encode string to base64"""
         return urlsafe_b64encode(data).rstrip(b'=')
+
+    async def generate_tokens(self, urlstring, code_verifier):
+        """Generate tokens from auth code"""
+        code_new = urlstring.replace("fordapp://userauthorized/?code=", "")
+        _LOGGER.debug(f"Code: {code_new}, Country: {self.country_code}")
+        
+        data = {
+            "client_id": "09852200-05fd-41f6-8c21-d36d3497dc64",
+            "scope": "09852200-05fd-41f6-8c21-d36d3497dc64 openid",
+            "grant_type": "authorization_code",
+            "code_verifier": code_verifier,
+            "code": code_new,
+            "redirect_uri": "fordapp://userauthorized"
+        }
+
+        _LOGGER.debug(data)
+        headers = {
+            "Accept-Encoding": "gzip",
+            "Connection": "Keep-Alive",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": "okhttp/4.12",
+        }
+        
+        async with self.session.post(
+            f"{FORD_LOGIN_URL}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/oauth2/v2.0/token",
+            headers=headers,
+            data=data,
+            ssl=False
+        ) as response:
+            _LOGGER.debug(f"Status: {response.status}")
+            text = await response.text()
+            _LOGGER.debug(text)
+            if response.status == 200:
+                token_data = await response.json()
+                return await self.generate_fulltokens(token_data)
+            else:
+                _LOGGER.error(f"Token generation failed: {response.status}")
+                return False
+
+    async def generate_fulltokens(self, token):
+        """Generate full tokens from initial token"""
+        data = {"idpToken": token["access_token"]}
+        headers = {**apiHeaders, "Application-Id": self.region}
+        
+        async with self.session.post(
+            f"{GUARD_URL}/token/v2/cat-with-b2c-access-token",
+            json=data,
+            headers=headers,
+            ssl=False
+        ) as response:
+            _LOGGER.debug(f"Status: {response.status}")
+            text = await response.text()
+            _LOGGER.debug(text)
+            if response.status == 200:
+                final_tokens = await response.json()
+                final_tokens["expiry_date"] = time.time() + final_tokens["expires_in"]
+                await self.write_token(final_tokens)
+                return True
+            else:
+                _LOGGER.error(f"Full token generation failed: {response.status}")
+                return False
 
     def generate_hash(self, code):
         """Generate hash for login"""
         hashengine = hashlib.sha256()
         hashengine.update(code.encode('utf-8'))
         return self.base64_url_encode(hashengine.digest()).decode('utf-8')
-    
-    def auth2_step1(self):
-        """Auth2 step 1 obtain tokens"""
-        _LOGGER.debug("Running Step1 new!")
+
+    async def auth(self):
+        """New Authentication System """
+        _LOGGER.debug("New System")
+        # Auth Step1
         headers = {
-            **loginHeaders,
+            **defaultHeaders,
+            'Content-Type': 'application/json',
         }
         code1 = ''.join(random.choice(string.ascii_lowercase) for i in range(43))
         code_verifier = self.generate_hash(code1)
-        step1_session = requests.session()
-        step1_url = f"{self.ford_login_url}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/oauth2/v2.0/authorize?redirect_uri=fordapp://userauthorized&response_type=code&max_age=3600&scope=%2009852200-05fd-41f6-8c21-d36d3497dc64%20openid&client_id=09852200-05fd-41f6-8c21-d36d3497dc64&code_challenge={code_verifier}&code_challenge_method=S256&ui_locales={self.country_code}&language_code={self.country_code}&country_code={self.short_code}&ford_application_id=5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98"
+        url1 = f"{SSO_URL}/v1.0/endpoint/default/authorize?redirect_uri=fordapp://userauthorized&response_type=code&scope=openid&max_age=3600&client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&code_challenge={code_verifier}&code_challenge_method=S256"
+        
+        async with self.session.get(url1, headers=headers) as response:
+            text = await response.text()
+            
+        test = re.findall('data-ibm-login-url="(.*)"\s', text)[0]
+        next_url = SSO_URL + test
 
-        step1get = step1_session.get(
-            step1_url,
-            headers=headers,
-        )
-
-        step1get.raise_for_status()
-
-        #_LOGGER.debug(step1_session.text)
-        pattern = r'var SETTINGS = (\{[^;]*\});'
-        #_LOGGER.debug(step1get.text)
-        match = re.search(pattern, step1get.text)
-        transId = None
-        csrfToken = None
-        if match:
-            settings = match.group(1)
-            settings_json = json.loads(settings)
-            _LOGGER.debug(settings_json)
-            _LOGGER.debug(settings_json["transId"])
-            transId = settings_json["transId"]
-            csrfToken = settings_json["csrf"]
-        _LOGGER.debug(step1get.status_code)
-        _LOGGER.debug(step1_session.cookies.get_dict())
-        data = {
-            "request_type": "RESPONSE",
-            "signInName": self.username,
-            "password": self.password,
-        }
-        urlp = f"{self.ford_login_url}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/SelfAsserted?tx={transId}&p=B2C_1A_SignInSignUp_{self.country_code}"
-        _LOGGER.debug(urlp)
+        # Auth Step2
         headers = {
-            **loginHeaders,
-            "Origin": self.ford_login_url,
-            "Referer": step1_url,
-            "X-Csrf-Token": csrfToken
+            **defaultHeaders,
+            "Content-Type": "application/x-www-form-urlencoded",
         }
-        step1post = step1_session.post(
-            urlp,
+        data = {
+            "operation": "verify",
+            "login-form-type": "password",
+            "username": self.username,
+            "password": self.password
+        }
+        
+        async with self.session.post(
+            next_url,
             headers=headers,
-            data=data
-        )
-        step1post.raise_for_status()
-        _LOGGER.debug("checking password")
-        _LOGGER.debug(step1post.text)
-        _LOGGER.debug(step1post.status_code)
-        cookie_dict = step1_session.cookies.get_dict()
-        _LOGGER.debug(cookie_dict)
+            data=data,
+            allow_redirects=False
+        ) as response:
+            if response.status == 302:
+                next_url = response.headers["Location"]
+            else:
+                response.raise_for_status()
 
-        if step1post.status_code == 400:
-            raise exceptions.HomeAssistantError(step1post.json()["message"])
+        # Auth Step3
+        headers = {
+            **defaultHeaders,
+            'Content-Type': 'application/json',
+        }
 
-
-
-
-        step1pt2 = step1_session.get(
-            f"{self.ford_login_url}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/api/CombinedSigninAndSignup/confirmed?rememberMe=false&csrf_token={csrfToken}",
+        async with self.session.get(
+            next_url,
             headers=headers,
-            allow_redirects=False,
-        )
-        step1pt2.raise_for_status()
+            allow_redirects=False
+        ) as response:
+            if response.status == 302:
+                next_url = response.headers["Location"]
+                query = next_url.split('?')[1] if '?' in next_url else ''
+                params = dict(x.split('=') for x in query.split('&') if '=' in x)
+                code = params["code"]
+                grant_id = params["grant_id"]
+            else:
+                response.raise_for_status()
 
-        test = step1pt2.headers["Location"]
-        _LOGGER.debug(test)
-
-        code_new = test.replace("fordapp://userauthorized/?code=","")
-
-        _LOGGER.debug(code_new)
+        # Auth Step4
+        headers = {
+            **defaultHeaders,
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
 
         data = {
-            "client_id" : "09852200-05fd-41f6-8c21-d36d3497dc64",
+            "client_id": "9fb503e0-715b-47e8-adfd-ad4b7770f73b",
             "grant_type": "authorization_code",
-            "code_verifier": code1,
-            "code": code_new,
-            "redirect_uri": "fordapp://userauthorized"
-
+            "redirect_uri": 'fordapp://userauthorized',
+            "grant_id": grant_id,
+            "code": code,
+            "code_verifier": code1
         }
 
-        step1pt3 = step1_session.post(
-            f"{self.ford_login_url}/4566605f-43a7-400a-946e-89cc9fdb0bd7/B2C_1A_SignInSignUp_{self.country_code}/oauth2/v2.0/token",
+        async with self.session.post(
+            f"{SSO_URL}/oidc/endpoint/default/token",
             headers=headers,
             data=data
-        )
-        step1pt3.raise_for_status()
+        ) as response:
+            if response.status == 200:
+                result = await response.json()
+                if result["access_token"]:
+                    access_token = result["access_token"]
+            else:
+                response.raise_for_status()
 
-        _LOGGER.debug(step1pt3.status_code)
-        _LOGGER.debug(step1pt3.text)
-
-        tokens = step1pt3.json()
-        if tokens:
-            if self.auth2_step2(tokens):
-                return tokens
-        else:
-            _LOGGER.debug("DAM IT WENT WRONG")
-
-    def auth2_step2(self, result):
-        _LOGGER.debug(result)
-
-        data = {"idpToken": result["access_token"]}
+        # Auth Step5
+        data = {"ciToken": access_token}
         headers = {**apiHeaders, "Application-Id": self.region}
-        response = session.post(
-            f"{GUARD_URL}/token/v2/cat-with-b2c-access-token",
-            data=json.dumps(data),
+        
+        async with self.session.post(
+            f"{GUARD_URL}/token/v2/cat-with-ci-access-token",
+            json=data,
             headers=headers,
-        )
-        response.raise_for_status()
-        _LOGGER.debug(response.status_code)
-        _LOGGER.debug(response.text)
-        result = response.json()
-        self.token = result["access_token"]
-        _LOGGER.debug(self.token)
-        self.refresh_token = result["refresh_token"]
-        self.expires_at = time.time() + result["expires_in"]
-        _LOGGER.debug(self.expires_at)
-        auto_token = self.get_auto_token()
-        _LOGGER.debug("AUTO 2")
-        self.auto_token = auto_token["access_token"]
-        self.auto_expires_at = time.time() + result["expires_in"]
-        if self.save_token:
-            result["expiry_date"] = time.time() + result["expires_in"]
-            result["auto_token"] = auto_token["access_token"]
-            result["auto_refresh"] = "" #auto_token["refresh_token"]
-            result["auto_expiry"] = time.time() + auto_token["expires_in"]
+        ) as response:
+            if response.status == 200:
+                result = await response.json()
 
-            self.write_token(result)
-        session.cookies.clear()
-        _LOGGER.debug("Step 5 Complete")
-        return True
+                self.token = result["access_token"]
+                self.refresh_token = result["refresh_token"]
+                self.expires_at = time.time() + result["expires_in"]
+                auto_token = await self.get_auto_token()
+                self.auto_token = auto_token["access_token"]
+                self.auto_expires_at = time.time() + result["expires_in"]
+                
+                result["expiry_date"] = time.time() + result["expires_in"]
+                result["auto_token"] = auto_token["access_token"]
+                result["auto_refresh"] = auto_token["refresh_token"]
+                result["auto_expiry"] = time.time() + auto_token["expires_in"]
 
-    def auth(self):
-        """New Authentication System """
-        _LOGGER.debug("New System")
-        _LOGGER.debug(self.errors)
+                await self.write_token(result)
+                return True
+            response.raise_for_status()
+            return False
 
-        # Run Step 1 auth
-        access_tokens = self.auth2_step1()
-        # ibm_urls = self.auth_step1()
-
-
-        # if ibm_urls is None:
-        #     self.errors += 1
-        #     if self.errors <= 10:
-        #         self.auth()
-        #     else:
-        #         raise Exception("Step 1 has reached error limit")
-
-        # # Run Step 2 auth
-        # login_url = self.auth_step2(ibm_urls["ibm_url"])
-
-        # if login_url is None:
-        #     self.errors += 1
-        #     if self.errors <= 10:
-        #         self.auth()
-        #     else:
-        #         raise Exception("Step 2 has reached error limit")
-
-        # # Run Step 3 auth
-        # codes = self.auth_step3(login_url)
-
-        # if codes is None:
-        #     self.errors += 1
-        #     if self.errors <= 10:
-        #         self.auth()
-        #     else:
-        #         raise Exception("Step 3 has reached error limit")
-
-        # # Run Step 4 auth
-        # access_tokens = self.auth_step4(codes, ibm_urls["code1"])
-
-        if access_tokens is None:
-            self.errors += 1
-            if self.errors <= 10:
-                self.auth()
-            else:
-                raise Exception("Step 1 has reached error limit")
-
-        # Run Step 5 auth
-        #success = self.auth_step5(access_tokens)
-        success = self.auth2_step2(access_tokens)
-        if success is False:
-            self.errors += 1
-            if self.errors <= 10:
-                self.auth()
-            else:
-                raise Exception("Step 2 has reached error limit")
-        else:
-            self.errors = 0
-            return True
-        return False
-
-    def refresh_token_func(self, token):
+    async def refresh_token_func(self, token):
         """Refresh token if still valid"""
-        _LOGGER.debug("Refreshing token")
         data = {"refresh_token": token["refresh_token"]}
         headers = {**apiHeaders, "Application-Id": self.region}
 
-        response = session.post(
+        async with self.session.post(
             f"{GUARD_URL}/token/v2/cat-with-refresh-token",
-            data=json.dumps(data),
+            json=data,
             headers=headers,
-        )
-        if response.status_code == 200:
-            result = response.json()
-            if self.save_token:
+        ) as response:
+            if response.status == 200:
+                result = await response.json()
                 result["expiry_date"] = time.time() + result["expires_in"]
-                self.write_token(result)
-            self.token = result["access_token"]
-            self.refresh_token = result["refresh_token"]
-            self.expires_at = time.time() + result["expires_in"]
-            _LOGGER.debug("WRITING REFRESH TOKEN")
-            return result
-        if response.status_code == 401:
-            _LOGGER.debug("401 response stage 2: refresh stage 1 token")
-            self.auth()
+                await self.write_token(result)
+                self.token = result["access_token"]
+                self.refresh_token = result["refresh_token"]
+                self.expires_at = time.time() + result["expires_in"]
+                _LOGGER.debug("WRITING REFRESH TOKEN")
+                return result
+            if response.status == 401:
+                _LOGGER.debug("401 response stage 2: refresh stage 1 token")
+                await self.auth()
 
-
-    def __acquire_token(self):
-        # Fetch and refresh token as needed
-        # If file exists read in token file and check it's valid
+    async def __acquire_token(self):
+        """Fetch and refresh token as needed"""
         _LOGGER.debug("Fetching token")
-        if self.save_token:
-            if os.path.isfile(self.token_location):
-                data = self.read_token()
-                self.token = data["access_token"]
-                self.refresh_token = data["refresh_token"]
-                self.expires_at = data["expiry_date"]
-                if "auto_token" in data and "auto_expiry" in data:
-                    self.auto_token = data["auto_token"]
-                    self.auto_expires_at = data["auto_expiry"]
-                else:
-                    _LOGGER.debug("AUTO token not set in file")
-                    self.auto_token = None
-                    self.auto_expires_at = None
+        
+        data = await self.read_token()
+        if data:
+            self.token = data.get("access_token")
+            self.refresh_token = data.get("refresh_token") 
+            self.expires_at = data.get("expiry_date")
+            if "auto_token" in data and "auto_expiry" in data:
+                self.auto_token = data.get("auto_token")
+                self.auto_expires_at = data.get("auto_expiry")
             else:
-                data = {}
-                data["access_token"] = self.token
-                data["refresh_token"] = self.refresh_token
-                data["expiry_date"] = self.expires_at
-                data["auto_token"] = self.auto_token
-                data["auto_expiry"] = self.auto_expires_at
+                _LOGGER.debug("AUTO token not set in file")
+                self.auto_token = None
+                self.auto_expires_at = None
         else:
             data = {}
             data["access_token"] = self.token
@@ -347,77 +301,64 @@ class Vehicle:
             data["expiry_date"] = self.expires_at
             data["auto_token"] = self.auto_token
             data["auto_expiry"] = self.auto_expires_at
+            
         _LOGGER.debug(self.auto_token)
         _LOGGER.debug(self.auto_expires_at)
         if self.auto_token is None or self.auto_expires_at is None:
-            #self.auth()
-            result = self.refresh_token_func(data)
+            result = await self.refresh_token_func(data)
             _LOGGER.debug("Result Above for new TOKEN")
-            self.refresh_auto_token(result)
-        # self.auto_token = data["auto_token"]
-        # self.auto_expires_at = data["auto_expiry"]
+            await self.refresh_auto_token(result)
+            
         if self.expires_at:
             if time.time() >= self.expires_at:
                 _LOGGER.debug("No token, or has expired, requesting new token")
-                self.refresh_token_func(data)
-                # self.auth()
+                await self.refresh_token_func(data)
+                
         if self.auto_expires_at:
             if time.time() >= self.auto_expires_at:
                 _LOGGER.debug("Autonomic token expired")
-                result = self.refresh_token_func(data)
+                result = await self.refresh_token_func(data)
                 _LOGGER.debug("Result Above for new TOKEN")
-                self.refresh_auto_token(result)
+                await self.refresh_auto_token(result)
+                
         if self.token is None:
             _LOGGER.debug("Fetching token4")
-            # No existing token exists so refreshing library
-            self.auth()
+            await self.auth()
         else:
             _LOGGER.debug("Token is valid, continuing")
 
-    def write_token(self, token):
-        """Save token to file for reuse"""
-        with open(self.token_location, "w", encoding="utf-8") as outfile:
-            token["expiry_date"] = time.time() + token["expires_in"]
-            _LOGGER.debug(token)
-            json.dump(token, outfile)
+    async def write_token(self, token):
+        """Save token to config store"""
+        await self.token_store.async_save(token)
 
-    def read_token(self):
-        """Read saved token from file"""
+    async def read_token(self):
+        """Read saved token from config store"""
         try:
-            with open(self.token_location, encoding="utf-8") as token_file:
-                token = json.load(token_file)
-                return token
-        except ValueError:
-            _LOGGER.debug("Fixing malformed token")
-            self.auth()
-            with open(self.token_location, encoding="utf-8") as token_file:
-                token = json.load(token_file)
-                return token
+            token = await self.token_store.async_load()
+            return token
+        except Exception as e:
+            _LOGGER.debug(f"Error reading token: {e}")
+            return None
 
-    def clear_token(self):
-        """Clear tokens from config directory"""
-        if os.path.isfile("/tmp/fordpass_token.txt"):
-            os.remove("/tmp/fordpass_token.txt")
-        if os.path.isfile("/tmp/token.txt"):
-            os.remove("/tmp/token.txt")
-        if os.path.isfile(self.token_location):
-            os.remove(self.token_location)
+    async def clear_token(self):
+        """Clear tokens from config store"""
+        await self.token_store.async_save({})
 
-    def refresh_auto_token(self, result):
-        auto_token = self.get_auto_token()
+    async def refresh_auto_token(self, result):
+        """Refresh autonomic token"""
+        auto_token = await self.get_auto_token()
         _LOGGER.debug("AUTO Refresh")
         self.auto_token = auto_token["access_token"]
         self.auto_token_refresh = auto_token["refresh_token"]
-        self.auto_expires_at = time.time() + result["expires_in"]
-        if self.save_token:
-            result["expiry_date"] = time.time() + result["expires_in"]
-            result["auto_token"] = auto_token["access_token"]
-            result["auto_refresh"] = auto_token["refresh_token"]
-            result["auto_expiry"] = time.time() + auto_token["expires_in"]
+        self.auto_expires_at = time.time() + auto_token["expires_in"]
+        
+        result["auto_token"] = auto_token["access_token"]
+        result["auto_refresh"] = auto_token["refresh_token"]
+        result["auto_expiry"] = time.time() + auto_token["expires_in"]
 
-            self.write_token(result)
+        await self.write_token(result)
 
-    def get_auto_token(self):
+    async def get_auto_token(self):
         """Get token from new autonomic API"""
         _LOGGER.debug("Getting Auto Token")
         headers = {
@@ -431,172 +372,141 @@ class Vehicle:
             "client_id": "fordpass-prod",
             "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
             "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-
         }
 
-        _LOGGER.debug(data)
-
-        r = session.post(
+        async with self.session.post(
             f"{AUTONOMIC_ACCOUNT_URL}/auth/oidc/token",
             data=data,
             headers=headers
-        )
-        _LOGGER.debug(r.text)
+        ) as response:
+            if response.status == 200:
+                result = await response.json()
+                _LOGGER.debug(f"Auto token status: {response.status}")
+                text = await response.text()
+                _LOGGER.debug(text)
+                self.auto_token = result["access_token"]
+                return result
+            return False
 
-        if r.status_code == 200:
-            result = r.json()
-            _LOGGER.debug(r.status_code)
-            _LOGGER.debug(r.text)
-            self.auto_token = result["access_token"]
-            return result
-        return False
+    async def status(self):
+        """Get Vehicle status from API"""
+        await self.__acquire_token()
 
-    def get_status(self):
-        """Get status from Autonomics endpoint"""
         params = {"lrdt": "01-01-1970 00:00:00"}
-
-        if self.auto_token is None:
-            self.__acquire_token()
 
         headers = {
             **apiHeaders,
             "auth-token": self.token,
             "Application-Id": self.region,
         }
-        _LOGGER.debug("Status function before auto_token")
         _LOGGER.debug(self.auto_token)
-        _LOGGER.debug(self.vin)
-
-        _LOGGER.debug("Trying new vehicle API endpoint")
-        headers = {
-            **apiHeaders,
-            "authorization": f"Bearer {self.auto_token}",
-            "Application-Id": self.region,
-        }
-        r = session.get(
-            f"{AUTONOMIC_URL}/telemetry/sources/fordpass/vehicles/{self.vin}", params=params, headers=headers
-        )
-        _LOGGER.debug(r.status_code)
-        return r
-
-    def status(self):
-        """Get Vehicle status from API"""
-        _LOGGER.debug("Getting Vehicle Status")
-        self.__acquire_token()
 
         if NEW_API:
-            r = self.get_status()
-            _LOGGER.debug("NEW API???")
-
-            if r.status_code == 200:
-                #_LOGGER.debug(r.text)
-                result = r.json()
-
-                return result
-            if r.status_code == 401:
-                self.auth()
-                response = self.get_status()
-                if response.status_code == 200:
-                    result = response.json()
+            headers = {
+                **apiHeaders,
+                "authorization": f"Bearer {self.auto_token}",
+                "Application-Id": self.region,
+            }
+            async with self.session.get(
+                f"{AUTONOMIC_URL}/telemetry/sources/fordpass/vehicles/{self.vin}",
+                params=params,
+                headers=headers
+            ) as response:
+                if response.status == 200:
+                    text = await response.text()
+                    _LOGGER.debug(text)
+                    result = await response.json()
                     return result
-            if r.status_code == 403:
-                i = 0
-                while i < 3:
-                    _LOGGER.debug(f"Retrying Vehicle endpoint attempt {i}")
-                    response = self.get_status()
-                    if response.status_code == 200:
-                        result = response.json()
-                        return result
-                    i += 1
-            response.raise_for_status()
-        return {}
+        else:
+            async with self.session.get(
+                f"{BASE_URL}/vehicles/v5/{self.vin}/status",
+                params=params,
+                headers=headers
+            ) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if result["status"] == 402:
+                        response.raise_for_status()
+                    return result["vehiclestatus"]
+                if response.status == 401:
+                    _LOGGER.debug("401 with status request: start token refresh")
+                    data = {}
+                    data["access_token"] = self.token
+                    data["refresh_token"] = self.refresh_token
+                    data["expiry_date"] = self.expires_at
+                    await self.refresh_token_func(data)
+                    await self.__acquire_token()
+                    headers = {
+                        **apiHeaders,
+                        "auth-token": self.token,
+                        "Application-Id": self.region,
+                    }
+                    async with self.session.get(
+                        f"{BASE_URL}/vehicles/v5/{self.vin}/status",
+                        params=params,
+                        headers=headers,
+                    ) as retry_response:
+                        if retry_response.status == 200:
+                            result = await retry_response.json()
+                            return result["vehiclestatus"]
+                response.raise_for_status()
 
-    def get_messages(self):
-        """Make call to messages API"""
+    async def messages(self):
+        """Get Vehicle messages from API"""
+        await self.__acquire_token()
         headers = {
             **apiHeaders,
             "Auth-Token": self.token,
             "Application-Id": self.region,
         }
-        response = session.get(f"{GUARD_URL}/messagecenter/v3/messages?", headers=headers)
-        return response
-
-    def messages(self):
-        """Get Vehicle messages from API"""
-        _LOGGER.debug("Getting Messages")
-        self.__acquire_token()
-        response = self.get_messages()
-        if response.status_code == 200:
-            result = response.json()
-            return result["result"]["messages"]
-            # _LOGGER.debug(result)
-        # _LOGGER.debug(response.text)
-        if response.status_code == 401:
-            self.auth()
-            response = self.get_messages()
-            if response.status_code == 200:
-                result = response.json()
+        async with self.session.get(
+            f"{GUARD_URL}/messagecenter/v3/messages?",
+            headers=headers
+        ) as response:
+            if response.status == 200:
+                result = await response.json()
                 return result["result"]["messages"]
-        return None
+            text = await response.text()
+            _LOGGER.debug(text)
+            if response.status == 401:
+                await self.auth()
+            response.raise_for_status()
+            return None
 
-    def get_vehicles(self):
-        """Make call to vehicles API"""
-        _LOGGER.debug("Getting Vehicles")
-        if self.region2 == "Australia":
-            countryheader = "AUS"
-        elif self.region2 == "North America & Canada":
-            countryheader = "USA"
-        elif self.region2 == "UK&Europe":
-            countryheader = "GBR"
-        else:
-            countryheader = "USA"
+    async def vehicles(self):
+        """Get vehicle list from account"""
+        await self.__acquire_token()
+
         headers = {
             **apiHeaders,
             "Auth-Token": self.token,
             "Application-Id": self.region,
-            "Countrycode": countryheader,
+            "Countrycode": self.countrycode,
             "Locale": "EN-US"
         }
 
         data = {
             "dashboardRefreshRequest": "All"
         }
-        response = session.post(
-            f"{GUARD_URL}/expdashboard/v1/details/",
+        async with self.session.post(
+            f"{BASE_URL}/expdashboard/v1/details/",
             headers=headers,
-            data=json.dumps(data)
-        )
-        return response
-
-    def vehicles(self):
-        """Get vehicle list from account"""
-        self.__acquire_token()
-
-        response = self.get_vehicles()
-
-        if response.status_code == 207:
-            result = response.json()
-            return result
-        if response.status_code == 401:
-            self.auth()
-            response = self.get_vehicles()
-            if response.status_code == 207:
-                result = response.json()
+            json=data
+        ) as response:
+            if response.status == 207:
+                result = await response.json()
+                _LOGGER.debug(result)
                 return result
-        if response.status_code == 403:
-            i = 0
-            while i <= 3:
-                response = self.get_vehicles()
-                if response.status_code == 207:
-                    result = response.json()
-                    return result
-                i += 1
+            text = await response.text()
+            _LOGGER.debug(text)
+            if response.status == 401:
+                await self.auth()
+            response.raise_for_status()
+            return None
 
-        return None
-
-    def guard_status(self):
+    async def guard_status(self):
         """Retrieve guard status from API"""
-        self.__acquire_token()
+        await self.__acquire_token()
 
         params = {"lrdt": "01-01-1970 00:00:00"}
 
@@ -606,88 +516,100 @@ class Vehicle:
             "Application-Id": self.region,
         }
 
-        response = session.get(
+        async with self.session.get(
             f"{GUARD_URL}/guardmode/v1/{self.vin}/session",
             params=params,
             headers=headers,
-        )
-        return response.json()
+        ) as response:
+            return await response.json()
 
-    def start(self):
-        """
-        Issue a start command to the engine
-        """
-        return self.__request_and_poll_command("remoteStart")
+    async def start(self):
+        """Issue a start command to the engine"""
+        return await self.__request_and_poll_command("remoteStart")
 
-    def stop(self):
-        """
-        Issue a stop command to the engine
-        """
-        return self.__request_and_poll_command("cancelRemoteStart")
+    async def stop(self):
+        """Issue a stop command to the engine"""
+        return await self.__request_and_poll_command("cancelRemoteStart")
 
-    def lock(self):
-        """
-        Issue a lock command to the doors
-        """
-        return self.__request_and_poll_command("lock")
+    async def lock(self):
+        """Issue a lock command to the doors"""
+        return await self.__request_and_poll_command("lock")
 
-    def unlock(self):
-        """
-        Issue an unlock command to the doors
-        """
-        return self.__request_and_poll_command("unlock")
+    async def unlock(self):
+        """Issue an unlock command to the doors"""
+        return await self.__request_and_poll_command("unlock")
 
-    def enable_guard(self):
-        """
-        Enable Guard mode on supported models
-        """
-        self.__acquire_token()
+    async def enable_guard(self):
+        """Enable Guard mode on supported models"""
+        await self.__acquire_token()
 
-        response = self.__make_request(
+        response = await self.__make_request(
             "PUT", f"{GUARD_URL}/guardmode/v1/{self.vin}/session", None, None
         )
-        _LOGGER.debug(response.text)
+        text = await response.text()
+        _LOGGER.debug(text)
         return response
 
-    def disable_guard(self):
-        """
-        Disable Guard mode on supported models
-        """
-        self.__acquire_token()
-        response = self.__make_request(
+    async def disable_guard(self):
+        """Disable Guard mode on supported models"""
+        await self.__acquire_token()
+        response = await self.__make_request(
             "DELETE", f"{GUARD_URL}/guardmode/v1/{self.vin}/session", None, None
         )
-        _LOGGER.debug(response.text)
+        text = await response.text()
+        _LOGGER.debug(text)
         return response
 
-    def request_update(self, vin=""):
+    async def request_update(self, vin=""):
         """Send request to vehicle for update"""
-        self.__acquire_token()
+        await self.__acquire_token()
         if vin:
             vinnum = vin
         else:
             vinnum = self.vin
-        status = self.__request_and_poll_command("statusRefresh", vinnum)
+        status = await self.__request_and_poll_command("statusRefresh", vinnum)
         return status
 
-    def __make_request(self, method, url, data, params):
-        """
-        Make a request to the given URL, passing data/params as needed
-        """
-
+    async def __make_request(self, method, url, data, params):
+        """Make a request to the given URL, passing data/params as needed"""
         headers = {
             **apiHeaders,
             "auth-token": self.token,
             "Application-Id": self.region,
         }
 
-        return getattr(requests, method.lower())(
-            url, headers=headers, data=data, params=params
-        )
+        method_lower = method.lower()
+        kwargs = {
+            "headers": headers,
+            "params": params
+        }
+        
+        if data is not None:
+            if method_lower in ["post", "put", "patch"]:
+                kwargs["json"] = data
+            else:
+                kwargs["data"] = data
 
-    def __request_and_poll_command(self, command, vin=None):
+        async with getattr(self.session, method_lower)(url, **kwargs) as response:
+            return response
+
+    async def __poll_status(self, url, command_id):
+        """Poll the given URL with the given command ID until the command is completed"""
+        async with self.session.get(f"{url}/{command_id}") as response:
+            result = await response.json()
+            if result["status"] == 552:
+                _LOGGER.debug("Command is pending")
+                await asyncio.sleep(5)
+                return await self.__poll_status(url, command_id)  # retry after 5s
+            if result["status"] == 200:
+                _LOGGER.debug("Command completed successfully")
+                return True
+            _LOGGER.debug("Command failed")
+            return False
+
+    async def __request_and_poll_command(self, command, vin=None):
         """Send command to the new Command endpoint"""
-        self.__acquire_token()
+        await self.__acquire_token()
         headers = {
             **apiHeaders,
             "Application-Id": self.region,
@@ -700,58 +622,49 @@ class Vehicle:
             "type": command,
             "wakeUp": True
         }
+        
         if vin is None:
-            r = session.post(
-                f"{AUTONOMIC_URL}/command/vehicles/{self.vin}/commands",
-                data=json.dumps(data),
-                headers=headers
-            )
+            target_vin = self.vin
         else:
-            r = session.post(
-                f"{AUTONOMIC_URL}/command/vehicles/{self.vin}/commands",
-                data=json.dumps(data),
-                headers=headers
-            )
+            target_vin = vin
 
-        _LOGGER.debug("Testing command")
-        _LOGGER.debug(r.status_code)
-        _LOGGER.debug(r.text)
-        if r.status_code == 201:
-            # New code to hanble checking states table from vehicle data
-            response = r.json()
-            command_id = response["id"]
-            # current_status = response["currentStatus"]
-            i = 1
-            while i < 14:
-                # Check status every 10 seconds for 90 seconds until command completes or time expires
-                status = self.status()
-                _LOGGER.debug("STATUS")
-                _LOGGER.debug(status)
+        async with self.session.post(
+            f"{AUTONOMIC_URL}/command/vehicles/{target_vin}/commands",
+            json=data,
+            headers=headers
+        ) as response:
+            _LOGGER.debug("Testing command")
+            _LOGGER.debug(f"Status: {response.status}")
+            text = await response.text()
+            _LOGGER.debug(text)
+            
+            if response.status == 201:
+                # New code to handle checking states table from vehicle data
+                result = await response.json()
+                command_id = result["id"]
+                i = 1
+                while i < 14:
+                    # Check status every 10 seconds for 90 seconds until command completes or time expires
+                    status = await self.status()
+                    _LOGGER.debug("STATUS")
+                    _LOGGER.debug(status)
 
-                if "states" in status:
-                    _LOGGER.debug("States located")
-                    if f"{command}Command" in status["states"]:
-                        _LOGGER.debug("Found command")
-                        _LOGGER.debug(status["states"][f"{command}Command"]["commandId"])
-                        if status["states"][f"{command}Command"]["commandId"] == command_id:
-                            _LOGGER.debug("Making progress")
-                            _LOGGER.debug(status["states"][f"{command}Command"])
-                            if status["states"][f"{command}Command"]["value"]["toState"] == "success":
-                                _LOGGER.debug("Command succeeded")
-                                return True
-                            if status["states"][f"{command}Command"]["value"]["toState"] == "expired":
-                                _LOGGER.warning(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Expired Status')}")
-                                if "statusRefresh" in command:
-                                    raise exceptions.HomeAssistantError(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Expired Status')}")
-                                return False
-                            if status["states"][f"{command}Command"]["value"]["toState"] == "failed":
-                                _LOGGER.warning(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Failed Status')}")
-                                if "statusRefresh" in command:
-                                    raise exceptions.HomeAssistantError(f"Fordpass Command: {status.get('states', {}).get(f'{command}Command', {}).get('message', 'Failed Status')}")
-                                return False
-                i += 1
-                _LOGGER.debug("Looping again")
-                time.sleep(10)
-            # time.sleep(90)
+                    if "states" in status:
+                        _LOGGER.debug("States located")
+                        if f"{command}Command" in status["states"]:
+                            _LOGGER.debug("Found command")
+                            _LOGGER.debug(status["states"][f"{command}Command"]["commandId"])
+                            if status["states"][f"{command}Command"]["commandId"] == command_id:
+                                _LOGGER.debug("Making progress")
+                                _LOGGER.debug(status["states"][f"{command}Command"])
+                                if status["states"][f"{command}Command"]["value"]["toState"] == "success":
+                                    _LOGGER.debug("Command succeeded")
+                                    return True
+                                if status["states"][f"{command}Command"]["value"]["toState"] == "expired":
+                                    _LOGGER.debug("Command expired")
+                                    return False
+                    i += 1
+                    _LOGGER.debug("Looping again")
+                    await asyncio.sleep(10)
+                return False
             return False
-        return False

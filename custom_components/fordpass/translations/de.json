@@ -1,38 +1,64 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Konto ist bereits konfiguriert"
+            "already_configured": "Konto ist bereits konfiguriert",
+            "no_vehicles": "Keine nicht konfigurierten Fahrzeuge in diesem Konto gefunden"
         },
         "error": {
-            "cannot_connect": "Verbindungsfehler",
-            "invalid_auth": "Authentifizierungsfehler",
-            "invalid_vin": "Die FIN kann nicht in deinem Konto gefunden werden",
-            "unknown": "Unbekannter Fehler"
+            "cannot_connect": "Verbindung fehlgeschlagen",
+            "invalid_auth": "Ungültige Anmeldedaten",
+            "invalid_vin": "FIN nicht für gegebenes Konto gefunden",
+            "invalid_mobile": "Mobilnummer als Benutzername muss angegeben werden, wenn die südafrikanische Region verwendet wird",
+            "invalid_token": "Token ist ungültig, bitte überprüfen Sie, dass Sie das korrekte Token aus dem Header Location kopiert haben, es sollte mit fordapp:// beginnen",
+            "unknown": "Unerwarteter Fehler"
         },
         "step": {
             "user": {
+                "title": "FordPass Einrichtung",
+                "description": "Wählen Sie, wie Sie FordPass einrichten möchten",
                 "data": {
-                    "password": "FordPass Password",
-                    "username": "FordPass Username (E-Mail)",
-                    "vin": "FIN",
-                    "region" : "FordPass Region"
+                    "setup_type": "Einrichtungstyp"
+                }
+            },
+            "new_account": {
+                "title": "Neues FordPass Konto", 
+                "description": "Neues FordPass Konto einrichten",
+                "data": {
+                    "password": "FordPass Passwort",
+                    "username": "FordPass Benutzername (E-Mail)",
+                    "region": "FordPass Region"
                 },
                 "data_description": {
-                    "username": "Wenn Sie ein Mobiltelefon anstelle einer E-Mail verwenden, geben Sie bitte Ihre Nummer (minus die anfängliche 0) sowie + und die Landesvorwahl ein (z. B. +99123456789)."
-                } 
+                    "username": "Wenn Sie eine Mobilnummer anstelle einer E-Mail verwenden, geben Sie bitte Ihre Nummer (ohne anfängliche 0) ein und fügen Sie + sowie die Ländervorwahl hinzu (z.B. +99123456789)"
+                }   
+            },
+            "add_vehicle": {
+                "title": "Fahrzeug zu bestehendem Konto hinzufügen",
+                "description": "Weiteres Fahrzeug zu einem bestehenden FordPass Konto hinzufügen. Dies verwendet die vorhandenen Authentifizierungs-Token.",
+                "data": {
+                    "account": "Konto auswählen"
+                }
+            },
+            "token": {
+                "title": "Token einrichten",
+                "description": "Bitte geben Sie das vollständige Token aus dem Location: Header nach der Anmeldung mit der unten stehenden URL ein. Für Hilfe siehe [Token erhalten](https://github.com/itchannel/fordpass-ha/wiki/Obtaining-Tokens-(As-of-25-05-2024))",
+                "data": {
+                    "url": "URL",
+                    "tokenstr": "Token"
+                }
             },
             "vehicle": {
-                "title": "Selecteer voertuig om toe te voegen",
-                "description": "Alleen voertuigen die momenteel niet zijn toegevoegd, worden weergegeven",
+                "title": "Fahrzeug zum Hinzufügen auswählen",
+                "description": "Nur Fahrzeuge, die derzeit nicht hinzugefügt sind, werden angezeigt",
                 "data": {
-                  "vin": "VIN"
+                    "vin": "FIN"
                 }
-              },
-              "vin": {
-                "title": "Manuelle Vin-Eingabe",
-                "description": "Bitte geben Sie Ihre VIN-Nummer manuell ein, da keine Fahrzeuge automatisch gefunden werden konnten.",
+            },
+            "vin": {
+                "title": "Manuelle FIN-Eingabe",
+                "description": "Bitte geben Sie Ihre FIN-Nummer manuell ein, da keine Fahrzeuge automatisch gefunden werden konnten.",
                 "data": {
-                    "vin": "Fahrgestellnummer für das Fahrzeug"
+                    "vin": "FIN-Nummer für Fahrzeug"
                 }
             }
         }
@@ -43,35 +69,36 @@
                 "data": {
                     "pressure_unit": "Maßeinheit für Druck",
                     "distance_unit": "Maßeinheit für Entfernung",
-                    "update_interval": "Aktualisierungsintervall FordPass-API (Sekunden)"
+                    "distance_conversion": "Entfernungskonvertierung deaktivieren",
+                    "update_interval": "Intervall zum Abfragen der Fordpass API (Sekunden)"
                 },
-                "description": "Optionen konfigurieren"
+                "description": "Fordpass-Optionen konfigurieren"
             }
         }
-    },
+    }, 
     "services": {
         "refresh_status": {
             "name": "Fahrzeugstatus aktualisieren",
-            "description": "Aktualisiert den Status und die Entitäten des Fahrzeugs. Der Vorgang kann bis zu 5 Minuten dauern.",
+            "description": "Fahrzeug nach neuestem Status abfragen (Dauert bis zu 5 Minuten zum Aktualisieren, sobald diese Funktion ausgeführt wurde!)",
             "fields": {
                 "vin": {
                     "name": "FIN",
-                    "description": "Wenn angegeben, aktualisiert nur den Status des Fahrzeugs mit dieser FIN. Ansonsten wird den Status aller Fahrzeuge aktualisiert."
+                    "description": "FIN-Nummer eingeben, um nur das angegebene Fahrzeug zu aktualisieren (Standard aktualisiert alle hinzugefügten Fahrzeuge)"
                 }
             }
         },
         "clear_tokens": {
-            "name": "Token-Cache leeren",
-            "description": "Leert die Token-Cache."
+            "name": "Token löschen",
+            "description": "Den Token-Cache löschen"
         },
         "reload": {
-            "name": "Integration neu laden",
-            "description": "Lädt die Fordpass-Integration neu."
+            "name": "Neu laden",
+            "description": "Die Fordpass-Integration neu laden"
         },
         "poll_api": {
-            "name": "API aufrufen",
-            "description": "Ruft eine manuelle Datenaktualisierung aus der Fordpass-API auf. (Vorsicht: Häufige Aufrufen können zu einer temporären Drosselung/Sperre führen)"
+            "name": "API abfragen",
+            "description": "API manuell für Datenupdate abfragen (Warnung: zu häufiges Ausführen könnte zu einer Sperre führen)"
         }
     },
-    "title": "FordPass"
+    "title": "Fordpass"
 }

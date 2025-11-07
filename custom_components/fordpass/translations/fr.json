@@ -2,40 +2,65 @@
     "config": {
         "abort": {
             "already_configured": "Le compte est déjà configuré",
-            "no_vehicles": "Aucun véhicule en compte ou tous sont déjà configurés"
+            "no_vehicles": "Aucun véhicule non configuré trouvé sur ce compte"
         },
         "error": {
-            "cannot_connect": "Impossible de se connecter",
-            "invalid_auth": "Authentification invalide",
-            "invalid_vin": "Le NIV n'est pas valide pour ce compte",
-            "unknown": "Erreur inconnue"
+            "cannot_connect": "Échec de la connexion",
+            "invalid_auth": "Identifiants invalides",
+            "invalid_vin": "NIV non trouvé pour le compte donné",
+            "invalid_mobile": "Le numéro de mobile comme nom d'utilisateur doit être spécifié si vous utilisez la région sud-africaine",
+            "invalid_token": "Le token est invalide, veuillez vérifier que vous avez copié le bon token depuis l'en-tête Location, il devrait commencer par fordapp://",
+            "unknown": "Erreur inattendue"
         },
         "step": {
             "user": {
+                "title": "Configuration FordPass",
+                "description": "Choisissez comment vous voulez configurer FordPass",
                 "data": {
-                    "password": "Mot de Passe FordPass",
-                    "username": "Utilisateur FordPass (Email)",
-                    "vin": "NIV",
-                    "region" : "Région FordPass"
+                    "setup_type": "Type de configuration"
+                }
+            },
+            "new_account": {
+                "title": "Nouveau compte FordPass", 
+                "description": "Configurer un nouveau compte FordPass",
+                "data": {
+                    "password": "Mot de passe FordPass",
+                    "username": "Nom d'utilisateur FordPass (Email)",
+                    "region": "Région FordPass"
                 },
                 "data_description": {
-                    "username": "Si vous utilisez un mobile au lieu d'un e-mail, veuillez saisir votre numéro (moins le 0 initial), inclure également + et l'indicatif du pays (par exemple +99123456789)."
-                } 
+                    "username": "Si vous utilisez un mobile au lieu d'un email, veuillez entrer votre numéro (sans le 0 initial) et inclure + ainsi que l'indicatif du pays (ex: +99123456789)"
+                }   
+            },
+            "add_vehicle": {
+                "title": "Ajouter un véhicule à un compte existant",
+                "description": "Ajouter un autre véhicule à un compte FordPass existant. Cela utilisera les tokens d'authentification existants.",
+                "data": {
+                    "account": "Sélectionner le compte"
+                }
+            },
+            "token": {
+                "title": "Configurer le token",
+                "description": "Veuillez entrer le token complet depuis l'en-tête Location: une fois connecté en utilisant l'URL ci-dessous. Pour de l'aide voir [Obtenir un Token](https://github.com/itchannel/fordpass-ha/wiki/Obtaining-Tokens-(As-of-25-05-2024))",
+                "data": {
+                    "url": "URL",
+                    "tokenstr": "Token"
+                }
             },
             "vehicle": {
-                "title": "Sélectionnez le véhicule à ajouter",
+                "title": "Sélectionner le véhicule à ajouter",
                 "description": "Seuls les véhicules non ajoutés actuellement seront affichés",
                 "data": {
-                  "vin": "VIN"
+                    "vin": "NIV"
                 }
-              },
-              "vin": {
-                "title": "Saisie manuelle du Vin",
-                "description": "Veuillez saisir votre numéro VIN manuellement car aucun véhicule n'a pu être trouvé automatiquement.",
+            },
+            "vin": {
+                "title": "Saisie manuelle du NIV",
+                "description": "Veuillez entrer votre numéro NIV manuellement car aucun véhicule n'a pu être trouvé automatiquement.",
                 "data": {
-                    "vin": "Numéro Vin du véhicule"
+                    "vin": "Numéro NIV pour le véhicule"
                 }
-            }             
+            }
         }
     },
     "options": {
@@ -47,32 +72,32 @@
                     "distance_conversion": "Désactiver la conversion de distance",
                     "update_interval": "Intervalle pour interroger l'API Fordpass (secondes)"
                 },
-                "description": "Configuration de Fordpass"
+                "description": "Configurer les options fordpass"
             }
         }
     }, 
     "services": {
         "refresh_status": {
             "name": "Actualiser l'état du véhicule",
-            "description": "Sonder la voiture pour le dernier statut (Prend jusqu'à 5 minutes pour mettre à jour une fois que cette fonction a été exécutée !)",
+            "description": "Interroger la voiture pour le dernier statut (Prend jusqu'à 5 minutes pour mettre à jour une fois que cette fonction a été exécutée!)",
             "fields": {
                 "vin": {
-                    "name": "VIN",
-                    "description": "Analyser un numéro vin pour actualiser uniquement le véhicule spécifié (la valeur par défaut actualise tous les véhicules ajoutés)"
+                    "name": "NIV",
+                    "description": "Entrer un numéro NIV pour actualiser uniquement le véhicule spécifié (Par défaut actualise tous les véhicules ajoutés)"
                 }
             }
         },
         "clear_tokens": {
-            "name": "Effacer les jetons",
-            "description": "Vider le cache des jetons"
+            "name": "Effacer les tokens",
+            "description": "Effacer le cache des tokens"
         },
         "reload": {
             "name": "Recharger",
             "description": "Recharger l'intégration Fordpass"
         },
         "poll_api": {
-            "name": "API de sondage",
-            "description": "Interroger manuellement l'API pour la mise à jour des données (Attention : le faire trop souvent pourrait entraîner une interdiction)"
+            "name": "Interroger l'API",
+            "description": "Interroger manuellement l'API pour la mise à jour des données (Attention: le faire trop souvent pourrait entraîner une interdiction)"
         }
     },
     "title": "Fordpass"

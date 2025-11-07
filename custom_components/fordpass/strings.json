@@ -3,10 +3,37 @@
   "config": {
     "step": {
       "user": {
+        "title": "FordPass Setup",
+        "description": "Choose how you want to set up FordPass",
+        "data": {
+          "setup_type": "Setup Type"
+        }
+      },
+      "new_account": {
+        "title": "New FordPass Account",
+        "description": "Set up a new FordPass account",
         "data": {
           "username": "FordPass Username (Email)",
           "password": "FordPass Password",
           "region": "FordPass Region"
+        },
+        "data_description": {
+          "username": "If using a mobile instead of email please enter your number include + and the country code (+99123456789)"
+        }
+      },
+      "add_vehicle": {
+        "title": "Add Vehicle to Existing Account",
+        "description": "Add another vehicle to an existing FordPass account",
+        "data": {
+          "account": "Select Account"
+        }
+      },
+      "token": {
+        "title": "Setup Token",
+        "description": "Please enter the full token from the Location: header once logging in using the URL above, the token should look like this '@fordapp://userauthorized/?code=eyJraWQiOiItSm9pdi1OX1ktU' . Please also ensure you include the fordpass:// part",
+        "data": {
+          "url": "URL",
+          "tokenstr": "Token"
         }
       },
       "vehicle": {
@@ -28,11 +55,13 @@
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
       "invalid_vin": "[%key:common::config_flow::error::invalid_vin%]",
+      "invalid_mobile": "[%key:common::config_flow::error::invalid_mobile%]",
+      "invalid_token": "[%key:common::config_flow::error::invalid_token%]",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_account%]",
-      "no_vehicles": "[%key:common::config_flow::abort::no_vehicles%]"
+      "no_vehicles": "No unconfigured vehicles found on this account"
     }
   }, 
   "options": {
@@ -49,4 +78,3 @@
     }
   }
 }
-  

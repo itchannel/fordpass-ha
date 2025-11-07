@@ -15,7 +15,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     # switches = [Switch(entry)]
     # async_add_entities(switches, False)
-    for key in SWITCHES:
+    for key, value in SWITCHES.items():
         sw = Switch(entry, key, config_entry.options)
         # Only add guard entity if supported by the car
         if key == "guardmode":
@@ -36,35 +36,27 @@ class Switch(FordPassEntity, SwitchEntity):
         self._device_id = "fordpass_" + switch
         self.switch = switch
         self.coordinator = coordinator
-        self.data = coordinator.data.get("metrics", {})
+        self.data = coordinator.data["metrics"]
         # Required for HA 2022.7
         self.coordinator_context = object()
 
     async def async_turn_on(self, **kwargs):
         """Send request to vehicle on switch status on"""
         if self.switch == "ignition":
-            await self.coordinator.hass.async_add_executor_job(
-                self.coordinator.vehicle.start
-            )
+            await self.coordinator.vehicle.start()
             await self.coordinator.async_request_refresh()
         elif self.switch == "guardmode":
-            await self.coordinator.hass.async_add_executor_job(
-                self.coordinator.vehicle.enableGuard
-            )
+            await self.coordinator.vehicle.enable_guard()
             await self.coordinator.async_request_refresh()
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Send request to vehicle on switch status off"""
         if self.switch == "ignition":
-            await self.coordinator.hass.async_add_executor_job(
-                self.coordinator.vehicle.stop
-            )
+            await self.coordinator.vehicle.stop()
             await self.coordinator.async_request_refresh()
         elif self.switch == "guardmode":
-            await self.coordinator.hass.async_add_executor_job(
-                self.coordinator.vehicle.disableGuard
-            )
+            await self.coordinator.vehicle.disable_guard()
             await self.coordinator.async_request_refresh()
         self.async_write_ha_state()
 
@@ -80,28 +72,60 @@ class Switch(FordPassEntity, SwitchEntity):
 
     @property
     def is_on(self):
-        """Check status of switch"""
+        """Check status of switch - considers both ignition and remote start status"""
         if self.switch == "ignition":
-            # Return None if both ignitionStatus and remoteStartCountdownTimer are None
-            metrics = self.coordinator.data.get("metrics", {})
-            ignition_status = metrics.get("ignitionStatus", {}).get("value")
-            countdown_timer = metrics.get("remoteStartCountdownTimer", {}).get("value")
-            if ignition_status == "ON" or countdown_timer is not None and countdown_timer > 0:
+            if self.coordinator.data["metrics"] is None:
+                return None
+            
+            # Check ignition status first
+            ignition_status = None
+            if (self.coordinator.data["metrics"].get("ignitionStatus") is not None):
+                ignition_status = self.coordinator.data["metrics"]["ignitionStatus"]["value"]
+                _LOGGER.debug(f"Ignition status: {ignition_status}")
+            
+            # Check remote start status using multiple methods
+            remote_start_active = False
+            
+            # Method 1: Check countdown timer (most reliable)
+            if "remoteStartCountdownTimer" in self.coordinator.data["metrics"]:
+                countdown_timer = self.coordinator.data["metrics"]["remoteStartCountdownTimer"].get("value", 0)
+                if countdown_timer and countdown_timer > 0:
+                    remote_start_active = True
+                    _LOGGER.debug(f"Remote start active via countdown timer: {countdown_timer}")
+            
+            
+            # Vehicle is "on" if either ignition is on OR remote start is active
+            if remote_start_active:
+                _LOGGER.debug("Vehicle is ON via remote start")
                 return True
-            return False
-
-        if self.switch == "guardmode":
-            # Need to find the correct response for enabled vs disabled so this may be spotty at the moment
-            guardstatus = self.coordinator.data["guardstatus"]
-
-            _LOGGER.debug(guardstatus)
-            if guardstatus["returnCode"] == 200:
-                if "gmStatus" in guardstatus:
+            elif ignition_status in ["ON", "RUN", "START", "ACCESSORY"]:
+                _LOGGER.debug("Vehicle is ON via ignition")
+                return True
+            elif ignition_status == "OFF":
+                _LOGGER.debug("Vehicle is OFF")
+                return False
+            elif ignition_status is None:
+                # If we can't get ignition status, fall back to remote start only
+                _LOGGER.debug(f"No ignition status available, using remote start status: {remote_start_active}")
+                return remote_start_active
+            else:
+                _LOGGER.warning(f"Unknown ignition status: {ignition_status}, using remote start status: {remote_start_active}")
+                return remote_start_active  # Fall back to remote start status
+                
+        elif self.switch == "guardmode":
+            # Guard mode logic remains the same
+            guardstatus = self.coordinator.data.get("guardstatus", {})
+            _LOGGER.debug(f"Guard status: {guardstatus}")
+            
+            if guardstatus.get("returnCode") == 200:
+                if "session" in guardstatus and "gmStatus" in guardstatus["session"]:
                     if guardstatus["session"]["gmStatus"] == "enable":
                         return True
-                    return False
+                    elif guardstatus["session"]["gmStatus"] == "disable":
+                        return False
                 return False
             return False
+        
         return False
 
     @property

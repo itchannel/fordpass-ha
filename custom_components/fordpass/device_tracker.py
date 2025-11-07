@@ -22,7 +22,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 class CarTracker(FordPassEntity, TrackerEntity):
-    """Class for the Car Tracker"""
     def __init__(self, coordinator, sensor):
 
         self._attr = {}
@@ -60,7 +59,6 @@ class CarTracker(FordPassEntity, TrackerEntity):
 
     @property
     def extra_state_attributes(self):
-        """Return device tracker attributes"""
         atts = {}
         if "alt" in self.coordinator.data["metrics"]["position"]["value"]["location"]:
             atts["Altitude"] = self.coordinator.data["metrics"]["position"]["value"]["location"]["alt"]
@@ -68,8 +66,6 @@ class CarTracker(FordPassEntity, TrackerEntity):
             atts["gpsCoordinateMethod"] = self.coordinator.data["metrics"]["position"]["value"]["gpsCoordinateMethod"]
         if "gpsDimension" in self.coordinator.data["metrics"]["position"]["value"]:
             atts["gpsDimension"] = self.coordinator.data["metrics"]["position"]["value"]["gpsDimension"]
-        atts["compassDirection"] = self.coordinator.data.get("metrics", {}).get("compassDirection", {}).get("value", "Unknown")
-        
         return atts
 
     @property

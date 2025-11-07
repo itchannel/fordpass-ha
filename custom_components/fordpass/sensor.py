@@ -1,7 +1,7 @@
 """All vehicle sensors from the accessible by the API"""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 import json
 
 from homeassistant.const import (
@@ -18,7 +18,7 @@ from homeassistant.components.sensor import (
 
 
 from . import FordPassEntity
-from .const import CONF_DISTANCE_UNIT, CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR
+from .const import CONF_PRESSURE_UNIT, DOMAIN, SENSORS, COORDINATOR
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         api_key = value["api_key"]
         api_class = value.get("api_class", None)
         sensor_type = value.get("sensor_type", None)
-        string =  isinstance(api_key, str)
+        string = isinstance(api_key, str)
         if string and sensor_type == "single":
             sensors.append(sensor)
         elif string:
@@ -84,7 +84,7 @@ class CarSensor(
         if ftype == "state":
             if self.sensor == "odometer":
                 return self.data.get("odometer", {}).get("value")
-                    #return self.data.get("odometer", {}).get("value", {})
+                # return self.data.get("odometer", {}).get("value", {})
             if self.sensor == "fuel":
                 fuel_level = self.data.get("fuelLevel", {}).get("value")
                 if fuel_level is not None:
@@ -114,7 +114,7 @@ class CarSensor(
                     if value["value"] in ["CLOSED", "Invalid", "UNKNOWN"]:
                         continue
                     return "Open"
-                if  self.data.get("hoodStatus", {}).get("value") == "OPEN":
+                if self.data.get("hoodStatus", {}).get("value") == "OPEN":
                     return "Open"
                 return "Closed"
             if self.sensor == "windowPosition":
@@ -177,7 +177,7 @@ class CarSensor(
             if self.sensor == "outsideTemp":
                 ambient_temp = self.data.get("ambientTemp", {}).get("value")
                 if ambient_temp is not None:
-                    return { "Ambient Temp": ambient_temp}
+                    return {"Ambient Temp": ambient_temp}
                 return None
             if self.sensor == "fuel":
                 fuel = {}
@@ -185,10 +185,10 @@ class CarSensor(
                 battery_range = self.data.get("xevBatteryRange", {}).get("value", 0)
                 if fuel_range != 0:
                     # Display fuel range for both Gas and Hybrid (assuming its not 0)
-                    fuel["fuelRange"] = self.units.length(fuel_range,UnitOfLength.KILOMETERS)
+                    fuel["fuelRange"] = self.units.length(fuel_range, UnitOfLength.KILOMETERS)
                 if battery_range != 0:
                     # Display Battery range for EV and Hybrid
-                    fuel["batteryRange"] = self.units.length(battery_range,UnitOfLength.KILOMETERS)
+                    fuel["batteryRange"] = self.units.length(battery_range, UnitOfLength.KILOMETERS)
                 return fuel
             if self.sensor == "battery":
                 return {
@@ -264,7 +264,7 @@ class CarSensor(
                     elecs["Maximum Battery Capacity"] = self.data.get("xevBatteryCapacity", {}).get("value", 0)
 
                 if "xevBatteryMaximumRange" in self.data:
-                    elecs["Maximum Battery Range"] = self.units.length(self.data.get("xevBatteryMaximumRange", {}).get("value", 0),UnitOfLength.KILOMETERS)
+                    elecs["Maximum Battery Range"] = self.units.length(self.data.get("xevBatteryMaximumRange", {}).get("value", 0), UnitOfLength.KILOMETERS)
 
                 if "xevBatteryVoltage" in self.data:
                     elecs["Battery Voltage"] = float(self.data.get("xevBatteryVoltage", {}).get("value", 0))
@@ -283,7 +283,7 @@ class CarSensor(
 
                 if "xevTractionMotorVoltage" in self.data:
                     elecs["Motor Voltage"] = float(self.data.get("xevTractionMotorVoltage", {}).get("value", 0))
-                    motor_volt = elecs.get("Motor Voltage",0)
+                    motor_volt = elecs.get("Motor Voltage", 0)
 
                 if "xevTractionMotorCurrent" in self.data:
                     elecs["Motor Amperage"] = float(self.data.get("xevTractionMotorCurrent", {}).get("value", 0))
@@ -301,7 +301,7 @@ class CarSensor(
                     elecs["Trip Driving Score"] = self.data.get("tripXevBatteryChargeRegenerated", {}).get("value", 0)
 
                 if "tripXevBatteryRangeRegenerated" in self.data:
-                    elecs["Trip Range Regenerated"] = self.units.length(self.data.get("tripXevBatteryRangeRegenerated", {}).get("value", 0),UnitOfLength.KILOMETERS)
+                    elecs["Trip Range Regenerated"] = self.units.length(self.data.get("tripXevBatteryRangeRegenerated", {}).get("value", 0), UnitOfLength.KILOMETERS)
 
                 if "customMetrics" in self.data and "xevBatteryCapacity" in self.data:
                     for key in self.data.get("customMetrics", {}):
@@ -314,7 +314,7 @@ class CarSensor(
                         if "custom:vehicle-electrical-efficiency" in key:
                             # Still don't know what this value is, but if I add it and get more data it could help to figure it out
                             elecs["Trip Electrical Efficiency"] = self.data.get("customMetrics", {}).get(key, {}).get("value")
-                            
+
                 if "customEvents" in self.events:
                     tripDataStr = self.events.get("customEvents", {}).get("xev-key-off-trip-segment-data", {}).get("oemData", {}).get("trip_data", {}).get("stringArrayValue", [])
                     for dataStr in tripDataStr:
@@ -331,12 +331,7 @@ class CarSensor(
                             elecs["Trip Energy Consumed"] = round(tripData["energy_consumed"] / 1000, 2)
                         if "distance_traveled" in tripData:
                             elecs["Trip Distance Traveled"] = self.units.length(tripData["distance_traveled"], UnitOfLength.KILOMETERS)
-                        if (
-                            "energy_consumed" in tripData
-                            and tripData["energy_consumed"] is not None
-                            and "distance_traveled" in tripData
-                            and tripData["distance_traveled"] is not None
-                        ):
+                        if ("energy_consumed" in tripData and tripData["energy_consumed"] is not None and "distance_traveled" in tripData and tripData["distance_traveled"] is not None):
                             if elecs["Trip Distance Traveled"] == 0 or elecs["Trip Energy Consumed"] == 0:
                                 elecs["Trip Efficiency"] = 0
                             else:
@@ -442,10 +437,10 @@ class CarSensor(
                     return zone
                 return None
             if self.sensor == "remoteStartStatus":
-                return {"Countdown:": self.data.get("remoteStartCountdownTimer", {}).get("value", 0)}
+                return {"Countdown": self.data.get("remoteStartCountdownTimer", {}).get("value", 0)}
             if self.sensor == "messages":
                 messages = {}
-                for value in  self.coordinator.data.get("messages", []):
+                for value in self.coordinator.data.get("messages", []):
                     messages[value["messageSubject"]] = value["createdDate"]
                 return messages
             if self.sensor == "dieselSystemStatus":
@@ -497,8 +492,6 @@ class CarSensor(
             if self.sensor == "metrics":
                 return self.data
         return None
-
-
 
     @property
     def name(self):
@@ -563,7 +556,7 @@ class CarSensor(
             if SENSORS[self.sensor]["device_class"] == "speed":
                 return SensorDeviceClass.SPEED
         return None
- 
+
     @property
     def entity_registry_enabled_default(self):
         """Return if entity should be enabled when first added to the entity registry."""
