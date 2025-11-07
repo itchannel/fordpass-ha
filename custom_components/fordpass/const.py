@@ -35,9 +35,9 @@ DEFAULT_REGION = "USA"
 
 SENSORS = {
     "odometer": {"icon": "mdi:counter", "state_class": "total", "device_class": "distance", "api_key": "odometer", "measurement": "km"},
-    "fuel": {"icon": "mdi:gas-station", "api_key": ["fuelLevel", "xevBatteryStateOfCharge"], "measurement": "%"},
+    "fuel": {"icon": "mdi:gas-station", "api_key": ["fuelLevel", "xevBatteryStateOfCharge"], "measurement": "%", "state_class": "measurement"},
     "battery": {"icon": "mdi:car-battery", "device_class": "battery", "state_class": "measurement", "api_key": "batteryStateOfCharge", "measurement": "%"},
-    "oil": {"icon": "mdi:oil", "api_key": "oilLifeRemaining", "measurement": "%"},
+    "oil": {"icon": "mdi:oil", "api_key": "oilLifeRemaining", "measurement": "%", "state_class": "measurement"},
     "tirePressure": {"icon": "mdi:car-tire-alert", "api_key": "tirePressure"},
     # "gps": {"icon": "mdi:radar"},
     "alarm": {"icon": "mdi:bell", "api_key": "alarmStatus"},
@@ -47,7 +47,7 @@ SENSORS = {
     "lastRefresh": {"icon": "mdi:clock", "device_class": "timestamp", "api_key": "lastRefresh", "sensor_type": "single"},
     "elVeh": {"icon": "mdi:ev-station", "api_key": "xevBatteryRange", "device_class": "distance", "state_class": "measurement", "measurement": "km"},
     "elVehCharging": {"icon": "mdi:ev-station", "api_key": "xevBatteryChargeDisplayStatus"},
-    "speed": {"icon": "mdi:speedometer", "device_class": "speed", "state_class": "measurement", "api_key": "speed", "measurement": "km/h"},
+    "speed": {"icon": "mdi:speedometer", "device_class": "speed", "state_class": "measurement", "api_key": "speed", "measurement": "m/s"},
     "indicators": {"icon": "mdi:engine-outline", "api_key": "indicators"},
     "coolantTemp": {"icon": "mdi:coolant-temperature", "api_key": "engineCoolantTemp", "state_class": "measurement", "device_class": "temperature", "measurement": "°C"},
     "outsideTemp": {"icon": "mdi:thermometer", "state_class": "measurement", "device_class": "temperature", "api_key": "outsideTemperature", "measurement": "°C"},
