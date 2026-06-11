@@ -31,14 +31,14 @@ from .const import (  # pylint:disable=unused-import
     STORAGE_VERSION,
     STORAGE_KEY_PREFIX,
 )
-from .fordpass_new import Vehicle
+from .fordpass_new import Vehicle, InvalidCredentials, LoginFlowError
 
 _LOGGER = logging.getLogger(__name__)
 
 DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_USERNAME): str,
-        # vol.Required(CONF_PASSWORD): str,
+        vol.Required(CONF_PASSWORD): str,
         vol.Required(REGION): vol.In(REGION_OPTIONS),
     }
 )
@@ -126,6 +126,9 @@ async def validate_input(hass: core.HomeAssistant, data):
 
     try:
         result = await vehicle.auth()
+    except (InvalidCredentials, LoginFlowError):
+        # Let the caller distinguish bad creds from a blocked/changed login.
+        raise
     except Exception as ex:
         raise InvalidAuth from ex
     try:
@@ -205,20 +208,48 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return await self.async_step_new_account()
 
     async def async_step_new_account(self, user_input=None):
-        """Handle setting up a new account."""
+        """Handle setting up a new account with username/password.
+
+        Logs in to Ford directly with the supplied credentials and fetches the
+        token automatically. If Ford blocks or changes the automated login, we
+        fall back to the manual token-entry step.
+        """
         errors = {}
         if user_input is not None:
+            self.region = user_input[REGION]
+            self.username = user_input[CONF_USERNAME]
+            self.login_input = {
+                CONF_USERNAME: user_input[CONF_USERNAME],
+                CONF_PASSWORD: user_input[CONF_PASSWORD],
+                REGION: user_input[REGION],
+            }
             try:
-                _LOGGER.debug(user_input[REGION])
-                self.region = user_input[REGION]
-                self.username = user_input[CONF_USERNAME]
+                info = await validate_input(self.hass, self.login_input)
+                if info is None:
+                    self.vehicles = None
+                    _LOGGER.debug("NO VEHICLES FOUND")
+                else:
+                    self.vehicles = info["userVehicles"]["vehicleDetails"]
+                if self.vehicles is None:
+                    return await self.async_step_vin()
+                return await self.async_step_vehicle()
+            except InvalidCredentials:
+                errors["base"] = "invalid_auth"
+            except LoginFlowError:
+                # Automated login blocked/changed — fall back to manual token entry.
+                _LOGGER.warning(
+                    "Automated Ford login unavailable; falling back to manual token entry"
+                )
                 return await self.async_step_token(None)
             except CannotConnect:
                 errors["base"] = "cannot_connect"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
 
         return self.async_show_form(
-            step_id="new_account", 
-            data_schema=DATA_SCHEMA, 
+            step_id="new_account",
+            data_schema=DATA_SCHEMA,
             errors=errors,
             description_placeholders={"setup_type": "new account"}
         )
