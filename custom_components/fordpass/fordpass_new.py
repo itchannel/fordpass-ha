@@ -57,6 +57,10 @@ AUTONOMIC_URL = "https://api.autonomic.ai/v1"
 AUTONOMIC_ACCOUNT_URL = "https://accounts.autonomic.ai/v1"
 FORD_LOGIN_URL = "https://login.ford.com"
 
+# Hard cap on each login request so a hung/challenged response can never make
+# the config flow spin forever.
+LOGIN_TIMEOUT = aiohttp.ClientTimeout(total=30)
+
 
 class Vehicle:
     # Represents a Ford vehicle, with methods for status and issuing commands
@@ -204,7 +208,7 @@ class Vehicle:
 
         # Step 1: load the login page and extract transId + CSRF token.
         async with self.session.get(
-            authorize_url, headers=loginHeaders, ssl=False
+            authorize_url, headers=loginHeaders, ssl=False, timeout=LOGIN_TIMEOUT
         ) as response:
             page = await response.text()
             if response.status != 200:
@@ -240,9 +244,19 @@ class Vehicle:
             "password": self.password,
         }
         async with self.session.post(
-            self_asserted_url, headers=post_headers, data=post_data, ssl=False
+            self_asserted_url, headers=post_headers, data=post_data,
+            ssl=False, timeout=LOGIN_TIMEOUT,
         ) as response:
             body = await response.text()
+            # Ford's Akamai bot protection rejects the scripted credential POST
+            # with a 403 "Access Denied" HTML page (a real browser passes because
+            # it runs Akamai's JS sensor). Surface this as a LoginFlowError so the
+            # config flow falls back to manual token entry instead of erroring.
+            if response.status in (403, 405) or "Access Denied" in body:
+                raise LoginFlowError(
+                    "Ford blocked the automated login (Akamai bot protection). "
+                    "Falling back to manual token entry."
+                )
             try:
                 result = json.loads(body)
             except ValueError:
@@ -260,7 +274,8 @@ class Vehicle:
             f"?rememberMe=false&csrf_token={csrf}&tx={trans_id}&p={policy}"
         )
         async with self.session.get(
-            confirmed_url, headers=post_headers, allow_redirects=False, ssl=False
+            confirmed_url, headers=post_headers, allow_redirects=False,
+            ssl=False, timeout=LOGIN_TIMEOUT,
         ) as response:
             location = response.headers.get("Location", "")
 

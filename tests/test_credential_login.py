@@ -44,7 +44,14 @@ def _install_stubs():
         sys.modules["homeassistant.helpers"] = helpers
         sys.modules["homeassistant.helpers.aiohttp_client"] = aiohttp_client
     if "aiohttp" not in sys.modules:
-        sys.modules["aiohttp"] = types.ModuleType("aiohttp")
+        aiohttp = types.ModuleType("aiohttp")
+
+        class ClientTimeout:
+            def __init__(self, *args, **kwargs):
+                pass
+
+        aiohttp.ClientTimeout = ClientTimeout
+        sys.modules["aiohttp"] = aiohttp
 
 
 def _load_module():
@@ -202,6 +209,21 @@ def test_auth_bad_credentials_raises_invalid_credentials():
         assert "Invalid password" in str(ex)
     else:
         raise AssertionError("expected InvalidCredentials")
+
+
+def test_auth_akamai_block_raises_login_flow_error():
+    # Akamai returns a 403 "Access Denied" HTML page on the credential POST.
+    routes = _success_routes()
+    routes["/SelfAsserted"] = FakeResponse(
+        403, text="<HTML><HEAD><TITLE>Access Denied</TITLE></HEAD><BODY>...</BODY></HTML>"
+    )
+    vehicle = _make_vehicle(FakeSession(routes))
+    try:
+        asyncio.run(vehicle.auth())
+    except fordpass_new.LoginFlowError:
+        pass
+    else:
+        raise AssertionError("expected LoginFlowError")
 
 
 def test_auth_blocked_login_page_raises_login_flow_error():
