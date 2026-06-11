@@ -9,11 +9,25 @@ import time
 import asyncio
 from base64 import urlsafe_b64encode
 import aiohttp
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import REGIONS
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class InvalidCredentials(HomeAssistantError):
+    """Raised when Ford rejects the supplied username/password."""
+
+
+class LoginFlowError(HomeAssistantError):
+    """Raised when the automated login flow cannot complete.
+
+    Typically means Ford changed the login page or is blocking the
+    automated (non-browser) login (e.g. an account challenge or bot
+    protection). Callers may fall back to manual token entry.
+    """
 
 defaultHeaders = {
     "Accept": "*/*",
@@ -56,6 +70,7 @@ class Vehicle:
         self.country_code = REGIONS[region]["locale"]
         self.short_code = REGIONS[region]["locale_short"]
         self.countrycode = REGIONS[region]["countrycode"]
+        self.login_url = REGIONS[region]["locale_url"]
         self.vin = vin
         self.token = None
         self.expires = None
@@ -138,122 +153,126 @@ class Vehicle:
         hashengine.update(code.encode('utf-8'))
         return self.base64_url_encode(hashengine.digest()).decode('utf-8')
 
+    @staticmethod
+    def _extract_login_settings(page_html):
+        """Pull the transId and CSRF token out of an Azure AD B2C login page.
+
+        The B2C "Unified" login page embeds a ``var SETTINGS = {...};`` block
+        that contains the ``transId`` and ``csrf`` values needed to drive the
+        rest of the flow. Returns ``(trans_id, csrf)`` or ``None`` if the
+        block is missing (e.g. the page changed or an automated login was
+        blocked).
+        """
+        match = re.search(r"var SETTINGS = (\{.*?\});", page_html, re.DOTALL)
+        if not match:
+            return None
+        try:
+            settings = json.loads(match.group(1))
+        except ValueError:
+            return None
+        trans_id = settings.get("transId")
+        csrf = settings.get("csrf")
+        if not trans_id or not csrf:
+            return None
+        return trans_id, csrf
+
     async def auth(self):
-        """New Authentication System """
-        _LOGGER.debug("New System")
-        # Auth Step1
-        headers = {
-            **defaultHeaders,
-            'Content-Type': 'application/json',
-        }
-        code1 = ''.join(random.choice(string.ascii_lowercase) for i in range(43))
-        code_verifier = self.generate_hash(code1)
-        url1 = f"{SSO_URL}/v1.0/endpoint/default/authorize?redirect_uri=fordapp://userauthorized&response_type=code&scope=openid&max_age=3600&client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&code_challenge={code_verifier}&code_challenge_method=S256"
-        
-        async with self.session.get(url1, headers=headers) as response:
-            text = await response.text()
-            
-        test = re.findall('data-ibm-login-url="(.*)"\s', text)[0]
-        next_url = SSO_URL + test
+        """Authenticate to Ford with username/password (no manual token paste).
 
-        # Auth Step2
-        headers = {
-            **defaultHeaders,
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
-        data = {
-            "operation": "verify",
-            "login-form-type": "password",
-            "username": self.username,
-            "password": self.password
-        }
-        
-        async with self.session.post(
-            next_url,
-            headers=headers,
-            data=data,
-            allow_redirects=False
-        ) as response:
-            if response.status == 302:
-                next_url = response.headers["Location"]
-            else:
-                response.raise_for_status()
+        Drives Ford's Azure AD B2C login server-side: load the login page,
+        submit the credentials to the SelfAsserted endpoint, follow the
+        confirmed endpoint to capture the ``fordapp://`` authorization code,
+        then exchange it for tokens. Used both at setup and for unattended
+        re-authentication when the refresh token expires.
+        """
+        _LOGGER.debug("Authenticating with username/password (B2C)")
+        tenant = "4566605f-43a7-400a-946e-89cc9fdb0bd7"
+        policy = f"B2C_1A_SignInSignUp_{self.country_code}"
 
-        # Auth Step3
-        headers = {
-            **defaultHeaders,
-            'Content-Type': 'application/json',
-        }
+        code1 = ''.join(random.choice(string.ascii_lowercase) for _ in range(43))
+        code_challenge = self.generate_hash(code1)
 
+        authorize_url = (
+            f"{self.login_url}/{tenant}/{policy}/oauth2/v2.0/authorize"
+            "?redirect_uri=fordapp://userauthorized&response_type=code&max_age=3600"
+            f"&code_challenge={code_challenge}&code_challenge_method=S256"
+            "&scope=%2009852200-05fd-41f6-8c21-d36d3497dc64%20openid"
+            "&client_id=09852200-05fd-41f6-8c21-d36d3497dc64"
+            f"&ui_locales={self.country_code}&language_code={self.country_code}"
+            f"&country_code={self.short_code}&ford_application_id={self.region}"
+        )
+
+        # Step 1: load the login page and extract transId + CSRF token.
         async with self.session.get(
-            next_url,
-            headers=headers,
-            allow_redirects=False
+            authorize_url, headers=loginHeaders, ssl=False
         ) as response:
-            if response.status == 302:
-                next_url = response.headers["Location"]
-                query = next_url.split('?')[1] if '?' in next_url else ''
-                params = dict(x.split('=') for x in query.split('&') if '=' in x)
-                code = params["code"]
-                grant_id = params["grant_id"]
-            else:
-                response.raise_for_status()
+            page = await response.text()
+            if response.status != 200:
+                raise LoginFlowError(
+                    f"Ford login page returned HTTP {response.status}"
+                )
 
-        # Auth Step4
-        headers = {
-            **defaultHeaders,
+        settings = self._extract_login_settings(page)
+        if settings is None:
+            raise LoginFlowError(
+                "Could not read the Ford login page. Ford may have changed the "
+                "login flow or is blocking automated logins; try again or use "
+                "manual token entry."
+            )
+        trans_id, csrf = settings
+
+        # Step 2: submit credentials to the SelfAsserted endpoint.
+        self_asserted_url = (
+            f"{self.login_url}/{tenant}/{policy}/SelfAsserted"
+            f"?tx={trans_id}&p={policy}"
+        )
+        post_headers = {
+            **loginHeaders,
+            "Origin": self.login_url,
+            "Referer": authorize_url,
+            "X-Csrf-Token": csrf,
+            "X-Requested-With": "XMLHttpRequest",
             "Content-Type": "application/x-www-form-urlencoded",
         }
-
-        data = {
-            "client_id": "9fb503e0-715b-47e8-adfd-ad4b7770f73b",
-            "grant_type": "authorization_code",
-            "redirect_uri": 'fordapp://userauthorized',
-            "grant_id": grant_id,
-            "code": code,
-            "code_verifier": code1
+        post_data = {
+            "request_type": "RESPONSE",
+            "signInName": self.username,
+            "password": self.password,
         }
-
         async with self.session.post(
-            f"{SSO_URL}/oidc/endpoint/default/token",
-            headers=headers,
-            data=data
+            self_asserted_url, headers=post_headers, data=post_data, ssl=False
         ) as response:
-            if response.status == 200:
-                result = await response.json()
-                if result["access_token"]:
-                    access_token = result["access_token"]
-            else:
-                response.raise_for_status()
-
-        # Auth Step5
-        data = {"ciToken": access_token}
-        headers = {**apiHeaders, "Application-Id": self.region}
-        
-        async with self.session.post(
-            f"{GUARD_URL}/token/v2/cat-with-ci-access-token",
-            json=data,
-            headers=headers,
-        ) as response:
-            if response.status == 200:
-                result = await response.json()
-
-                self.token = result["access_token"]
-                self.refresh_token = result["refresh_token"]
-                self.expires_at = time.time() + result["expires_in"]
-                auto_token = await self.get_auto_token()
-                self.auto_token = auto_token["access_token"]
-                self.auto_expires_at = time.time() + result["expires_in"]
-                
-                result["expiry_date"] = time.time() + result["expires_in"]
-                result["auto_token"] = auto_token["access_token"]
-                result["auto_refresh"] = auto_token["refresh_token"]
-                result["auto_expiry"] = time.time() + auto_token["expires_in"]
-
-                await self.write_token(result)
-                return True
+            body = await response.text()
+            try:
+                result = json.loads(body)
+            except ValueError:
+                result = {}
+            # SelfAsserted returns HTTP 200 with {"status":"400"} for bad creds.
+            if response.status == 400 or result.get("status") not in (None, "200"):
+                raise InvalidCredentials(
+                    result.get("message", "Invalid Ford username or password")
+                )
             response.raise_for_status()
-            return False
+
+        # Step 3: follow the confirmed endpoint to capture the auth code.
+        confirmed_url = (
+            f"{self.login_url}/{tenant}/{policy}/api/CombinedSigninAndSignup/confirmed"
+            f"?rememberMe=false&csrf_token={csrf}&tx={trans_id}&p={policy}"
+        )
+        async with self.session.get(
+            confirmed_url, headers=post_headers, allow_redirects=False, ssl=False
+        ) as response:
+            location = response.headers.get("Location", "")
+
+        if "fordapp://userauthorized" not in location or "code=" not in location:
+            raise LoginFlowError(
+                "Ford did not return an authorization code. This usually means an "
+                "account challenge (e.g. two-factor/CAPTCHA) or a blocked automated "
+                "login; use manual token entry if this persists."
+            )
+
+        # Step 4: exchange the captured code for tokens (shared with manual flow).
+        return await self.generate_tokens(location, code1)
 
     async def refresh_token_func(self, token):
         """Refresh token if still valid"""
